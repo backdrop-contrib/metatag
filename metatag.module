@@ -1748,6 +1748,11 @@ function metatag_prepare_tags() {
     return;
   }
 
+  // Special consideration for the Me module, which uses the "user/me" path.
+  if (arg(0) == 'user' && arg(1) == 'me' && function_exists('me_menu_alter')) {
+    return;
+  }
+
   // The home page has special consideration.
   if (backdrop_is_front_page()) {
     $instance = 'global:frontpage';

@@ -164,10 +164,10 @@ function metatag_config_overview() {
     ),
     '#attached' => array(
       'js' => array(
-        drupal_get_path('module', 'metatag') . '/metatag.admin.js',
+        drupal_get_path('module', 'metatag') . '/js/metatag.admin.js',
       ),
       'css' => array(
-        drupal_get_path('module', 'metatag') . '/metatag.admin.css',
+        drupal_get_path('module', 'metatag') . '/css/metatag.admin.css',
       ),
     ),
     '#suffix' => '<p>' . t('Any items marked "Unknown" are configurations in the system for entity types or bundles which have been disabled via the API or the <a href="@url">Settings page</a>; they will not be used.', array('@url' => url('admin/config/search/metatags/settings'))) . '</p>',
@@ -601,10 +601,10 @@ function metatag_admin_settings_form() {
 
   $form['#attached'] = array(
     'js' => array(
-      drupal_get_path('module', 'metatag') . '/metatag.admin.js',
+      drupal_get_path('module', 'metatag') . '/js/metatag.admin.js',
     ),
     'css' => array(
-      drupal_get_path('module', 'metatag') . '/metatag.admin.css',
+      drupal_get_path('module', 'metatag') . '/css/metatag.admin.css',
     ),
   );
 
@@ -759,14 +759,6 @@ function metatag_admin_settings_form() {
     '#title' => t("Leave core's meta tags as-is"),
     '#description' => t("Drupal core outputs a number of meta tags itself: canonical, shortlink, and generator. Metatag can be used to replace these with custom values. Should Metatag not have values for these meta tags, core's tags will normally be removed. Enabling this option will leave those meta tags on the page, even if Metatag is not replacing them."),
     '#default_value' => variable_get('metatag_leave_core_tags', FALSE),
-  );
-
-  $form['advanced']['metatag_page_region'] = array(
-    '#type' => 'select',
-    '#title' => t("Page region to use"),
-    '#description' => t("By default Metatag uses the 'Content' region to trigger output of the meta tags. Some themes do not have this region, so it can be necessary to pick another."),
-    '#options' => system_region_list(variable_get('theme_default', 'bartik')),
-    '#default_value' => variable_get('metatag_page_region', 'content'),
   );
 
   $form['advanced']['metatag_token_sanitize'] = array(

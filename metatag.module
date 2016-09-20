@@ -5,21 +5,6 @@
  */
 
 /**
- * Implements hook_help().
- */
-function metatag_help($path, $arg) {
-  if ($path == 'admin/config/search/metatags') {
-    return '<p>' . t('To view a summary of the default meta tags and the inheritance, click on a meta tag type.') . '</p>';
-  }
-  elseif ($path == 'admin/help#metatag') {
-    return '<p>' . t('The Metatag module provides a options to let each page have customized meta data added to the "meta" tags in the HEAD section of the document.') . '</p>';
-  }
-  elseif ($path == 'admin/config/search/metatags/bulk-revert') {
-    return '<p>' . t('This form <strong>will wipe out</strong> all custom meta tags for the selected entities, reverting them to the default configuration assigned at the <a href="@url">Defaults tab</a>. For example, if the meta tags are changed for an article they will be removed if the "Node: Article" checkbox is selected.', array('@url' => url('admin/config/search/metatags'))) . '</p>';
-  }
-}
-
-/**
  * Implements hook_theme().
  */
 function metatag_theme() {
@@ -45,24 +30,6 @@ function metatag_theme() {
   );
 
   return $info;
-}
-
-/**
- * Implements hook_ctools_plugin_api().
- */
-function metatag_ctools_plugin_api($owner, $api) {
-  if ($owner == 'metatag' && $api == 'metatag') {
-    return array('version' => 1);
-  }
-}
-
-/**
- * Implements hook_ctools_plugin_directory().
- */
-function metatag_ctools_plugin_directory($owner, $plugin_type) {
-  if ($owner == 'ctools' && $plugin_type == 'content_types') {
-    return "plugins/$plugin_type";
-  }
 }
 
 /**
@@ -1393,7 +1360,7 @@ function metatag_metatags_form(array &$form, $instance, array $metatags = array(
   foreach (element_children($form) as $key) {
     if (isset($form[$key]['#type']) && $form[$key]['#type'] == 'vertical_tabs') {
       $form['metatags']['#group'] = $key;
-      $form['metatags']['#attached']['js']['vertical-tabs'] = drupal_get_path('module', 'metatag') . '/metatag.vertical-tabs.js';
+      $form['metatags']['#attached']['js']['vertical-tabs'] = drupal_get_path('module', 'metatag') . '/js/metatag.vertical-tabs.js';
       break;
     }
   }
@@ -1757,7 +1724,7 @@ function metatag_page_get_metatags() {
 }
 
 /**
- * Implements hook_page_build().
+ * Implements hook_page_build(). @todo remove this.
  */
 function metatag_page_build(&$page) {
   // By default do not add meta tags to admin pages. To enable meta tags on
@@ -1770,17 +1737,6 @@ function metatag_page_build(&$page) {
   // will cause problems.
   if (arg(0) == 'user' && arg(1) == 'me' && function_exists('me_menu_alter')) {
     return;
-  }
-
-  // The page region can be changed.
-  $region = variable_get('metatag_page_region', 'content');
-
-  // Ensure these arrays exist, otherwise several use cases will fail.
-  if (!isset($page[$region]) || !is_array($page[$region])) {
-    $page[$region] = array();
-  }
-  if (!isset($page[$region]['metatags']) || !is_array($page[$region]['metatags'])) {
-    $page[$region]['metatags'] = array();
   }
 
   // The front page has special consideration. Also, check if this is an error

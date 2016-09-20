@@ -10,6 +10,7 @@ Additionally, meta tags can be used to control the display of content as it is
 shared across social networks. The Open Graph submodule in particular, will help
 with Facebook, Pinterest, LinkedIn, etc (see below).
 
+
 Installation
 ------------
 
@@ -62,17 +63,35 @@ Documentation
 Additional documentation is located in the Wiki:
 https://github.com/backdrop-contrib/metatag/wiki/Documentation
 
+
 Issues
 ------
 
 Bugs and Feature requests should be reported in the Issue Queue:
 https://github.com/backdrop-contrib/metatag/issues
 
+
+API
+---
+
+Full API documentation is available in metatag.api.php.
+
+It is not necessary to control Metatag via the entity API, any entity that has
+view modes defined and is not a configuration entity is automatically suitable
+for use.
+
+The meta tags for a given entity object (node, etc) can be obtained as follows:
+  $metatags = metatags_get_entity_metatags($entity_id, $entity_type, $langcode);
+The result will be a nested array of meta tag structures ready for either output
+via drupal_render(), or examining to identify the actual text values.
+
+
 Current Maintainers
 -------------------
 
 - Jen Lampton (https://github.com/jenlampton).
 - Seeking additional maintainers.
+
 
 Credits
 -------

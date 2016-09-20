@@ -57,24 +57,6 @@ function metatag_requirements($phase) {
     // Complete data dump of all installed modules, used later.
     $module_data = system_rebuild_module_data();
 
-    // Work out the release of D7 that is currently running.
-    list($major, $minor) = explode('.', VERSION);
-    // Strip off any suffixes on the version string, e.g. "17-dev".
-    if (strpos('-', $minor)) {
-      list($minor, $suffix) = explode('-', $minor);
-    }
-
-    // Releases of Drupal older than 7.28 did not have entity_language(), which
-    // is now required, and had a broken [node:summary] token.
-    if ($minor < 28) {
-      $requirements['metatag'] = array(
-        'severity' => REQUIREMENT_WARNING,
-        'title' => 'Metatag',
-        'value' => $t('Upgrade Drupal core to v7.28 or newer'),
-        'description' => $t("This older version of Drupal core is missing functionality necessary for the module's multilingual support and contains a broken [node:summary] token, it must be upgraded to version 7.28 or newer."),
-      );
-    }
-
     // Add a note if Page Title is also installed.
     if (module_exists('page_title')) {
       $requirements['metatag_page_title'] = array(
@@ -82,18 +64,6 @@ function metatag_requirements($phase) {
         'title' => 'Metatag',
         'value' => $t('Page Title module should be removed'),
         'description' => $t('The Metatag module is able to customize page titles, so running the Page Title module simultaneously can lead to complications. Please follow the instructions to <a href="@page">convert the Page Title settings</a> and uninstall the module.', array('@page' => 'https://www.drupal.org/node/2774833')),
-      );
-    }
-
-    // Add a note if the deprecated metatag.entity_translation.inc file still
-    // exists.
-    $filename = 'metatag.entity_translation.inc';
-    if (file_exists(dirname(__FILE__) . '/' . $filename)) {
-      $requirements['metatag_deprecated_et_file'] = array(
-        'severity' => REQUIREMENT_ERROR,
-        'title' => 'Metatag',
-        'value' => $t('Unwanted :filename file found', array(':filename' => $filename)),
-        'description' => $t("The :filename file was removed in v7.x-1.0-beta5 but it still exists in the site's Metatag module's directory and will cause problems. This file needs to be removed. The file's path in the Drupal directory structure is:<br /><code>!short_path</code><br />The file's full path is:<br /><code>!full_path</code>", array(':filename' => $filename, '!short_path' => drupal_get_path('module', 'metatag') . '/' . $filename, '!full_path' => dirname(__FILE__) . $filename)),
       );
     }
 
@@ -107,17 +77,6 @@ function metatag_requirements($phase) {
         'title' => 'Metatag',
         'value' => $t('<a href="@url">Entity_Translation</a> is out of date and requires updating', array('@url' => 'https://www.drupal.org/project/entity_translation')),
         'description' => $t('The Entity_Translation module is out of date and needs to be updated in order to be compatible with Metatag.'),
-      );
-    }
-
-    // It's recommended to install the Transliteration module to clean up file
-    // paths for use with image meta tags.
-    if (!module_exists('transliteration')) {
-      $requirements['metatag_transliteration'] = array(
-        'severity' => REQUIREMENT_INFO,
-        'title' => 'Metatag',
-        'value' => $t('The Transliteration module is recommended.'),
-        'description' => $t("It is recommended to install the <a href=\"@url\">Transliteration module</a> to clean up filenames of uploaded files that may be used with image meta tags.", array('@url' => 'https://drupal.org/project/transliteration')),
       );
     }
 
@@ -140,46 +99,6 @@ function metatag_requirements($phase) {
         'value' => $t('Conflict with Admin Language module.'),
         'description' => $t("Using the \"@option\" with Metatag can lead to data loss, so it is recommended to <a href=\"@url\">disable that option</a>.", array('@option' => t('Force language neutral aliases'), '@url' => url('admin/config/regional/language/admin_language'))),
       );
-    }
-
-    // Token v7.x-1.6 is *highly* recommended.
-    $token_module = $module_data['token'];
-    // If the version string is not present then it means the module is running
-    // from git, which means it can't be compared against. Alternatively, look
-    // for the test file, which was the last commit of the 1.6 release.
-    if (!empty($token_module->info['version'])
-      || empty($token_module->info['files'])) {
-      // If there's no test file then this is older than v1.6.
-      if (empty($token_module->info['files'])) {
-        $minor = 5;
-      }
-      // Otherwise check the version string.
-      else {
-        // Versions are in the format 7.x-1.y, so split the string up to find
-        // the 'y' portion.
-        $version = explode('-', $token_module->info['version']);
-        if (isset($version[1])) {
-          list($major, $minor) = explode('.', $version[1]);
-          // Strip off any suffixes on the version string, e.g. "17-dev".
-          if (strpos('-', $minor)) {
-            list($minor, $suffix) = explode('-', $minor);
-          }
-        }
-        // If the version string couldn't be extracted correctly, assume that
-        // an incorrect version is installed.
-        else {
-          $minor = 0;
-        }
-      }
-      // If v1.6 is not installed, give a warning.
-      if ($minor < 6) {
-        $requirements['metatag_token_version'] = array(
-          'severity' => REQUIREMENT_WARNING,
-          'title' => 'Metatag',
-          'value' => $t('Token module is out of date.'),
-          'description' => $t('It is highly recommended to install <a href="https://www.drupal.org/project/token">Token module</a> v7.x-1.6 or newer, otherwise there may be problems using certain meta tags.'),
-        );
-      }
     }
   }
 
@@ -298,8 +217,6 @@ function metatag_schema() {
  * Implements hook_install().
  */
 function metatag_install() {
-  drupal_set_message(t("Thank you for installing the Metatag module. It is recommended to read the module's <a href=\"!url\" title=\"Read the Metatag module's documentation\">README.txt</a> file as there are some known issues that may affect this site.", array('!url' => url(drupal_get_path('module', 'metatag') . '/README.txt'))));
-
   // Always enable the node, taxonomy term and user entities.
   foreach (array('node', 'taxonomy_term', 'user') as $entity_type) {
     // Enable the main entity type.
@@ -378,7 +295,7 @@ function metatag_install() {
     }
   }
 
-  drupal_set_message(t('It may be worth verifying on the <a href="@url">Settings page</a> which types of content on the site should allow meta tags.', array('@url' => url('admin/config/search/metatags/settings'))));
+  drupal_set_message(t('Please visit the <a href="@url">Metatag settings page</a> to determine which types of content should allow meta tags.', array('@url' => url('admin/config/search/metatags/settings'))));
 }
 
 /**
@@ -387,8 +304,10 @@ function metatag_install() {
 function metatag_uninstall() {
   // This variable is created via hook_enable.
   variable_del('metatag_schema_installed');
+
   // Used to control whether 403/404 pages are cached.
   variable_del('metatag_cache_error_pages');
+
   // Used to make meta tags display on admin pages.
   variable_del('metatag_tag_admin_pages');
 
@@ -956,7 +875,7 @@ function metatag_update_7011(&$sandbox) {
     }
 
     // Shortcuts for later.
-    $langcode = $sandbox['records'][$sandbox['current_record']]->language;
+    $langcode = $sandbox['records'][$sandbox['current_record']]->langcode;
     $nid = $sandbox['records'][$sandbox['current_record']]->nid;
 
     db_update('metatag')
@@ -1110,7 +1029,7 @@ function metatag_update_7013(&$sandbox) {
       // Make sure that the entity has a language set.
       if (!empty($entity)) {
         // If there's a (non-empty) language value, use it.
-        $new_language = entity_language($entity_type, $entity);
+        $new_language = $entity->langcode;
         if (empty($new_language)) {
           $new_language = LANGUAGE_NONE;
         }
@@ -1189,7 +1108,7 @@ function _metatag_remove_dupes($entity_type) {
             // loop's.
             if (isset($langs[$inner]) && $langs[$outer]->data == $langs[$inner]->data) {
               // Remove the second record.
-              $langs_to_remove[] = $langs[$inner]->language;
+              $langs_to_remove[] = $langs[$inner]->langcode;
               unset($langs[$inner]);
             }
           }
@@ -1204,7 +1123,7 @@ function _metatag_remove_dupes($entity_type) {
       elseif (count($langs) > 1) {
         // Work out the entity's language.
         $entity = entity_load($entity_type, $entity_id);
-        $entity_language = entity_language($entity_type, $entity);
+        $entity_language = $entity->langcode;
         if (empty($language)) {
           $entity_language = LANGUAGE_NONE;
         }
@@ -1212,7 +1131,7 @@ function _metatag_remove_dupes($entity_type) {
         // Work out if the entity's language record exists.
         $lang_pos = NULL;
         foreach ($langs as $key => $record) {
-          if ($record->language == $entity_language) {
+          if ($record->langcode == $entity_language) {
             $lang_pos = $key;
             break;
           }
@@ -1220,38 +1139,38 @@ function _metatag_remove_dupes($entity_type) {
         // If the language record exists, delete the others.
         if (isset($lang_pos)) {
           foreach ($langs as $key => $record) {
-            if ($record->language != $entity_language) {
-              $langs_to_remove[] = $record->language;
+            if ($record->langcode != $entity_language) {
+              $langs_to_remove[] = $record->langcode;
             }
           }
         }
         // Otherwise look for a record for the site's default language.
         else {
           foreach ($langs as $key => $record) {
-            if ($record->language == $GLOBALS['language']->language) {
+            if ($record->langcode == $GLOBALS['language']->langcode) {
               $lang_pos = $key;
               break;
             }
           }
           if (isset($lang_pos)) {
             foreach ($langs as $key => $record) {
-              if ($record->language != $GLOBALS['language']->language) {
-                $langs_to_remove[] = $record->language;
+              if ($record->langcode != $GLOBALS['language']->langcode) {
+                $langs_to_remove[] = $record->langcode;
               }
             }
           }
           // Finally check for LANGUAGE_NONE.
           else {
             foreach ($langs as $key => $record) {
-              if ($record->language == LANGUAGE_NONE) {
+              if ($record->langcode == LANGUAGE_NONE) {
                 $lang_pos = $key;
                 break;
               }
             }
             if (isset($lang_pos)) {
               foreach ($langs as $key => $record) {
-                if ($record->language != LANGUAGE_NONE) {
-                  $langs_to_remove[] = $record->language;
+                if ($record->langcode != LANGUAGE_NONE) {
+                  $langs_to_remove[] = $record->langcode;
                 }
               }
             }
@@ -1486,7 +1405,7 @@ function metatag_update_7018(&$sandbox) {
     $entity_type = $sandbox['records'][$sandbox['current_record']]->entity_type;
     $entity_id = $sandbox['records'][$sandbox['current_record']]->entity_id;
     // Make sure to load the correct language record.
-    $language = $sandbox['records'][$sandbox['current_record']]->language;
+    $language = $sandbox['records'][$sandbox['current_record']]->langcode;
     $conditions = array();
     // Some entities don't include a language value.
     if (!empty($has_language[$entity_type])) {
@@ -1591,7 +1510,7 @@ function metatag_update_7018(&$sandbox) {
                     $record->entity_type = $entity_type;
                     $record->entity_id = $entity_id;
                     $record->revision_id = $vid;
-                    $record->language = $language;
+                    $record->langcode = $language;
                     $record->data = $metatags->data;
                     drupal_write_record('metatag', $record);
                   }
@@ -1966,7 +1885,7 @@ function metatag_update_7040(&$sandbox) {
         ->condition('entity_type', $record->entity_type)
         ->condition('entity_id', $record->entity_id)
         ->condition('revision_id', $record->revision_id)
-        ->condition('language', $record->language)
+        ->condition('language', $record->langcode)
         ->execute();
 
       // Clear the cache for this entity.

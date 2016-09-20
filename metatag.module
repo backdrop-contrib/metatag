@@ -260,7 +260,7 @@ function metatag_config_load_with_defaults($instance, $include_global = TRUE) {
   $defaults = &drupal_static(__FUNCTION__, array());
 
   // Use the current page's locale.
-  $langcode = $GLOBALS['language_content']->language;
+  $langcode = $GLOBALS['language_content']->langcode;
 
   // Statically cache defaults since they can include multiple levels.
   $cid = "config:{$instance}:{$langcode}" . ($include_global ? ':withglobal' : ':withoutglobal');
@@ -545,7 +545,7 @@ function metatag_metatags_load_multiple($entity_type, array $entity_ids, array $
       }
     }
 
-    $metatags[$record->entity_id][$record->revision_id][$record->language] = $data;
+    $metatags[$record->entity_id][$record->revision_id][$record->langcode] = $data;
   }
 
   return $metatags;
@@ -858,13 +858,13 @@ function metatag_entity_insert($entity, $entity_type) {
     $revision_id = intval($revision_id);
 
     // Determine the entity's language.
-    $langcode = entity_language($entity_type, $entity);
+    $langcode = $entity->langcode;
 
-    // Unfortunately due to how core works, the normal entity_language()
+    // Unfortunately due to how core works, the normal $entity->langcode
     // function returns 'und' instead of the node's language during node
     // creation.
-    if ((empty($langcode) || $langcode == LANGUAGE_NONE) && !empty($entity->language)) {
-      $langcode = $entity->language;
+    if ((empty($langcode) || $langcode == LANGUAGE_NONE) && !empty($entity->langcode)) {
+      $langcode = $entity->langcode;
     }
 
     // If no language was still found, use the 'no language' value.
@@ -910,14 +910,14 @@ function metatag_entity_update($entity, $entity_type) {
     // If applicable, determine the entity's original language. This cannot be
     // obtained via the normal API as that data will already have been updated,
     // instead check to see if the entity has an old-fasioned 'language' value.
-    if (isset($entity->original) && isset($entity->language) && isset($entity->original->language)) {
-      $old_language = $entity->original->language;
+    if (isset($entity->original) && isset($entity->langcode) && isset($entity->original->langcode)) {
+      $old_language = $entity->original->langcode;
 
       // If the language has changed then additional checking needs to be done.
       // Need to compare against the entity's raw language value as they will
       // be different when updating a translated entity, versus an untranslated
       // entity or a source entity for translation, and give a false positive.
-      if ($new_language == $entity->language && $new_language != $old_language) {
+      if ($new_language == $entity->langcode && $new_language != $old_language) {
         // If this entity is not translated, or if it is translated but the
         // translation was previously created, then some language cleanup needs
         // to be done.
@@ -1079,7 +1079,7 @@ function metatag_generate_entity_metatags($entity, $entity_type, $langcode = NUL
   // If no language was requested, try the language defined for this page
   // request.
   if (empty($langcode)) {
-    $langcode = $GLOBALS['language_content']->language;
+    $langcode = $GLOBALS['language_content']->langcode;
   }
 
   // This entity doesn't have any languages defined, i.e. it uses 'und'. This
@@ -1123,7 +1123,7 @@ function metatag_generate_entity_metatags($entity, $entity_type, $langcode = NUL
       // Cache separately based on the language of the passed-in entity and the
       // overall active language of the page.
       'langcode' => $langcode,
-      'language_content' => $GLOBALS['language_content']->language,
+      'language_content' => $GLOBALS['language_content']->langcode,
       'view_mode' => $view_mode,
     );
     $key = metatag_cache_default_cid_parts($key_parts);
@@ -1226,8 +1226,8 @@ function metatag_metatags_view($instance, array $metatags = array(), array $opti
   // If there are any tags, determine the translation to display.
   if (!empty($metatags)) {
     // Get the display language; default to the entity's language.
-    if (isset($options['language']) && isset($options['language']->language) && isset($metatags[$options['language']->language])) {
-      $metatags = $metatags[$options['language']->language];
+    if (isset($options['language']) && isset($options['language']->langcode) && isset($metatags[$options['language']->langcode])) {
+      $metatags = $metatags[$options['language']->langcode];
     }
     // If no language requested, use the no-language value.
     elseif (!empty($metatags[LANGUAGE_NONE])) {
@@ -1998,7 +1998,7 @@ function metatag_get_info($type = NULL, $name = NULL) {
   if (!isset($info)) {
     // hook_metatag_info() includes translated strings, so each language is cached
     // separately.
-    $cid = 'info:' . $language->language;
+    $cid = 'info:' . $language->langcode;
 
     if ($cache = metatag_cache_get($cid)) {
       $info = $cache->data;
@@ -2206,7 +2206,7 @@ function metatag_config_instance_info($instance = NULL) {
 
   // hook_metatag_info() includes translated strings, so each language is cached
   // separately.
-  $cid = 'metatag:config:instance:info:' . $language->language;
+  $cid = 'metatag:config:instance:info:' . $language->langcode;
 
   if (!isset($info)) {
     if ($cache = metatag_cache_get($cid)) {
@@ -2372,7 +2372,7 @@ function metatag_config_is_enabled($instance, $include_defaults = FALSE, $includ
 }
 
 /**
- * Wrapper around entity_language() to use LANGUAGE_NONE if the entity does not
+ * Wrapper around $entity->langcode to use LANGUAGE_NONE if the entity does not
  * have a language assigned.
  *
  * @param $entity_type
@@ -2385,7 +2385,7 @@ function metatag_config_is_enabled($instance, $include_defaults = FALSE, $includ
  */
 function metatag_entity_get_language($entity_type, $entity) {
   // Determine the entity's language, af
-  $langcode = entity_language($entity_type, (object) $entity);
+  $langcode = $entity->langcode;
 
   // If no matching language was found, which will happen for e.g. terms and
   // users, it is normally recommended to use the system default language.
@@ -2522,7 +2522,7 @@ function metatag_ctools_render_alter(&$info, $page, $context) {
           if (!empty($entity_info) && _metatag_entity_is_page($entity_type, $entity)) {
             // Load the meta tags for this entity.
             global $language;
-            metatag_entity_view($entity, $entity_type, 'full', $language->language, TRUE);
+            metatag_entity_view($entity, $entity_type, 'full', $language->langcode, TRUE);
 
             // Don't bother looping over any more contexts, an entity has been
             // found.
@@ -2588,7 +2588,7 @@ function metatag_cache_default_cid_parts(array $cid_parts = array()) {
     'entity_type' => '',
     'entity_id' => '',
     'bundle' => '',
-    'langcode' => $GLOBALS['language_content']->language,
+    'langcode' => $GLOBALS['language_content']->langcode,
     'revision_id' => '',
     'view_mode' => '',
     'status' => 200,

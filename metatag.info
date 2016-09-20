@@ -1,18 +1,8 @@
+type = module
 name = Metatag
-description = "Adds support and an API to implement meta tags."
+description = Adds support and an API to implement meta tags.
 package = SEO
-core = 7.x
-
-; This requires Drupal 7.28 or newer as it fixes the [node:summary] token that
-; was previously broken.
-dependencies[] = system (>= 7.28)
-
-; CTools is required.
-dependencies[] = ctools
-
-; Requires Token; v7.x-1.6 is highly recommended due to bugs with certain tags
-; when using older versions.
-dependencies[] = token
+backdrop = 1.x
 
 configure = admin/config/search/metatags
 

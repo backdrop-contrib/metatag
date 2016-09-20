@@ -1,0 +1,15 @@
+{
+    "_config_name": "metatag.settings",
+    "load_defaults": 1,
+    "load_all_pages": 1,
+    "entity_no_lang_default": 0,
+    "tag_admin_pages": 0,
+    "extended_permissions": 0,
+    "cache_output": 1,
+    "leave_core_tags": 1,
+    "token_sanitize": 0,
+    "pager_string": "Page PAGER | ",
+    "i18n_disabled": 0,
+    "i18n_translate_output": 0,
+    "i18n_enable_watchdog": 0
+}

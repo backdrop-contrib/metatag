@@ -108,7 +108,7 @@ function metatag_i18n_object_info() {
   );
 
   // The final meta tags being output on the page.
-  if (variable_get('metatag_i18n_translate_output', FALSE)) {
+  if (config_get('metatag.settings', 'i18n_translate_output')) {
     $info['output'] = array(
       'title' => t('Metatag final tag output'),
 

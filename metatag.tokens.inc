@@ -55,7 +55,7 @@ function metatag_token_info() {
   }
 
   // A custom pager.
-  $pager = variable_get('metatag_pager_string', 'Page PAGER | ');
+  $pager = config_get('metatag.settings', 'pager_string');
   $page = str_replace('PAGER', 12, $pager);
   $info['tokens']['current-page']['pager'] = array(
     'name' => t('Custom pager'),

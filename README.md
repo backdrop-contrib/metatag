@@ -29,8 +29,8 @@ Installation
 
 - The main administrative page ("Administer >> Configuration >> Search and
   metadata >> Metatag" or admin/config/search/metatags) controls the site-wide
-  defaults, bothg lobal settings, and defaults for content entity (node, term,
-  etc), in addition to those assigned specifically for the home page.
+  defaults. Global settings, Home page settings, and specific defaults for
+  different kinds of content are defined here.
 
 - The list of configured sets of metatags may be controlled from the Settings
   page ("Administer >> Configuration >> Search and metadata >> Settings" or

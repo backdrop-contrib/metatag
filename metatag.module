@@ -5,6 +5,17 @@
  */
 
 /**
+ * Implements hook_config_info().
+ */
+function metatag_config_info() {
+  $prefixes['metatag.settings'] = array(
+    'label' => t('Metatag Settings'),
+    'group' => t('Configuration'),
+  );
+  return $prefixes;
+}
+
+/**
  * Implements hook_theme().
  */
 function metatag_theme() {
@@ -68,7 +79,7 @@ function metatag_permission() {
   );
 
   // Optional extended edit permissions.
-  if (variable_get('metatag_extended_permissions', FALSE)) {
+  if (config_get('metatag.settings', 'extended_permissions')) {
     $permissions['edit meta tags']['description'] .= '<br />' . t('<em>Extended Permissions</em> has been enabled. Roles have the :admin permission will see all meta tags on edit forms, otherwise the permissions below will control which meta tags are available and are needed in addition to <em>Edit meta tags</em>.', array(':admin' => t('Administer meta tags')));
     $metatags = metatag_get_info();
     foreach ($metatags['tags'] as $metatag_name => $metatag) {
@@ -184,7 +195,7 @@ function metatag_menu() {
   // configurations. Note: this should also check for 'metatag_i18n_disabled'
   // but doing so would require rebuilding the menu cache every time the Metatag
   // settings page was saved, which may not be advised. Instead the links to
-  // these pages on the config pages *do* check the variable, which is close
+  // these pages on the config pages *do* check the setting, which is close
   // enough.
   if (module_exists('i18n_string')) {
     $items['admin/config/search/metatags/config/%metatag_config/translate'] = array(
@@ -220,7 +231,7 @@ function metatag_flush_caches() {
  * will load the configuration records for 'node:article', then 'node', and
  * then finally 'global', with each attempt using an array merge.
  *
- * The levels of defaults is arranged by splitting the $instance variable by
+ * The levels of defaults is arranged by splitting the $instance setting by
  * the colon character, and always using a 'global' instance at the end.
  */
 function metatag_config_load_with_defaults($instance, $include_global = TRUE) {
@@ -287,11 +298,12 @@ function metatag_config_load_multiple(array $instances) {
   }
 
   // Translate the configuration.
-  if (module_exists('i18n_string') && !variable_get('metatag_i18n_disabled', FALSE)) {
+  $config = config('metatag.settings');
+  if (module_exists('i18n_string') && !$config->get('i18n_disabled')) {
     $options = array();
 
     // By default disable the watchdog logging of translation messages.
-    $options['watchdog'] = variable_get('metatag_i18n_enable_watchdog', FALSE);
+    $options['watchdog'] = $config->get('i18n_enable_watchdog');
 
     foreach ($configs as $instance => &$config) {
       foreach ($config->config as $tag => &$value) {
@@ -460,9 +472,10 @@ function metatag_metatags_load_multiple($entity_type, array $entity_ids, array $
 
   // Also need to check if the metatag table exists since this condition could
   // fire before the table has been installed yet.
-  if (!variable_get('metatag_schema_installed', FALSE)) {
+  $config = config('metatag.settings');
+  if (!$config->get('schema_installed')) {
     if (db_table_exists('metatag')) {
-      variable_set('metatag_schema_installed', TRUE);
+      $config->set('schema_installed', TRUE);
     }
     else {
       watchdog('metatag', 'The system tried to load metatag data before the schema was fully loaded.', array(), WATCHDOG_WARNING);
@@ -472,9 +485,9 @@ function metatag_metatags_load_multiple($entity_type, array $entity_ids, array $
 
   // Verify that the metatag.revision_id field has been added to the {metatag}
   // table schema.
-  if (!variable_get('metatag_has_revision_id', FALSE)) {
+  if (!$config->get('has_revision_id')) {
     if (db_field_exists('metatag', 'revision_id')) {
-      variable_set('metatag_has_revision_id', TRUE);
+      $config->set('has_revision_id', TRUE);
     }
     else {
       watchdog('metatag', 'The database updates need to be ran.', array(), WATCHDOG_WARNING);
@@ -1025,6 +1038,7 @@ function metatag_entity_view($entity, $entity_type, $view_mode, $langcode, $forc
 function metatag_generate_entity_metatags($entity, $entity_type, $langcode = NULL, $view_mode = 'full', $cached = TRUE) {
   // Obtain some details of the entity that are needed elsewhere.
   list($entity_id, $revision_id, $bundle) = entity_extract_ids($entity_type, $entity);
+  $config = config('metatag.settings');
 
   // If this entity object isn't allowed meta tags, don't continue.
   if (!metatag_entity_supports_metatags($entity_type, $bundle)) {
@@ -1061,7 +1075,7 @@ function metatag_generate_entity_metatags($entity, $entity_type, $langcode = NUL
   // default language's values, unless the "Don't load entity's default
   // language values if no languages match" option is enabled on the advanced
   // settings page.
-  elseif (empty($entity->metatags[$langcode]) && !empty($entity->metatags[$entity_language]) && !variable_get('metatag_entity_no_lang_default', FALSE)) {
+  elseif (empty($entity->metatags[$langcode]) && !empty($entity->metatags[$entity_language]) && !$config->get('entity_no_lang_default')) {
     $langcode = $entity_language;
   }
 
@@ -1076,7 +1090,7 @@ function metatag_generate_entity_metatags($entity, $entity_type, $langcode = NUL
   $metatag_variants = array();
 
   // Caching is enabled.
-  if ($cached && variable_get('metatag_cache_output', TRUE)) {
+  if ($cached && $config->get('cache_output')) {
     // All possible variants of the metatags for this entity are stored in a
     // single cache entry.
     $cid = "output:$entity_type:$entity_id";
@@ -1235,14 +1249,14 @@ function metatag_metatags_view($instance, array $metatags = array(), array $opti
  * Get the pager string for the current page.
  *
  * return @string
- *   Returns a string based upon the 'metatag_pager_string' variable and the
+ *   Returns a string based upon the 'metatag_pager_string' setting and the
  *   current page number.
  */
 function metatag_get_current_pager() {
   if (isset($_GET['page']) && !empty($_GET['page']) && is_numeric($_GET['page'])) {
     $page = intval($_GET['page']) + 1;
     if ($page > 1) {
-      $pager = variable_get('metatag_pager_string', 'Page PAGER | ');
+      $pager = config_get('metatag.settings', 'pager_string');
       return str_replace('PAGER', $page, $pager);
     }
   }
@@ -1397,7 +1411,8 @@ function metatag_metatags_form(array &$form, $instance, array $metatags = array(
     }
 
     // Optional extended edit permissions.
-    if (variable_get('metatag_extended_permissions', FALSE)) {
+    $extended_permissions = config_get('metatag.settings', 'extended_permissions');
+    if ($extended_permissions) {
       $metatag_form['#access'] = user_access('edit meta tag: ' . $metatag) || user_access('administer meta tags');
     }
     else {
@@ -1420,7 +1435,7 @@ function metatag_metatags_form(array &$form, $instance, array $metatags = array(
 
       // Hide the fieldset itself if there is not at least one of the meta tag
       // fields visible.
-      if (variable_get('metatag_extended_permissions', FALSE)) {
+      if ($extended_permissions) {
         $form['metatags'][$langcode][$group_key]['#access'] = count(element_get_visible_children($form['metatags'][$langcode][$group_key])) > 0;
       }
       else {
@@ -1438,7 +1453,7 @@ function metatag_metatags_form(array &$form, $instance, array $metatags = array(
   // Hide the fieldset itself if there is not at least one of the meta tag
   // fields visible; only bother checking this if the user had edit access in
   // the first place.
-  if ($form['metatags']['#access'] && variable_get('metatag_extended_permissions', FALSE)) {
+  if ($form['metatags']['#access'] && $extended_permissions) {
     $form['metatags']['#access'] = count(element_get_visible_children($form['metatags'][$langcode])) > 0;
   }
 
@@ -1573,6 +1588,7 @@ function metatag_field_extra_fields() {
  */
 function metatag_entity_supports_metatags($entity_type = NULL, $bundle = NULL) {
   $entity_types = &drupal_static(__FUNCTION__);
+  $config = config('metatag.settings');
 
   // Identify which entities & bundles are supported the first time the
   // function is called.
@@ -1584,14 +1600,7 @@ function metatag_entity_supports_metatags($entity_type = NULL, $bundle = NULL) {
       // The entity type technically supports entities.
       if (!empty($entity_types[$entity_name])) {
         // Entiy types are enabled by default.
-        // Allow entities to be disabled by assigning a variable
-        // 'metatag_enable_{$entity_type}' the value FALSE, e.g.:
-        //
-        // // Disable metatags for file_entity.
-        // $conf['metatag_enable_file'] = FALSE;
-        //
-        // @see Settings page.
-        if (variable_get('metatag_enable_' . $entity_name, FALSE) == FALSE) {
+        if ($config->get('metatag_enable_' . $entity_name) == FALSE) {
           $entity_types[$entity_name] = FALSE;
         }
 
@@ -1602,18 +1611,11 @@ function metatag_entity_supports_metatags($entity_type = NULL, $bundle = NULL) {
             // If only one bundle exists, take configuration for entity, to
             // reflect options as they are available in the UI.
             if (count($entity_info['bundles']) === 1) {
-              $entity_types[$entity_name][$bundle_name] = variable_get('metatag_enable_' . $entity_name, FALSE) == TRUE;
+              $entity_types[$entity_name][$bundle_name] = $config->get('metatag_enable_' . $entity_name) == TRUE;
               continue;
             }
 
-            // Allow bundles to be disabled by assigning a variable
-            // 'metatag_enable_{$entity_type}__{$bundle}' the value FALSE, e.g.:
-            //
-            // // Disable metatags for carousel nodes.
-            // $conf['metatag_enable_node__carousel'] = FALSE;
-            //
-            // @see Settings page.
-            if (variable_get('metatag_enable_' . $entity_name . '__' . $bundle_name, TRUE) == FALSE) {
+            if ($config->get('metatag_enable_' . $entity_name . '__' . $bundle_name) == FALSE) {
               $entity_types[$entity_name][$bundle_name] = FALSE;
             }
             else {
@@ -1651,18 +1653,19 @@ function metatag_entity_supports_metatags($entity_type = NULL, $bundle = NULL) {
  * @param string $entity_type
  * @param string $bundle
  * @param bool $force_enable
- *   If TRUE, then the type is enabled regardless of any stored variables.
+ *   If TRUE, then the type is enabled regardless of any stored settings.
  *
  * @return bool
  *   TRUE if either the bundle or entity type was enabled by this function.
  */
 function metatag_entity_type_enable($entity_type, $bundle = NULL, $force_enable = FALSE) {
+  $config = config('metatag.settings');
   // The bundle was defined.
   $bundle_set = FALSE;
   if (isset($bundle)) {
-    $stored_bundle = variable_get('metatag_enable_' . $entity_type . '__' . $bundle, NULL);
+    $stored_bundle = $config->get('metatag_enable_' . $entity_type . '__' . $bundle);
     if ($force_enable || !isset($stored_bundle)) {
-      variable_set('metatag_enable_' . $entity_type . '__' . $bundle, TRUE);
+      $config->set('metatag_enable_' . $entity_type . '__' . $bundle, TRUE);
       $bundle_set = TRUE;
     }
   }
@@ -1670,13 +1673,14 @@ function metatag_entity_type_enable($entity_type, $bundle = NULL, $force_enable 
   // Always enable the entity type, because otherwise there's no point in
   // enabling the bundle.
   $entity_type_set = FALSE;
-  $stored_entity_type = variable_get('metatag_enable_' . $entity_type, NULL);
+  $stored_entity_type = $config->get('metatag_enable_' . $entity_type);
   if ($force_enable || !isset($stored_entity_type)) {
-    variable_set('metatag_enable_' . $entity_type, TRUE);
+    $config->set('metatag_enable_' . $entity_type, TRUE);
     $entity_type_set = TRUE;
   }
 
-  // Clear the static cache so that the entity type / bundle will work.
+  // Save and clear the static cache so that the entity type / bundle will work.
+  $config->save();
   drupal_static_reset('metatag_entity_supports_metatags');
 
   return $bundle_set || $entity_type_set;
@@ -1691,11 +1695,11 @@ function metatag_entity_type_enable($entity_type, $bundle = NULL, $force_enable 
 function metatag_entity_type_disable($entity_type, $bundle = NULL) {
   // The bundle was defined.
   if (isset($bundle)) {
-    variable_set('metatag_enable_' . $entity_type . '__' . $bundle, FALSE);
+    config_set('metatag.settings', 'metatag_enable_' . $entity_type . '__' . $bundle, FALSE);
   }
   // The bundle was not defined.
   else {
-    variable_set('metatag_enable_' . $entity_type, FALSE);
+    config_set('metatag.settings', 'metatag_enable_' . $entity_type, FALSE);
   }
 
   // Clear the static cache so that the entity type / bundle will work.
@@ -1727,9 +1731,10 @@ function metatag_page_get_metatags() {
  * Implements hook_page_build(). @todo remove this.
  */
 function metatag_page_build(&$page) {
+  $config = config('metatag.settings');
   // By default do not add meta tags to admin pages. To enable meta tags on
-  // admin pages set the 'metatag_tag_admin_pages' variable to TRUE.
-  if (path_is_admin(current_path()) && !variable_get('metatag_tag_admin_pages', FALSE)) {
+  // admin pages set the 'tag_admin_pages' setting to TRUE.
+  if (path_is_admin(current_path()) && !$config->get('tag_admin_pages')) {
     return;
   }
 
@@ -1770,7 +1775,7 @@ function metatag_page_build(&$page) {
 
   // If no meta tags were loaded at least load the global defaults. This may be
   // disabled, see README.txt for details.
-  if (empty($page[$region]['metatags']) && variable_get('metatag_load_all_pages', TRUE)) {
+  if (empty($page[$region]['metatags']) && $config->get('load_all_pages')) {
     $instance = 'global';
 
     // Generate the cache ID.
@@ -2053,10 +2058,10 @@ function metatag_get_preprocess_variables($hook) {
 }
 
 /**
- * Implements hook_preprocess_html().
+ * Implements hook_preprocess_page().
  */
-function metatag_preprocess_html(&$variables) {
-  foreach (metatag_get_preprocess_variables('html') as $variable => $value) {
+function metatag_preprocess_page(&$variables) {
+  foreach (metatag_get_preprocess_variables('page') as $variable => $value) {
     $variables[$variable] = $value;
   }
 }
@@ -2065,7 +2070,7 @@ function metatag_preprocess_html(&$variables) {
  * Implements hook_preprocess_maintenance_page().
  */
 function metatag_preprocess_maintenance_page(&$variables) {
-  foreach (metatag_get_preprocess_variables('html') as $variable => $value) {
+  foreach (metatag_get_preprocess_variables('page') as $variable => $value) {
     $variables[$variable] = $value;
   }
 }
@@ -2122,13 +2127,11 @@ function metatag_html_head_alter(&$elements) {
 
   // If the 'leave core tags' option is disabled then the following meta tags
   // will be removed if they're provided by core.
-  if (!variable_get('metatag_leave_core_tags', FALSE)) {
+  if (config_get('metatag.settings', 'leave_core_tags')) {
     $core_tags = array(
       'generator',
       'canonical',
       'shortlink',
-      // Leave the shortcut icon, that's more of a theming thing.
-      // 'shortcut icon',
     );
     foreach ($elements as $name => &$element) {
       // Ignore meta tags provided by Metatag.
@@ -2378,8 +2381,8 @@ function metatag_features_api() {
  */
 function metatag_views_post_render(&$view, &$output, &$cache) {
   // By default do not add meta tags to admin pages. To enable meta tags on
-  // admin pages set the 'metatag_tag_admin_pages' variable to TRUE.
-  if (path_is_admin(current_path()) && !variable_get('metatag_tag_admin_pages', FALSE)) {
+  // admin pages set the 'tag_admin_pages' setting to TRUE.
+  if (path_is_admin(current_path()) && !config_get('metatag.settings', 'tag_admin_pages')) {
     return;
   }
 
@@ -2458,8 +2461,8 @@ function metatag_views_post_render(&$view, &$output, &$cache) {
  */
 function metatag_ctools_render_alter(&$info, $page, $context) {
   // By default do not add meta tags to admin pages. To enable meta tags on
-  // admin pages set the 'metatag_tag_admin_pages' variable to TRUE.
-  if (path_is_admin(current_path()) && !variable_get('metatag_tag_admin_pages', FALSE)) {
+  // admin pages set the 'tag_admin_pages' setting to TRUE.
+  if (path_is_admin(current_path()) && !config_get('metatag.settings', 'tag_admin_pages')) {
     return;
   }
 
@@ -2712,10 +2715,12 @@ function metatag_node_type_insert($info) {
 /**
  * Implements hook_node_type_delete().
  *
- * When a content type is deleted, remove the corresponding Metatag variable.
+ * When a content type is deleted, remove the corresponding Metatag setting.
  */
 function metatag_node_type_delete($info) {
-  variable_del('metatag_enable_node__' . $info->type);
+  $config = config('metatag.settings');
+  $config->clear('metatag_enable_node__' . $info->type);
+  $config->save();
 }
 
 /**
@@ -2734,10 +2739,12 @@ function metatag_taxonomy_vocabulary_insert($vocabulary) {
 /**
  * Implements hook_taxonomy_vocabulary_delete().
  *
- * When a vocabulary is deleted, remove the corresponding Metatag variable.
+ * When a vocabulary is deleted, remove the corresponding Metatag setting.
  */
 function metatag_taxonomy_vocabulary_delete($info) {
-  variable_del('metatag_enable_taxonomy_term__' . $info->machine_name);
+  $config = config('metatag.settings');
+  $config->clear('metatag_enable_taxonomy_term__' . $info->machine_name);
+  $config->save();
 }
 
 /**
@@ -2819,13 +2826,14 @@ function metatag_entity_translation_delete($entity_type, $entity, $langcode) {
  * @see i18n_string_translate()
  */
 function metatag_translate_metatag($string, $tag_name, $context, $langcode = NULL, $update = TRUE) {
-  if (module_exists('i18n_string') && !variable_get('metatag_i18n_disabled', FALSE)) {
+  $config = config('metatag.settings');
+  if (module_exists('i18n_string') && !$config->get('i18n_disabled')) {
     // By default do not add meta tags to admin pages. To enable meta tags on
-    // admin pages set the 'metatag_tag_admin_pages' variable to TRUE.
+    // admin pages set the 'metatag_tag_admin_pages' setting to TRUE.
     static $page_is_admin;
     if (is_null($page_is_admin)) {
       $page_is_admin = FALSE;
-      if (path_is_admin(current_path()) && !variable_get('metatag_tag_admin_pages', FALSE)) {
+      if (path_is_admin(current_path()) && !$config->get('tag_admin_pages')) {
         $page_is_admin = TRUE;
       }
     }
@@ -2838,7 +2846,7 @@ function metatag_translate_metatag($string, $tag_name, $context, $langcode = NUL
     // unnecessary entity_extract_ids() call when i18n isn't being used.
     if (is_array($context)) {
       // Optionally disable output generation.
-      if (!variable_get('metatag_i18n_translate_output', FALSE)) {
+      if (!$config->get('i18n_translate_output')) {
         return $string;
       }
 
@@ -2876,7 +2884,7 @@ function metatag_translate_metatag($string, $tag_name, $context, $langcode = NUL
     }
 
     // By default disable the watchdog logging of translation messages.
-    $options['watchdog'] = variable_get('metatag_i18n_enable_watchdog', FALSE);
+    $options['watchdog'] = $config->get('i18n_enable_watchdog');
 
     // Triggers hook_metatag_i18n_context_alter() - allows the i18n string to
     // be altered before being used.
@@ -2944,13 +2952,14 @@ function metatag_translate_metatags(&$metatags, $context = NULL, $langcode = NUL
 function metatag_translations_update($metatags, $context) {
   // Store the context as it was originally provided.
   $original_context = $context;
+  $config = config('metatag.settings');
 
   // Update the i18n string.
-  if (module_exists('i18n_string') && !variable_get('metatag_i18n_disabled', FALSE)) {
+  if (module_exists('i18n_string') && !$config->get('i18n_disabled')) {
     $options = array();
 
     // By default disable the watchdog logging of translation messages.
-    $options['watchdog'] = variable_get('metatag_i18n_enable_watchdog', FALSE);
+    $options['watchdog'] = $config->get('i18n_enable_watchdog');
 
     foreach ($metatags as $tag_name => $data) {
       // Revert the context, so that it can be changed if needed.
@@ -2985,13 +2994,14 @@ function metatag_translations_update($metatags, $context) {
 function metatag_translations_delete($metatags, $context) {
   // Store the context as it was originally provided.
   $original_context = $context;
+  $config = config('metatag.settings');
 
   // Update the i18n string.
-  if (module_exists('i18n_string') && !variable_get('metatag_i18n_disabled', FALSE)) {
+  if (module_exists('i18n_string') && !$config->get('i18n_disabled')) {
     $options = array();
 
     // By default disable the watchdog logging of translation messages.
-    $options['watchdog'] = variable_get('metatag_i18n_enable_watchdog', FALSE);
+    $options['watchdog'] = $config->get('i18n_enable_watchdog');
 
     foreach ($metatags as $tag_name => $data) {
       // Revert the context, so that it can be changed if needed.

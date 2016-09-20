@@ -5,7 +5,7 @@
  */
 function metatag_metatag_config_default() {
   // Optionally skip loading the defaults.
-  if (!variable_get('metatag_load_defaults', TRUE)) {
+  if (!config_get('metatag.settings', 'load_defaults', TRUE)) {
     return;
   }
 
@@ -28,7 +28,7 @@ function metatag_metatag_config_default() {
   $config->api_version = 1;
   $config->disabled = FALSE;
   $config->config = array(
-    'title' => array('value' => variable_get('site_slogan') ? '[site:name] | [current-page:pager][site:slogan]' : '[site:name] | [current-page:pager]'),
+    'title' => array('value' => config_get('system.core', 'site_slogan') ? '[site:name] | [current-page:pager][site:slogan]' : '[site:name] | [current-page:pager]'),
     'canonical' => array('value' => '[site:url]'),
     'shortlink' => array('value' => '[site:url]'),
   );
@@ -83,7 +83,7 @@ function metatag_metatag_config_default() {
   $config->config = array(
     'title' => array('value' => '[user:name] | [site:name]'),
   );
-  if (variable_get('user_pictures')) {
+  if (config_get('system.core', 'user_pictures')) {
     $config->config['image_src'] = array('value' => '[user:picture:url]');
   }
   $configs[$config->instance] = $config;

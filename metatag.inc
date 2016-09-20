@@ -203,7 +203,7 @@ class DrupalDefaultMetaTag implements DrupalMetaTagInterface {
     // URLs.
     if (strpos($url, base_path()) === 0 && strpos($url, '//') !== 0) {
       // Logic:
-      // * Get the length of the base_path(), 
+      // * Get the length of the base_path(),
       // * Get a portion of the image's path starting from the position equal
       //   to the base_path()'s length; this will result in a path relative
       //   to the Drupal installation's base directory.
@@ -293,7 +293,7 @@ class DrupalTextMetaTag extends DrupalDefaultMetaTag {
       'token data' => array(),
       // Remove any remaining token after the string is parsed.
       'clear' => TRUE,
-      'sanitize' => variable_get('metatag_token_sanitize', FALSE),
+      'sanitize' => config_get('metatag.settings', 'token_sanitize'),
       'raw' => FALSE,
     );
 

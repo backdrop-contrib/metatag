@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Administration page callbacks for the metatag module.
@@ -134,7 +133,7 @@ function metatag_config_overview() {
       'title' => t('Export'),
       'href' => 'admin/config/search/metatags/config/' . $config->instance . '/export',
     );
-    if (module_exists('i18n_string') && !variable_get('metatag_i18n_disabled', FALSE)) {
+    if (module_exists('i18n_string') && !$config->get('i18n_disabled', FALSE)) {
       $operations['translate'] = array(
         'title' => t('Translate'),
         'href' => 'admin/config/search/metatags/config/' . $config->instance . '/translate',
@@ -429,7 +428,7 @@ function metatag_bulk_revert_form() {
     LANGUAGE_NONE => t('Language neutral'),
   );
   foreach ($languages as $language) {
-    $options[$language->language] = $language->name;
+    $options[$language->langcode] = $language->name;
   }
 
   $form['languages'] = array(
@@ -597,6 +596,8 @@ function metatag_bulk_revert_batch_finished($success, $results, $operations) {
  * Misc settings page.
  */
 function metatag_admin_settings_form() {
+  $config = config('metatag.settings');
+
   $form = array();
 
   $form['#attached'] = array(
@@ -610,8 +611,8 @@ function metatag_admin_settings_form() {
 
   $form['entities'] = array(
     '#type' => 'fieldset',
-    '#title' => t('Master controls for all entities'),
-    '#description' => t('By enabling and disabling items here, it is possible to control which entities (e.g. nodes, taxonomy terms) and bundles (e.g. content types, vocabularies) will have the meta tag form available on their respective edit pages. If an entity type is disabled it also disables it for <em>all</em> of that entity type\'s bundles.<br />Technical note: Entity types must not be configuration entities and must have view modes in order to be compatible.'),
+    '#title' => t('Allow Meta tags'),
+    '#description' => t('Specity on which forms meta tag information can be defined.'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
@@ -624,7 +625,7 @@ function metatag_admin_settings_form() {
         '#type' => 'checkbox',
         '#title' => t($entity_info['label']),
         '#default_value' => $entity_enabled,
-        // '#description' => t('Enable meta tags for all pages of this entity type.'),
+        '#description' => t('Enable meta tags for all pages of this type.'),
       );
 
       // Some entities, e.g. User, (core) File, have a single bundle with the
@@ -659,49 +660,32 @@ function metatag_admin_settings_form() {
     }
   }
 
-  $form['additional'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Additional settings'),
-    '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
-  );
-
-  $form['additional']['metatag_pager_string'] = array(
-    '#title' => t('Custom pager string'),
-    '#type' => 'textfield',
-    '#description' => t('When the current page includes a pager, e.g. the URL contains "?page=42", the [current-page:pager] token may be added to a meta tag to differentiate between two pages that would otherwise have the same meta tags. The value "PAGER" (must be in uppercase) will be replaced by the actual page count. Note: the pager will only output if the page number is 2 or above and the string "page=NUMBER" is in the URL.<br />For best use, it may be worthwhile to add the [current-page:pager] to the page title to the left of the site name, to the start of description tags, etc.'),
-    '#default_value' => variable_get('metatag_pager_string', 'Page PAGER | '),
-  );
-
   $form['i18n'] = array(
     '#type' => 'fieldset',
     '#title' => t('Internationalization options'),
     '#description' => t('Additional options are available when using the <a href="@url">Internationalization module</a>.', array('@url' => 'https://www.drupal.org/project/i18n')),
     '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
+    '#collapsed' => TRUE,
   );
-
-  $form['i18n']['metatag_i18n_disabled'] = array(
+  $form['i18n']['i18n_disabled'] = array(
     '#title' => t('Disable i18n integration'),
     '#type' => 'checkbox',
     '#description' => t('If the i18n_string module is enabled but the site does not need to translate Metatag strings, the integration may be disabled to avoid a large volume of records being added to the translation system.'),
-    '#default_value' => variable_get('metatag_i18n_disabled', FALSE),
+    '#default_value' => $config->get('i18n_disabled'),
     '#disabled' => !module_exists('i18n_string'),
   );
-
-  $form['i18n']['metatag_i18n_translate_output'] = array(
+  $form['i18n']['i18n_translate_output'] = array(
     '#title' => t('Translate output'),
     '#type' => 'checkbox',
     '#description' => t('Optionally translate the final page output.'),
-    '#default_value' => variable_get('metatag_i18n_translate_output', FALSE),
+    '#default_value' => $config->get('i18n_translate_output'),
     '#disabled' => !module_exists('i18n_string'),
   );
-
-  $form['i18n']['metatag_i18n_enable_watchdog'] = array(
+  $form['i18n']['i18n_enable_watchdog'] = array(
     '#title' => t('Enable logging of translations to Watchdog'),
     '#type' => 'checkbox',
     '#description' => t('Optionally log to Watchdog any changes that happen.'),
-    '#default_value' => variable_get('metatag_i18n_enable_watchdog', FALSE),
+    '#default_value' => $config->get('i18n_enable_watchdog'),
     '#disabled' => !module_exists('i18n_string'),
   );
 
@@ -709,76 +693,90 @@ function metatag_admin_settings_form() {
     '#type' => 'fieldset',
     '#title' => t('Advanced settings'),
     '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
+    //'#collapsed' => TRUE,
   );
-
-  $form['advanced']['metatag_load_all_pages'] = array(
+  $form['advanced']['load_defaults'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Output meta tags even if only global settings apply'),
-    '#description' => t('By default Metatag will load the global default values for all pages that do not have meta tags assigned via the normal entity display or via Metatag Context. This may be disabled so that meta tags will only be output on pages that specifically have meta tags configured for them.'),
-    '#default_value' => variable_get('metatag_load_all_pages', TRUE),
+    '#title' => t("Provide sensible default values for meta tags"),
+    '#default_value' => $config->get('load_defaults'),
   );
-
-  $form['advanced']['metatag_tag_admin_pages'] = array(
+  $form['advanced']['load_all_pages'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Output meta tags on admin pages'),
-    '#description' => t('By default meta tags will not be output on admin pages, but it may be beneficial for some sites to do so.'),
-    '#default_value' => variable_get('metatag_tag_admin_pages', FALSE),
+    '#title' => t('Always output meta tags, even if global default'),
+    '#description' => t('When disabled, meta tags will be removed when values are not explicitly provided.'),
+    '#default_value' => $config->get('load_all_pages'),
   );
-
-  $form['advanced']['metatag_extended_permissions'] = array(
+  $form['advanced']['leave_core_tags'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Advanced permissions'),
-    '#description' => t('Optionally add a permission for each individual meta tag. This provides tremendous flexibility for the editorial process, at the expense of making the permissions configuration more tedious.'),
-    '#default_value' => variable_get('metatag_extended_permissions', FALSE),
+    '#title' => t('Always output canonical, shortlink, and generator meta tags'),
+    '#description' => t('When disabled, the meta tags for canonical, shortlink, and generator will be removed when values are not explicitly provided.'),
+    '#default_value' => $config->get('leave_core_tags'),
   );
-
-  $form['advanced']['metatag_entity_no_lang_default'] = array(
+  $form['advanced']['entity_no_lang_default'] = array(
     '#type' => 'checkbox',
-    '#title' => t("Don't load entity's default language values if no languages match"),
-    '#description' => t("On a site with multiple languages it is possible for an entity to not have meta tag values assigned for the language of the current page. By default the meta tags for an entity's default language value will be used in this scenario, with the canonical URL pointing to the URL. This option may be disabled, i.e. to only load meta tags for languages that specifically have them assigned, otherwise using defaults."),
-    '#default_value' => variable_get('metatag_entity_no_lang_default', FALSE),
+    '#title' => t('Only output meta tags that match the requested language'),
+    '#description' => t('When disabled, meta tags for the <em>default language</em> will be output when no match is found for the requested language.'),
+    '#default_value' => $config->get('entity_no_lang_default'),
   );
-
-  $form['advanced']['metatag_load_defaults'] = array(
+  $form['advanced']['tag_admin_pages'] = array(
     '#type' => 'checkbox',
-    '#title' => t("Load the module's default configurations"),
-    '#description' => t("Control whether the module's default configuration is used. This will not affect configurations exported via Features."),
-    '#default_value' => variable_get('metatag_load_defaults', TRUE),
+    '#title' => t('Also output meta tags on admin pages'),
+    '#description' => t('When disabled, meta tags will not be output on administrative pages.'),
+    '#default_value' => $config->get('tag_admin_pages'),
   );
-
-  $form['advanced']['metatag_cache_output'] = array(
+  $form['advanced']['extended_permissions'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Provide a permission for each individual meta tag'),
+    '#description' => t('Provides increased flexibility for the editorial process, but increases complexity in permissions configuration.'),
+    '#default_value' => $config->get('extended_permissions'),
+  );
+  $form['advanced']['cache_output'] = array(
     '#type' => 'checkbox',
     '#title' => t('Cache meta tag output'),
-    '#description' => t('Disabling this will cause all meta tag output to be generated uniquely for each page load. Currently only affects entities. Note: the entity configuration and output for other types of pages will still be cached, but this can stop the {cache_metatag} table from growing out of control in some scenarios.'),
-    '#default_value' => variable_get('metatag_cache_output', TRUE),
+    '#description' => t('When disabled, all meta tag output will be generated on request and may adversely impact performance.'),
+    '#default_value' => $config->get('cache_output'),
   );
-
-  $form['advanced']['metatag_leave_core_tags'] = array(
+  $form['advanced']['token_sanitize'] = array(
     '#type' => 'checkbox',
-    '#title' => t("Leave core's meta tags as-is"),
-    '#description' => t("Drupal core outputs a number of meta tags itself: canonical, shortlink, and generator. Metatag can be used to replace these with custom values. Should Metatag not have values for these meta tags, core's tags will normally be removed. Enabling this option will leave those meta tags on the page, even if Metatag is not replacing them."),
-    '#default_value' => variable_get('metatag_leave_core_tags', FALSE),
+    '#title' => t('Sanitize meta tag text during token replacement'),
+    '#default_value' => $config->get('token_sanitize'),
+  );
+  $form['advanced']['pager_string'] = array(
+    '#title' => t('Custom pager string'),
+    '#type' => 'textfield',
+    '#description' => t('When the page includes a pager and the URL contains "?page=42", the token [current-page:pager] may be added to differentiate between two pages that would otherwise have the same meta tags. The value "PAGER" (must be in uppercase) will be replaced by the actual page count. Note: the pager will only output if the page number is 2 or above and the string "page=NUMBER" is in the URL.'),
+    '#default_value' => $config->get('pager_string'),
   );
 
-  $form['advanced']['metatag_token_sanitize'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Sanitize content during token replacement'),
-    '#description' => t('If checked, will ensure that metatag value output is encoded and text filters are processed.'),
-    '#default_value' => variable_get('metatag_token_sanitize', FALSE),
+  $form['actions']['#type'] = 'actions';
+  $form['actions']['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save configuration'),
   );
 
-  // Extra submission logic.
+  // Submit handler.
   $form['#submit'][] = 'metatag_admin_settings_form_submit';
 
-  return system_settings_form($form);
+  return $form;
 }
 
 /**
  * Form API submission callback for metatag_admin_settings_form().
  */
-function metatag_admin_settings_form_submit() {
+function metatag_admin_settings_form_submit(&$form, &$form_state) {
+  $config = config('metatag.settings');
+  $values = $form_state['values']; // Make a copy.
+  unset($values['form_build_id']);
+  unset($values['form_token']);
+  unset($values['form_id']);
+  unset($values['op']);
+  unset($values['submit']);
+  foreach ($values as $key => $value) {
+    $config->set($key, $value);
+  }
+  $config->save();
+
   cache_clear_all('entity_info:', 'cache', TRUE);
   cache_clear_all('*', 'cache_metatag', TRUE);
-  drupal_set_message(t('The Metatag cache has been cleared, so all meta tags can be reloaded.'));
+  backdrop_set_message(t('The configuration options have been saved and the Metatag cache cleared.'));
 }

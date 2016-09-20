@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Theme callbacks for the metatag module.
@@ -89,3 +88,4 @@ function theme_metatag_property($variables) {
   unset($element['#value']);
   return theme('html_tag', $variables);
 }
+

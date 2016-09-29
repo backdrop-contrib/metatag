@@ -19,11 +19,11 @@ function _metatag_config_overview_indent($text, $instance) {
 }
 
 function metatag_config_overview() {
-  ctools_include('export');
-
   $metatags = metatag_get_info('tags');
 
-  $configs = ctools_export_crud_load_all('metatag_config');
+  $names = config_get_names_with_prefix('metatag.instance');
+  $configs = config_load_multiple($names);
+
   uksort($configs, '_metatag_config_instance_sort');
 
   $rows = array();
@@ -35,11 +35,13 @@ function metatag_config_overview() {
       $row['class'][] = 'disabled';
     }
 
-    $details = '<div class="metatag-config-label collapsed"><a href="#" class="toggle-details">' . check_plain(metatag_config_instance_label($config->instance)) . '</a></div>';
+    $details  = '<div class="metatag-config-label collapsed">';
+    $details .= '  <a href="#" class="toggle-details">' . check_plain(metatag_config_instance_label($config['instance'])) . '</a>';
+    $details .= '</div>';
     $details .= '<div class="metatag-config-details js-hide">';
 
     $inherits = array();
-    $parents = metatag_config_get_parent_instances($config->instance);
+    $parents = metatag_config_get_parent_instances($config['instance']);
     array_shift($parents);
     foreach (array_reverse($parents) as $parent) {
       if (!isset($configs[$parent])) {
@@ -63,7 +65,7 @@ function metatag_config_overview() {
 
     // Add a summary of the configuration's defaults.
     $summary = array();
-    foreach ($config->config as $metatag => $data) {
+    foreach ($config['config'] as $metatag => $data) {
       // Skip meta tags that were disabled.
       if (empty($metatags[$metatag])) {
         continue;
@@ -88,55 +90,57 @@ function metatag_config_overview() {
     $details .= '</div>';
 
     // Add indentation to the leading cell based on how many parents the config has.
-    $details = _metatag_config_overview_indent($details, $config->instance);
+    $details = _metatag_config_overview_indent($details, $config['instance']);
 
     $row['data']['details'] = $details;
 
     $operations = array();
     if (metatag_config_access('disable', $config)) {
       $operations['edit'] = array(
-        'title' => ($config->export_type & EXPORT_IN_DATABASE) ? t('Edit') : t('Override'),
-        'href' => 'admin/config/search/metatags/config/' . $config->instance,
+        'title' => ($config['storage'] & METATAG_STORAGE_OVERRIDDEN) ? t('Edit') : t('Override'),
+        'href' => 'admin/config/search/metatags/config/' . $config['instance'],
       );
     }
     if (metatag_config_access('enable', $config)) {
       $operations['enable'] = array(
         'title' => t('Enable'),
-        'href' => 'admin/config/search/metatags/config/' . $config->instance . '/enable',
+        'href' => 'admin/config/search/metatags/config/' . $config['instance'] . '/enable',
         'query' => array(
-          'token' => drupal_get_token('enable-' . $config->instance),
-        ) + drupal_get_destination(),
+          'token' => backdrop_get_token('enable-' . $config['instance']),
+        ) + backdrop_get_destination(),
       );
     }
     if (metatag_config_access('disable', $config)) {
       $operations['disable'] = array(
         'title' => t('Disable'),
-        'href' => 'admin/config/search/metatags/config/' . $config->instance . '/disable',
+        'href' => 'admin/config/search/metatags/config/' . $config['instance'] . '/disable',
         'query' => array(
-          'token' => drupal_get_token('disable-' . $config->instance),
-        ) + drupal_get_destination(),
+          'token' => backdrop_get_token('disable-' . $config['instance']),
+        ) + backdrop_get_destination(),
       );
     }
     if (metatag_config_access('revert', $config)) {
       $operations['revert'] = array(
         'title' => t('Revert'),
-        'href' => 'admin/config/search/metatags/config/' . $config->instance . '/revert',
+        'href' => 'admin/config/search/metatags/config/' . $config['instance'] . '/revert',
       );
     }
     if (metatag_config_access('delete', $config)) {
       $operations['delete'] = array(
         'title' => t('Delete'),
-        'href' => 'admin/config/search/metatags/config/' . $config->instance . '/delete',
+        'href' => 'admin/config/search/metatags/config/' . $config['instance'] . '/delete',
       );
     }
+    /* @todo replace this with Config Mgmt UI goto.
     $operations['export'] = array(
       'title' => t('Export'),
-      'href' => 'admin/config/search/metatags/config/' . $config->instance . '/export',
+      'href' => 'admin/config/search/metatags/config/' . $config['instance'] . '/export',
     );
-    if (module_exists('i18n_string') && !$config->get('i18n_disabled', FALSE)) {
+    */
+    if (module_exists('i18n_string') && !$settings->get('i18n_disabled', FALSE)) {
       $operations['translate'] = array(
         'title' => t('Translate'),
-        'href' => 'admin/config/search/metatags/config/' . $config->instance . '/translate',
+        'href' => 'admin/config/search/metatags/config/' . $config['instance'] . '/translate',
       );
     }
     $row['data']['operations'] = array(
@@ -147,7 +151,7 @@ function metatag_config_overview() {
       ),
     );
 
-    $rows[$config->instance] = $row;
+    $rows[$config['instance']] = $row;
   }
 
   $build['config_table'] = array(
@@ -163,10 +167,10 @@ function metatag_config_overview() {
     ),
     '#attached' => array(
       'js' => array(
-        drupal_get_path('module', 'metatag') . '/js/metatag.admin.js',
+        backdrop_get_path('module', 'metatag') . '/js/metatag.admin.js',
       ),
       'css' => array(
-        drupal_get_path('module', 'metatag') . '/css/metatag.admin.css',
+        backdrop_get_path('module', 'metatag') . '/css/metatag.admin.css',
       ),
     ),
     '#suffix' => '<p>' . t('Any items marked "Unknown" are configurations in the system for entity types or bundles which have been disabled via the API or the <a href="@url">Settings page</a>; they will not be used.', array('@url' => url('admin/config/search/metatags/settings'))) . '</p>',
@@ -184,8 +188,9 @@ function _metatag_config_instance_get_available_options() {
 
   foreach ($instances as $instance => $instance_info) {
     if (metatag_config_load($instance)) {
-      continue;
+      //continue; // @todo uncomment me.
     }
+
     $parents = metatag_config_get_parent_instances($instance, FALSE);
     array_shift($parents);
     if (!empty($parents)) {
@@ -239,33 +244,22 @@ function metatag_config_add_form_submit($form, &$form_state) {
   form_state_values_clean($form_state);
   $config = (object) $form_state['values'];
   metatag_config_save($config);
-  $form_state['redirect'] = 'admin/config/search/metatags/config/' . $config->instance;
+  $form_state['redirect'] = 'admin/config/search/metatags/config/' . $config['instance'];
 }
 
 function metatag_config_edit_form($form, &$form_state, $config) {
-  $form['cid'] = array(
-    '#type' => 'value',
-    '#value' => !empty($config->cid) ? $config->cid : NULL,
-  );
   $form['instance'] = array(
     '#type' => 'value',
-    '#value' => $config->instance,
+    '#value' => $config['instance'],
   );
 
-  $contexts = explode(':', $config->instance);
+  $contexts = explode(':', $config['instance']);
   $options['context'] = $contexts[0];
   if ($contexts[0] != 'global') {
-    // The context part of the instance may not map to an entity type, so allow
-    // the token_get_entity_mapping() function to fallback to the provided type.
-    if ($token_type = token_get_entity_mapping('entity', $contexts[0], TRUE)) {
-      $options['token types'] = array($token_type);
-    }
-    else {
-      $options['token types'] = array($contexts[0]);
-    }
+    $options['token types'] = array($contexts[0]);
     // Trigger hook_metatag_token_types_alter().
     // Allow the defined tokens to be modified.
-    drupal_alter('metatag_token_types', $options);
+    backdrop_alter('metatag_token_types', $options);
   }
 
   // Ensure that this configuration is properly compared to its parent 'default'
@@ -276,19 +270,19 @@ function metatag_config_edit_form($form, &$form_state, $config) {
     $default_instance = $contexts;
     array_pop($default_instance);
     $default_instance = implode(':', $default_instance);
-    $options['defaults'] = metatag_config_load_with_defaults($default_instance);
+    $options['defaults'] = metatag_config_load($default_instance);
   }
   elseif ($contexts[0] != 'global') {
     // If the config is something like 'node' or 'taxonomy_term' then the
     // parent default config is 'global'.
-    $options['defaults'] = metatag_config_load_with_defaults('global');
+    $options['defaults'] = metatag_config_load('global');
   }
   else {
     // If the config is 'global' than there are no parent defaults.
     $options['defaults'] = array();
   }
 
-  metatag_metatags_form($form, $config->instance, $config->config, $options);
+  metatag_metatags_form($form, $config['instance'], $config['config'], $options);
   $form['metatags']['#type'] = 'container';
 
   $form['actions']['#type'] = 'actions';
@@ -309,47 +303,51 @@ function metatag_config_edit_form($form, &$form_state, $config) {
 function metatag_config_edit_form_submit($form, &$form_state) {
   // Build the configuration object and save it.
   form_state_values_clean($form_state);
-  $config = (object) $form_state['values'];
-  // @todo Consider renaming the config field from 'config' to 'metatags'
-  $config->config = $config->metatags[LANGUAGE_NONE];
-  unset($config->metatags);
+  $config = $form_state['values'];
+  $config['config'] = $config['metatags'][LANGUAGE_NONE];
+  unset($config['metatags']);
   metatag_config_save($config);
 
-  $label = metatag_config_instance_label($config->instance);
-  drupal_set_message(t('The meta tag defaults for @label have been saved.', array('@label' => $label)));
+  $label = metatag_config_instance_label($config['instance']);
+  backdrop_set_message(t('The meta tag defaults for @label have been saved.', array('@label' => $label)));
 
   $form_state['redirect'] = 'admin/config/search/metatags';
 }
 
-function metatag_config_enable($config) {
-  if (!isset($_GET['token']) || !drupal_valid_token($_GET['token'], 'enable-' . $config->instance)) {
+function metatag_config_enable($data) {
+  if (!isset($_GET['token']) || !backdrop_valid_token($_GET['token'], 'enable-' . $data['instance'])) {
     return MENU_ACCESS_DENIED;
   }
 
-  ctools_export_crud_enable('metatag_config', $config);
+  $name = str_replace(':', '.', $data['instance']);
+  $config = config('metatag.instance.' . $name);
+  $config->set('disabled', FALSE);
+  $config->save();
 
-  $label = metatag_config_instance_label($config->instance);
-  drupal_set_message(t('The meta tag defaults for @label have been enabled.', array('@label' => $label)));
-  drupal_goto();
+  $label = metatag_config_instance_label($data['instance']);
+  backdrop_set_message(t('The meta tag defaults for @label have been enabled.', array('@label' => $label)));
+  backdrop_goto();
 }
 
-function metatag_config_disable($config) {
-  if (!isset($_GET['token']) || !drupal_valid_token($_GET['token'], 'disable-' . $config->instance)) {
+function metatag_config_disable($data) {
+  if (!isset($_GET['token']) || !backdrop_valid_token($_GET['token'], 'disable-' . $data['instance'])) {
     return MENU_ACCESS_DENIED;
   }
 
-  ctools_export_crud_disable('metatag_config', $config);
+  $name = str_replace(':', '.', $data['instance']);
+  $config = config('metatag.instance.' . $name);
+  $config->set('disabled', TRUE);
+  $config->save();
 
-  $label = metatag_config_instance_label($config->instance);
-  drupal_set_message(t('The meta tag defaults for @label have been disabled.', array('@label' => $label)));
-  drupal_goto();
+  $label = metatag_config_instance_label($data['instance']);
+  backdrop_set_message(t('The meta tag defaults for @label have been disabled.', array('@label' => $label)));
+  backdrop_goto();
 }
 
 function metatag_config_delete_form($form, &$form_state, $config) {
-  $form['cid'] = array('#type' => 'value', '#value' => $config->cid);
-  $form['instance'] = array('#type' => 'value', '#value' => $config->instance);
+  $form['instance'] = array('#type' => 'value', '#value' => $config['instance']);
 
-  $label = metatag_config_instance_label($config->instance);
+  $label = metatag_config_instance_label($config['instance']);
   $delete = metatag_config_access('delete', $config);
   $title = $delete ? t('Are you sure you want to delete the meta tag defaults for @label?', array('@label' => $label)) : t('Are you sure you want to revert the meta tag defaults for @label?', array('@label' => $label));
 
@@ -365,17 +363,17 @@ function metatag_config_delete_form_submit($form, &$form_state) {
   $config = metatag_config_load($form_state['values']['instance']);
   metatag_config_delete($config);
 
-  $label = metatag_config_instance_label($config->instance);
+  $label = metatag_config_instance_label($config['instance']);
   $delete = metatag_config_access('delete', $config);
   $title = $delete ? t('The meta tag defaults for @label have been deleted.', array('@label' => $label)) : t('The meta tag defaults for @label have been reverted.', array('@label' => $label));
-  drupal_set_message($title);
+  backdrop_set_message($title);
 
   $form_state['redirect'] = 'admin/config/search/metatags';
 }
 
 function metatag_config_export_form($config) {
   ctools_include('export');
-  return drupal_get_form('ctools_export_form', ctools_export_crud_export('metatag_config', $config), t('Export'));
+  return backdrop_get_form('ctools_export_form', ctools_export_crud_export('metatag_config', $config), t('Export'));
 }
 
 /**
@@ -458,7 +456,7 @@ function metatag_bulk_revert_form_submit($form, &$form_state) {
     'title' => t('Bulk updating metatags'),
     'operations' => array(),
     'finished' => 'metatag_bulk_revert_batch_finished',
-    'file' => drupal_get_path('module', 'metatag') . '/metatag.admin.inc',
+    'file' => backdrop_get_path('module', 'metatag') . '/metatag.admin.inc',
   );
 
   $tags = isset($form_state['values']['tags']) ? array_filter($form_state['values']['tags']) : array();
@@ -578,16 +576,16 @@ function metatag_bulk_revert_batch_operation($entity_type, $bundle, $tags, $lang
 function metatag_bulk_revert_batch_finished($success, $results, $operations) {
   if ($success) {
     if (!count($results)) {
-      drupal_set_message(t('No metatags were reverted.'));
+      backdrop_set_message(t('No metatags were reverted.'));
     }
     else {
       $message = theme('item_list', array('items' => $results));
-      drupal_set_message($message);
+      backdrop_set_message($message);
     }
   }
   else {
     $error_operation = reset($operations);
-    drupal_set_message(t('An error occurred while processing @operation with arguments : @args',
+    backdrop_set_message(t('An error occurred while processing @operation with arguments : @args',
       array('@operation' => $error_operation[0], '@args' => print_r($error_operation[0], TRUE))));
   }
 }
@@ -596,16 +594,16 @@ function metatag_bulk_revert_batch_finished($success, $results, $operations) {
  * Misc settings page.
  */
 function metatag_admin_settings_form() {
-  $config = config('metatag.settings');
+  $settings = config('metatag.settings');
 
   $form = array();
 
   $form['#attached'] = array(
     'js' => array(
-      drupal_get_path('module', 'metatag') . '/js/metatag.admin.js',
+      backdrop_get_path('module', 'metatag') . '/js/metatag.admin.js',
     ),
     'css' => array(
-      drupal_get_path('module', 'metatag') . '/css/metatag.admin.css',
+      backdrop_get_path('module', 'metatag') . '/css/metatag.admin.css',
     ),
   );
 
@@ -671,21 +669,21 @@ function metatag_admin_settings_form() {
     '#title' => t('Disable i18n integration'),
     '#type' => 'checkbox',
     '#description' => t('If the i18n_string module is enabled but the site does not need to translate Metatag strings, the integration may be disabled to avoid a large volume of records being added to the translation system.'),
-    '#default_value' => $config->get('i18n_disabled'),
+    '#default_value' => $settings->get('i18n_disabled'),
     '#disabled' => !module_exists('i18n_string'),
   );
   $form['i18n']['i18n_translate_output'] = array(
     '#title' => t('Translate output'),
     '#type' => 'checkbox',
     '#description' => t('Optionally translate the final page output.'),
-    '#default_value' => $config->get('i18n_translate_output'),
+    '#default_value' => $settings->get('i18n_translate_output'),
     '#disabled' => !module_exists('i18n_string'),
   );
   $form['i18n']['i18n_enable_watchdog'] = array(
     '#title' => t('Enable logging of translations to Watchdog'),
     '#type' => 'checkbox',
     '#description' => t('Optionally log to Watchdog any changes that happen.'),
-    '#default_value' => $config->get('i18n_enable_watchdog'),
+    '#default_value' => $settings->get('i18n_enable_watchdog'),
     '#disabled' => !module_exists('i18n_string'),
   );
 
@@ -698,54 +696,54 @@ function metatag_admin_settings_form() {
   $form['advanced']['load_defaults'] = array(
     '#type' => 'checkbox',
     '#title' => t("Provide sensible default values for meta tags"),
-    '#default_value' => $config->get('load_defaults'),
+    '#default_value' => $settings->get('load_defaults'),
   );
   $form['advanced']['load_all_pages'] = array(
     '#type' => 'checkbox',
     '#title' => t('Always output meta tags, even if global default'),
     '#description' => t('When disabled, meta tags will be removed when values are not explicitly provided.'),
-    '#default_value' => $config->get('load_all_pages'),
+    '#default_value' => $settings->get('load_all_pages'),
   );
   $form['advanced']['leave_core_tags'] = array(
     '#type' => 'checkbox',
     '#title' => t('Always output canonical, shortlink, and generator meta tags'),
     '#description' => t('When disabled, the meta tags for canonical, shortlink, and generator will be removed when values are not explicitly provided.'),
-    '#default_value' => $config->get('leave_core_tags'),
+    '#default_value' => $settings->get('leave_core_tags'),
   );
   $form['advanced']['entity_no_lang_default'] = array(
     '#type' => 'checkbox',
     '#title' => t('Only output meta tags that match the requested language'),
     '#description' => t('When disabled, meta tags for the <em>default language</em> will be output when no match is found for the requested language.'),
-    '#default_value' => $config->get('entity_no_lang_default'),
+    '#default_value' => $settings->get('entity_no_lang_default'),
   );
   $form['advanced']['tag_admin_pages'] = array(
     '#type' => 'checkbox',
     '#title' => t('Also output meta tags on admin pages'),
     '#description' => t('When disabled, meta tags will not be output on administrative pages.'),
-    '#default_value' => $config->get('tag_admin_pages'),
+    '#default_value' => $settings->get('tag_admin_pages'),
   );
   $form['advanced']['extended_permissions'] = array(
     '#type' => 'checkbox',
     '#title' => t('Provide a permission for each individual meta tag'),
     '#description' => t('Provides increased flexibility for the editorial process, but increases complexity in permissions configuration.'),
-    '#default_value' => $config->get('extended_permissions'),
+    '#default_value' => $settings->get('extended_permissions'),
   );
   $form['advanced']['cache_output'] = array(
     '#type' => 'checkbox',
     '#title' => t('Cache meta tag output'),
     '#description' => t('When disabled, all meta tag output will be generated on request and may adversely impact performance.'),
-    '#default_value' => $config->get('cache_output'),
+    '#default_value' => $settings->get('cache_output'),
   );
   $form['advanced']['token_sanitize'] = array(
     '#type' => 'checkbox',
     '#title' => t('Sanitize meta tag text during token replacement'),
-    '#default_value' => $config->get('token_sanitize'),
+    '#default_value' => $settings->get('token_sanitize'),
   );
   $form['advanced']['pager_string'] = array(
     '#title' => t('Custom pager string'),
     '#type' => 'textfield',
     '#description' => t('When the page includes a pager and the URL contains "?page=42", the token [current-page:pager] may be added to differentiate between two pages that would otherwise have the same meta tags. The value "PAGER" (must be in uppercase) will be replaced by the actual page count. Note: the pager will only output if the page number is 2 or above and the string "page=NUMBER" is in the URL.'),
-    '#default_value' => $config->get('pager_string'),
+    '#default_value' => $settings->get('pager_string'),
   );
 
   $form['actions']['#type'] = 'actions';
@@ -764,7 +762,7 @@ function metatag_admin_settings_form() {
  * Form API submission callback for metatag_admin_settings_form().
  */
 function metatag_admin_settings_form_submit(&$form, &$form_state) {
-  $config = config('metatag.settings');
+  $settings = config('metatag.settings');
   $values = $form_state['values']; // Make a copy.
   unset($values['form_build_id']);
   unset($values['form_token']);
@@ -772,9 +770,9 @@ function metatag_admin_settings_form_submit(&$form, &$form_state) {
   unset($values['op']);
   unset($values['submit']);
   foreach ($values as $key => $value) {
-    $config->set($key, $value);
+    $settings->set($key, $value);
   }
-  $config->save();
+  $settings->save();
 
   cache_clear_all('entity_info:', 'cache', TRUE);
   cache_clear_all('*', 'cache_metatag', TRUE);

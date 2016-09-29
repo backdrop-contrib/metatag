@@ -292,9 +292,7 @@ class MetatagCoreNodeTest extends MetatagTestHelper {
     $xpath = $this->xpath("//body//div[@class='content']//table//tbody//tr");
     $this->assertEqual(count($xpath), 2, 'There are two revisions of this node again.');
 
-    // Clear the caches and then load the current revision, just to confirm
-    // that the page is still loading correctly.
-    metatag_config_cache_clear();
+    // Load the current revision again to confirm that the page is still loading correctly.
     $this->drupalGet('node/' . $node->nid);
     $this->assertResponse(200, 'Loaded the current revision of this node again.');
     $xpath = $this->xpath("//meta[@name='abstract']");
@@ -314,9 +312,7 @@ class MetatagCoreNodeTest extends MetatagTestHelper {
     $this->drupalGet('node/' . $node->nid . '/revisions');
     $this->assertResponse(403, 'No longer able to load the node revisions page.');
 
-    // Clear the caches and then load the current revision, just to confirm
-    // that the page is still loading correctly.
-    metatag_config_cache_clear();
+    // Load the current revision again to confirm that the page is still loading correctly.
     $this->drupalGet('node/' . $node->nid);
     $this->assertResponse(200, 'Loaded the current revision of this node again.');
     $xpath = $this->xpath("//meta[@name='abstract']");

@@ -4,14 +4,27 @@
  * Primary hook implementations for Metatag.
  */
 
+define('METATAG_STORAGE_CUSTOM', 'custom');
+define('METATAG_STORAGE_DEFAULT', 'default');
+define('METATAG_STORAGE_OVERRIDDEN', 'overridden');
+
 /**
  * Implements hook_config_info().
  */
 function metatag_config_info() {
+  // Metatag settings.
   $prefixes['metatag.settings'] = array(
     'label' => t('Metatag Settings'),
     'group' => t('Configuration'),
   );
+
+  // Metatag instances.
+  $prefixes['metatag.instance'] = array(
+    'name_key' => 'instance',
+    'label_key' => 'label',
+    'group' => t('Metatag'),
+  );
+
   return $prefixes;
 }
 
@@ -111,7 +124,7 @@ function metatag_menu() {
   );
   $items['admin/config/search/metatags/config/add'] = array(
     'title' => 'Add default meta tags',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('metatag_config_add_form'),
     'access arguments' => array('administer meta tags'),
     'file' => 'metatag.admin.inc',
@@ -120,7 +133,7 @@ function metatag_menu() {
   $items['admin/config/search/metatags/config/%metatag_config'] = array(
     'title callback' => 'metatag_config_title',
     'title arguments' => array(5),
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('metatag_config_edit_form', 5),
     'access arguments' => array('administer meta tags'),
     'file' => 'metatag.admin.inc',
@@ -148,7 +161,7 @@ function metatag_menu() {
   );
   $items['admin/config/search/metatags/config/%metatag_config/revert'] = array(
     'title' => 'Revert',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('metatag_config_delete_form', 5),
     'access callback' => 'metatag_config_access',
     'access arguments' => array('revert', 5),
@@ -157,7 +170,7 @@ function metatag_menu() {
   );
   $items['admin/config/search/metatags/config/%metatag_config/delete'] = array(
     'title' => 'Delete',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('metatag_config_delete_form', 5),
     'access callback' => 'metatag_config_access',
     'access arguments' => array('delete', 5),
@@ -174,7 +187,7 @@ function metatag_menu() {
   );
   $items['admin/config/search/metatags/settings'] = array(
     'title' => 'Settings',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('metatag_admin_settings_form'),
     'access arguments' => array('administer meta tags'),
     'type' => MENU_LOCAL_TASK,
@@ -183,7 +196,7 @@ function metatag_menu() {
   );
   $items['admin/config/search/metatags/bulk-revert'] = array(
     'title' => 'Bulk revert',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('metatag_bulk_revert_form'),
     'access arguments' => array('administer meta tags'),
     'type' => MENU_LOCAL_TASK,
@@ -225,88 +238,41 @@ function metatag_flush_caches() {
 }
 
 /**
- * Load a metatag configuration record with all the defaults merged in.
- *
- * For example, given the configuration instance 'node:article', this function
- * will load the configuration records for 'node:article', then 'node', and
- * then finally 'global', with each attempt using an array merge.
- *
- * The levels of defaults is arranged by splitting the $instance setting by
- * the colon character, and always using a 'global' instance at the end.
- */
-function metatag_config_load_with_defaults($instance, $include_global = TRUE) {
-  $defaults = &drupal_static(__FUNCTION__, array());
-
-  // Use the current page's locale.
-  $langcode = $GLOBALS['language_content']->langcode;
-
-  // Statically cache defaults since they can include multiple levels.
-  $cid = "config:{$instance}:{$langcode}" . ($include_global ? ':withglobal' : ':withoutglobal');
-
-  if (!isset($defaults[$cid])) {
-    if ($cache = metatag_cache_get($cid)) {
-      $defaults[$cid] = $cache->data;
-    }
-    else {
-      $defaults[$cid] = array();
-      $instances = metatag_config_get_parent_instances($instance, $include_global);
-      $configs = metatag_config_load_multiple($instances);
-      foreach ($instances as $key) {
-        // Ignore disabled configurations.
-        if (!isset($configs[$key]) || !empty($configs[$key]->disabled)) {
-          continue;
-        }
-
-        // Add config to the defaults array.
-        if (!empty($configs[$key]->config)) {
-          $defaults[$cid] += $configs[$key]->config;
-        }
-      }
-
-      metatag_cache_set($cid, $defaults[$cid]);
-    }
-  }
-
-  return $defaults[$cid];
-}
-
-/**
- * Load a metatag configuration record.
+ * Load a metatag configuration record (not the JSON file).
  */
 function metatag_config_load($instance) {
-  $results = metatag_config_load_multiple(array($instance));
-  return !empty($results[$instance]) ? $results[$instance] : FALSE;
+  // Replace colons with dots.
+  $name = str_replace(':', '.', $instance);
+  $config = config('metatag.instance.' . $name);
+  return $config->get();
 }
 
 /**
- * Load multiple metatag configuration records.
+ * Create a new metatag configuration file.
+ */
+function metatag_config_create($instance) {
+  // Replace colons with dots.
+  $name = str_replace(':', '.', $instance);
+  return config('metatag.instance.' . $name);
+}
+
+/**
+ * Load multiple metatag configuration files.
  */
 function metatag_config_load_multiple(array $instances) {
   // Load the data.
-  ctools_include('export');
-  $configs = ctools_export_load_object('metatag_config', 'names', $instances);
-
-  // "Fix" any records that might be using old values. Ideally these will be
-  // permanently fixed by being re-saved or re-exported.
-  foreach (metatag_config_get_replacements() as $old_tag => $new_tag) {
-    foreach ($configs as $instance => $config) {
-      if (isset($config->config[$old_tag])) {
-        $config->config[$new_tag] = $config->config[$old_tag];
-        unset($config->config[$old_tag]);
-      }
-    }
-  }
+  $configs = config_get_names_with_prefix('metatag.instance');
 
   // Translate the configuration.
-  $config = config('metatag.settings');
-  if (module_exists('i18n_string') && !$config->get('i18n_disabled')) {
+  $settings = config('metatag.settings');
+  if (module_exists('i18n_string') && !$settings->get('i18n_disabled')) {
     $options = array();
 
     // By default disable the watchdog logging of translation messages.
-    $options['watchdog'] = $config->get('i18n_enable_watchdog');
+    $options['watchdog'] = $settings->get('i18n_enable_watchdog');
 
     foreach ($configs as $instance => &$config) {
-      foreach ($config->config as $tag => &$value) {
+      foreach ($config['config'] as $tag => &$value) {
         if (isset($value['value']) && is_string($value['value'])) {
           $value['value'] = i18n_string_translate(array('metatag', 'metatag_config', $instance, $tag), $value['value'], $options);
         }
@@ -321,7 +287,7 @@ function metatag_config_load_multiple(array $instances) {
  * Identify the meta tags that have been deprecated and replaced by others.
  */
 function metatag_config_get_replacements() {
-  $replacements = &drupal_static(__FUNCTION__);
+  $replacements = &backdrop_static(__FUNCTION__);
 
   if (!isset($replacements)) {
     $replacements = array();
@@ -342,63 +308,41 @@ function metatag_config_get_replacements() {
 }
 
 /**
- * Save a metatag configuration record to the database.
+ * Save a metatag configuration file.
  */
-function metatag_config_save($config) {
-  $config->is_new = empty($config->cid);
-
+function metatag_config_save($data) {
   // Allow modules to alter the configuration before it is saved using
   // hook_metatag_config_presave().
-  module_invoke_all('metatag_config_presave', $config);
+  module_invoke_all('metatag_config_presave', $data);
 
-  if ($config->is_new) {
-    drupal_write_record('metatag_config', $config);
+  $name = str_replace(':', '.', $data['instance']);
+  $config = config('metatag.instance.' . $name);
+  $is_new = $config->isNew();
+  $config->set('data', $data);
+  $config->save();
 
+  if ($is_new) {
     // Allow modules to act upon the record insertion using
     // hook_metatag_config_insert().
-    module_invoke_all('metatag_config_insert', $config);
+    module_invoke_all('metatag_config_insert', $data);
   }
   else {
-    drupal_write_record('metatag_config', $config, array('cid'));
-
     // Allow modules to act upon the record update using
     // hook_metatag_config_insert().
-    module_invoke_all('metatag_config_update', $config);
+    module_invoke_all('metatag_config_update', $data);
   }
-
-  unset($config->is_new);
-
-  // Clear any caches.
-  metatag_config_cache_clear();
 }
 
 /**
- * Delete a metatag configuration record.
+ * Delete a metatag configuration file.
  */
-function metatag_config_delete($config) {
-  db_delete('metatag_config')
-    ->condition('instance', $config->instance)
-    ->execute();
+function metatag_config_delete($data) {
+  //$config = metatag_config_load($data['instance']);
+  $config->delete();
 
   // Allow modules to act upon the record deletion using
   // hook_metatag_config_delete().
-  module_invoke_all('metatag_config_delete', $config);
-
-  // Clear any caches.
-  metatag_config_cache_clear();
-}
-
-/**
- * Clear the metatag configuration cache.
- */
-function metatag_config_cache_clear() {
-  cache_clear_all('*', 'cache_metatag', TRUE);
-  drupal_static_reset('metatag_config_load_with_defaults');
-  drupal_static_reset('metatag_entity_supports_metatags');
-  drupal_static_reset('metatag_config_instance_info');
-  drupal_static_reset('metatag_get_info');
-  ctools_include('export');
-  ctools_export_load_object_reset('metatag_config');
+  module_invoke_all('metatag_config_delete', $data);
 }
 
 /**
@@ -472,10 +416,10 @@ function metatag_metatags_load_multiple($entity_type, array $entity_ids, array $
 
   // Also need to check if the metatag table exists since this condition could
   // fire before the table has been installed yet.
-  $config = config('metatag.settings');
-  if (!$config->get('schema_installed')) {
+  $settings = config('metatag.settings');
+  if (!$settings->get('schema_installed')) {
     if (db_table_exists('metatag')) {
-      $config->set('schema_installed', TRUE);
+      $settings->set('schema_installed', TRUE);
     }
     else {
       watchdog('metatag', 'The system tried to load metatag data before the schema was fully loaded.', array(), WATCHDOG_WARNING);
@@ -485,9 +429,9 @@ function metatag_metatags_load_multiple($entity_type, array $entity_ids, array $
 
   // Verify that the metatag.revision_id field has been added to the {metatag}
   // table schema.
-  if (!$config->get('has_revision_id')) {
+  if (!$settings->get('has_revision_id')) {
     if (db_field_exists('metatag', 'revision_id')) {
-      $config->set('has_revision_id', TRUE);
+      $settings->set('has_revision_id', TRUE);
     }
     else {
       watchdog('metatag', 'The database updates need to be ran.', array(), WATCHDOG_WARNING);
@@ -813,12 +757,12 @@ function metatag_entity_load($entities, $entity_type) {
   catch (Exception $e) {
     watchdog('metatag', 'Error loading meta tag data, do the <a href="@update">database updates</a> need to be run? The error occurred when loading record(s) %ids for the %type entity type. The error message was: %error', array('@update' => base_path() . 'update.php', '%ids' => implode(', ', array_keys($entities)), '%type' => $entity_type, '%error' => $e->getMessage()), WATCHDOG_WARNING);
     // Don't display the same message twice for Drush.
-    if (drupal_is_cli()) {
-      drupal_set_message(t('Run your updates, like drush updb.'));
+    if (backdrop_is_cli()) {
+      backdrop_set_message(t('Run your updates, like drush updb.'));
     }
     // Only message people who can see it in watchdog and can likely fix it.
     elseif (user_access('access site reports')) {
-      drupal_set_message(t('Error loading meta tag data, do the <a href="@update">database updates</a> need to be run?', array('@update' => base_path() . 'update.php')), 'error');
+      backdrop_set_message(t('Error loading meta tag data, do the <a href="@update">database updates</a> need to be run?', array('@update' => base_path() . 'update.php')), 'error');
     }
   }
 }
@@ -967,7 +911,7 @@ function metatag_field_attach_delete_revision($entity_type, $entity) {
  */
 function metatag_get_entity_metatags_instance($entity, $entity_type, $bundle) {
   $instance = "{$entity_type}:{$bundle}";
-  drupal_alter('metatag_get_entity_metatags_instance', $instance, $entity, $entity_type, $bundle);
+  backdrop_alter('metatag_get_entity_metatags_instance', $instance, $entity, $entity_type, $bundle);
   return $instance;
 }
 
@@ -1038,7 +982,7 @@ function metatag_entity_view($entity, $entity_type, $view_mode, $langcode, $forc
 function metatag_generate_entity_metatags($entity, $entity_type, $langcode = NULL, $view_mode = 'full', $cached = TRUE) {
   // Obtain some details of the entity that are needed elsewhere.
   list($entity_id, $revision_id, $bundle) = entity_extract_ids($entity_type, $entity);
-  $config = config('metatag.settings');
+  $settings = config('metatag.settings');
 
   // If this entity object isn't allowed meta tags, don't continue.
   if (!metatag_entity_supports_metatags($entity_type, $bundle)) {
@@ -1075,7 +1019,7 @@ function metatag_generate_entity_metatags($entity, $entity_type, $langcode = NUL
   // default language's values, unless the "Don't load entity's default
   // language values if no languages match" option is enabled on the advanced
   // settings page.
-  elseif (empty($entity->metatags[$langcode]) && !empty($entity->metatags[$entity_language]) && !$config->get('entity_no_lang_default')) {
+  elseif (empty($entity->metatags[$langcode]) && !empty($entity->metatags[$entity_language]) && !$settings->get('entity_no_lang_default')) {
     $langcode = $entity_language;
   }
 
@@ -1090,7 +1034,7 @@ function metatag_generate_entity_metatags($entity, $entity_type, $langcode = NUL
   $metatag_variants = array();
 
   // Caching is enabled.
-  if ($cached && $config->get('cache_output')) {
+  if ($cached && $settings->get('cache_output')) {
     // All possible variants of the metatags for this entity are stored in a
     // single cache entry.
     $cid = "output:$entity_type:$entity_id";
@@ -1240,7 +1184,7 @@ function metatag_metatags_view($instance, array $metatags = array(), array $opti
 
   // Allow the output meta tags to be modified using
   // hook_metatag_metatags_view_alter().
-  drupal_alter('metatag_metatags_view', $output, $instance, $options);
+  backdrop_alter('metatag_metatags_view', $output, $instance, $options);
 
   return $output;
 }
@@ -1267,7 +1211,7 @@ function metatag_metatags_values($instance, array $metatags = array(), array $op
 
   // Apply defaults to the data for each language.
   foreach ($metatags as $language => $metatag) {
-    $metatags[$language] += metatag_config_load_with_defaults($instance);
+    $metatags[$language] += metatag_config_load($instance);
   }
 
   // Generate output only if we have a valid language.
@@ -1286,7 +1230,7 @@ function metatag_metatags_values($instance, array $metatags = array(), array $op
     }
   }
 
-  return array_filter($values, 'drupal_strlen');
+  return array_filter($values, 'backdrop_strlen');
 }
 
 /**
@@ -1328,13 +1272,13 @@ function metatag_metatags_form(array &$form, $instance, array $metatags = array(
   // Merge in the default options.
   $options += array(
     'token types' => array(),
-    'defaults' => metatag_config_load_with_defaults($instance),
+    'defaults' => metatag_config_load($instance),
     'instance' => $instance,
   );
 
   // Trigger hook_metatag_token_types_alter().
   // Allow the defined tokens to be modified.
-  drupal_alter('metatag_token_types', $options);
+  backdrop_alter('metatag_token_types', $options);
 
   $form['metatags'] = array(
     '#type' => 'fieldset',
@@ -1374,7 +1318,7 @@ function metatag_metatags_form(array &$form, $instance, array $metatags = array(
   foreach (element_children($form) as $key) {
     if (isset($form[$key]['#type']) && $form[$key]['#type'] == 'vertical_tabs') {
       $form['metatags']['#group'] = $key;
-      $form['metatags']['#attached']['js']['vertical-tabs'] = drupal_get_path('module', 'metatag') . '/js/metatag.vertical-tabs.js';
+      $form['metatags']['#attached']['js']['vertical-tabs'] = backdrop_get_path('module', 'metatag') . '/js/metatag.vertical-tabs.js';
       break;
     }
   }
@@ -1587,8 +1531,8 @@ function metatag_field_extra_fields() {
  * @see metatag_entity_type_is_suitable().
  */
 function metatag_entity_supports_metatags($entity_type = NULL, $bundle = NULL) {
-  $entity_types = &drupal_static(__FUNCTION__);
-  $config = config('metatag.settings');
+  $entity_types = &backdrop_static(__FUNCTION__);
+  $settings = config('metatag.settings');
 
   // Identify which entities & bundles are supported the first time the
   // function is called.
@@ -1600,7 +1544,7 @@ function metatag_entity_supports_metatags($entity_type = NULL, $bundle = NULL) {
       // The entity type technically supports entities.
       if (!empty($entity_types[$entity_name])) {
         // Entiy types are enabled by default.
-        if ($config->get('metatag_enable_' . $entity_name) == FALSE) {
+        if ($settings->get('metatag_enable_' . $entity_name) == FALSE) {
           $entity_types[$entity_name] = FALSE;
         }
 
@@ -1611,11 +1555,11 @@ function metatag_entity_supports_metatags($entity_type = NULL, $bundle = NULL) {
             // If only one bundle exists, take configuration for entity, to
             // reflect options as they are available in the UI.
             if (count($entity_info['bundles']) === 1) {
-              $entity_types[$entity_name][$bundle_name] = $config->get('metatag_enable_' . $entity_name) == TRUE;
+              $entity_types[$entity_name][$bundle_name] = $settings->get('metatag_enable_' . $entity_name) == TRUE;
               continue;
             }
 
-            if ($config->get('metatag_enable_' . $entity_name . '__' . $bundle_name) == FALSE) {
+            if ($settings->get('metatag_enable_' . $entity_name . '__' . $bundle_name) == FALSE) {
               $entity_types[$entity_name][$bundle_name] = FALSE;
             }
             else {
@@ -1659,13 +1603,13 @@ function metatag_entity_supports_metatags($entity_type = NULL, $bundle = NULL) {
  *   TRUE if either the bundle or entity type was enabled by this function.
  */
 function metatag_entity_type_enable($entity_type, $bundle = NULL, $force_enable = FALSE) {
-  $config = config('metatag.settings');
+  $settings = config('metatag.settings');
   // The bundle was defined.
   $bundle_set = FALSE;
   if (isset($bundle)) {
-    $stored_bundle = $config->get('metatag_enable_' . $entity_type . '__' . $bundle);
+    $stored_bundle = $settings->get('metatag_enable_' . $entity_type . '__' . $bundle);
     if ($force_enable || !isset($stored_bundle)) {
-      $config->set('metatag_enable_' . $entity_type . '__' . $bundle, TRUE);
+      $settings->set('metatag_enable_' . $entity_type . '__' . $bundle, TRUE);
       $bundle_set = TRUE;
     }
   }
@@ -1673,15 +1617,15 @@ function metatag_entity_type_enable($entity_type, $bundle = NULL, $force_enable 
   // Always enable the entity type, because otherwise there's no point in
   // enabling the bundle.
   $entity_type_set = FALSE;
-  $stored_entity_type = $config->get('metatag_enable_' . $entity_type);
+  $stored_entity_type = $settings->get('metatag_enable_' . $entity_type);
   if ($force_enable || !isset($stored_entity_type)) {
-    $config->set('metatag_enable_' . $entity_type, TRUE);
+    $settings->set('metatag_enable_' . $entity_type, TRUE);
     $entity_type_set = TRUE;
   }
 
   // Save and clear the static cache so that the entity type / bundle will work.
-  $config->save();
-  drupal_static_reset('metatag_entity_supports_metatags');
+  $settings->save();
+  backdrop_static_reset('metatag_entity_supports_metatags');
 
   return $bundle_set || $entity_type_set;
 }
@@ -1703,7 +1647,7 @@ function metatag_entity_type_disable($entity_type, $bundle = NULL) {
   }
 
   // Clear the static cache so that the entity type / bundle will work.
-  drupal_static_reset('metatag_entity_supports_metatags');
+  backdrop_static_reset('metatag_entity_supports_metatags');
 }
 
 /**
@@ -1715,7 +1659,7 @@ function metatag_entity_type_disable($entity_type, $bundle = NULL) {
  *   An array of meta tags from metatag_metatags_view().
  */
 function metatag_page_set_metatags($instance, $metatags) {
-  $page_metatags = &drupal_static(__FUNCTION__, array());
+  $page_metatags = &backdrop_static(__FUNCTION__, array());
   $page_metatags[$instance] = $metatags;
 }
 
@@ -1724,7 +1668,7 @@ function metatag_page_set_metatags($instance, $metatags) {
  */
 function metatag_page_get_metatags() {
   // @todo Add alter to this result?
-  return drupal_static('metatag_page_set_metatags', array());
+  return backdrop_static('metatag_page_set_metatags', array());
 }
 
 /**
@@ -1734,7 +1678,7 @@ function metatag_page_build(&$page) {
   $config = config('metatag.settings');
   // By default do not add meta tags to admin pages. To enable meta tags on
   // admin pages set the 'tag_admin_pages' setting to TRUE.
-  if (path_is_admin(current_path()) && !$config->get('tag_admin_pages')) {
+  if (path_is_admin(current_path()) && !$settings->get('tag_admin_pages')) {
     return;
   }
 
@@ -1747,7 +1691,7 @@ function metatag_page_build(&$page) {
   // The front page has special consideration. Also, check if this is an error
   // (403/404) page, those also require separate handling.
   $instance = 'global:frontpage';
-  if ((drupal_is_front_page() && metatag_config_is_enabled($instance))
+  if ((backdrop_is_front_page() && metatag_config_is_enabled($instance))
     || ($instance = metatag_is_error_page())) {
 
     // Generate the cache ID.
@@ -1775,7 +1719,7 @@ function metatag_page_build(&$page) {
 
   // If no meta tags were loaded at least load the global defaults. This may be
   // disabled, see README.txt for details.
-  if (empty($page[$region]['metatags']) && $config->get('load_all_pages')) {
+  if (empty($page[$region]['metatags']) && $settings->get('load_all_pages')) {
     $instance = 'global';
 
     // Generate the cache ID.
@@ -1948,12 +1892,12 @@ function metatag_form_alter(&$form, $form_state, $form_id) {
  *   or NULL to return an array with info about all meta tags.
  */
 function metatag_get_info($type = NULL, $name = NULL) {
-  // Use the advanced drupal_static() pattern, since this is called very often.
-  static $drupal_static_fast;
-  if (!isset($drupal_static_fast)) {
-    $drupal_static_fast['metatag_info'] = &drupal_static(__FUNCTION__);
+  // Use the advanced backdrop_static() pattern, since this is called very often.
+  static $backdrop_static_fast;
+  if (!isset($backdrop_static_fast)) {
+    $backdrop_static_fast['metatag_info'] = &backdrop_static(__FUNCTION__);
   }
-  $info = &$drupal_static_fast['metatag_info'];
+  $info = &$backdrop_static_fast['metatag_info'];
 
   global $language;
   if (!isset($info)) {
@@ -1981,7 +1925,7 @@ function metatag_get_info($type = NULL, $name = NULL) {
 
       // Let other modules alter the entity info using
       // hook_metatag_info_alter().
-      drupal_alter('metatag_info', $info);
+      backdrop_alter('metatag_info', $info);
 
       metatag_cache_set($cid, $info);
     }
@@ -1999,6 +1943,7 @@ function metatag_get_info($type = NULL, $name = NULL) {
 }
 
 function metatag_get_instance($metatag, array $data = array()) {
+  module_load_include('inc', 'metatag', 'metatag');
   $info = metatag_get_info('tags', $metatag);
   if (!empty($info['class']) && class_exists($info['class'])) {
     $class = $info['class'];
@@ -2041,7 +1986,7 @@ function metatag_get_value($metatag, array $data, array $options = array()) {
  * @see metatag_preprocess_maintenance_page()
  */
 function metatag_set_preprocess_variable($hook, $variable, $value) {
-  $variables = &drupal_static(__FUNCTION__, array());
+  $variables = &backdrop_static(__FUNCTION__, array());
   $variables[$hook][$variable] = $value;
 }
 
@@ -2053,7 +1998,7 @@ function metatag_set_preprocess_variable($hook, $variable, $value) {
  * @see metatag_preprocess_maintenance_page()
  */
 function metatag_get_preprocess_variables($hook) {
-  $variables = drupal_static('metatag_set_preprocess_variable', array());
+  $variables = backdrop_static('metatag_set_preprocess_variable', array());
   return isset($variables[$hook]) ? $variables[$hook] : array();
 }
 
@@ -2161,7 +2106,7 @@ function metatag_metatag_get_form($metatag, array $data = array(), array $option
 function metatag_config_instance_info($instance = NULL) {
   global $language;
 
-  $info = &drupal_static(__FUNCTION__);
+  $info = &backdrop_static(__FUNCTION__);
 
   // hook_metatag_info() includes translated strings, so each language is cached
   // separately.
@@ -2178,7 +2123,7 @@ function metatag_config_instance_info($instance = NULL) {
 
       // Allow other modules to customize the data using
       // hook_metatag_config_instance_info_alter().
-      drupal_alter('metatag_config_instance_info', $info);
+      backdrop_alter('metatag_config_instance_info', $info);
 
       metatag_cache_set($cid, $info);
     }
@@ -2204,7 +2149,7 @@ function metatag_filter_values_from_defaults(array &$values, array $defaults = a
       // Meta tag has a default, and it matches user-submitted value.
       unset($values[$metatag]);
     }
-    elseif (!isset($default) && (is_string($data['value']) && !drupal_strlen($data['value']) || (is_array($data['value']) && !array_filter($data['value'])))) {
+    elseif (!isset($default) && (is_string($data['value']) && !backdrop_strlen($data['value']) || (is_array($data['value']) && !array_filter($data['value'])))) {
       // Metatag does not have a default, and user did not submit a value.
       unset($values[$metatag]);
     }
@@ -2246,7 +2191,7 @@ function metatag_config_get_parent_instances($instance, $include_global = TRUE) 
  *   A meta tag configuration instance.
  */
 function metatag_config_instance_label($instance) {
-  $labels = &drupal_static(__FUNCTION__, array());
+  $labels = &backdrop_static(__FUNCTION__, array());
 
   if (!isset($labels[$instance])) {
     $instance_parts = explode(':', $instance);
@@ -2271,9 +2216,14 @@ function metatag_config_instance_label($instance) {
 
 /**
  * Title callback for meta tag configuration instances.
+ *
+ * @param $config
+ *   Configuration object containing everything in the JSON config file.
+ *
+ * @return (string) Label for the metatag.
  */
 function metatag_config_title($config) {
-  return metatag_config_instance_label($config->instance);
+  return metatag_config_instance_label($config['instance']);
 }
 
 /**
@@ -2285,16 +2235,16 @@ function metatag_config_access($op, $config = NULL) {
   }
 
   if ($op == 'enable') {
-    return !empty($config->disabled);
+    return $config['disabled'];
   }
   elseif ($op == 'disable') {
-    return empty($config->disabled);
+    return !$config['disabled'];
   }
   elseif ($op == 'delete') {
-    return ($config->export_type & EXPORT_IN_DATABASE) && !($config->export_type & EXPORT_IN_CODE);
+    return ($config['storage'] & METATAG_STORAGE_OVERRIDDEN) && !($config['storage'] & METATAG_STORAGE_DEFAULT);
   }
   elseif ($op == 'revert') {
-    return ($config->export_type & EXPORT_IN_DATABASE) && ($config->export_type & EXPORT_IN_CODE);
+    return ($config['storage'] & METATAG_STORAGE_OVERRIDDEN) && ($config['storage'] & METATAG_STORAGE_DEFAULT);
   }
 
   return FALSE;
@@ -2368,7 +2318,7 @@ function metatag_features_api() {
       'feature_source' => TRUE,
       'default_hook' => 'metatag_export_default',
       'default_file' => FEATURES_DEFAULTS_INCLUDED,
-      'file' => drupal_get_path('module', 'metatag') . '/metatag.features.inc',
+      'file' => backdrop_get_path('module', 'metatag') . '/metatag.features.inc',
     ),
   );
   return $components;
@@ -2558,7 +2508,7 @@ function metatag_cache_default_cid_parts(array $cid_parts = array()) {
   $cid_parts = array_merge($cid_part_defaults, $cid_parts);
 
   // Add the HTTP status code.
-  $headers = drupal_get_http_header();
+  $headers = backdrop_get_http_header();
   if (isset($headers['status'])) {
     $cid_parts['status'] = intval($headers['status']);
   }
@@ -2570,7 +2520,7 @@ function metatag_cache_default_cid_parts(array $cid_parts = array()) {
 
   // Allow other modules to customize the data using
   // hook_metatag_page_cache_cid_parts_alter().
-  drupal_alter('metatag_page_cache_cid_parts', $cid_parts);
+  backdrop_alter('metatag_page_cache_cid_parts', $cid_parts);
 
   // Remove empty parts.
   $cid_parts = array_filter($cid_parts);
@@ -2609,7 +2559,7 @@ function metatag_is_error_page() {
     'global:403' => '403 Forbidden',
     'global:404' => '404 Not Found',
   );
-  $headers = drupal_get_http_header();
+  $headers = backdrop_get_http_header();
   if (isset($headers['status'])) {
     foreach ($known_errors as $error => $status) {
       if ($status == $headers['status']) {
@@ -2618,17 +2568,6 @@ function metatag_is_error_page() {
     }
   }
   return '';
-}
-
-/**
- * Implements hook_admin_menu_cache_info().
- */
-function metatag_admin_menu_cache_info() {
-  $caches['metatag'] = array(
-    'title' => t('Metatag'),
-    'callback' => 'metatag_config_cache_clear',
-  );
-  return $caches;
 }
 
 /**
@@ -2694,7 +2633,7 @@ function metatag_entity_type_is_suitable($entity_type, $entity_info = array()) {
 
   // Trigger hook_metatag_entity_type_is_supported_alter() to allow other
   // modules to either enable or disable certain entity types.
-  drupal_alter('metatag_entity_type_is_supported', $suitable, $entity_type, $entity_info);
+  backdrop_alter('metatag_entity_type_is_supported', $suitable, $entity_type, $entity_info);
 
   return $suitable;
 }
@@ -2707,7 +2646,7 @@ function metatag_entity_type_is_suitable($entity_type, $entity_info = array()) {
 function metatag_node_type_insert($info) {
   if (metatag_entity_supports_metatags('node')) {
     if (metatag_entity_type_enable('node', $info->type)) {
-      drupal_set_message(t('Metatag support has been enabled for the @label content type.', array('@label' => $info->name)));
+      backdrop_set_message(t('Metatag support has been enabled for the @label content type.', array('@label' => $info->name)));
     }
   }
 }
@@ -2718,9 +2657,9 @@ function metatag_node_type_insert($info) {
  * When a content type is deleted, remove the corresponding Metatag setting.
  */
 function metatag_node_type_delete($info) {
-  $config = config('metatag.settings');
-  $config->clear('metatag_enable_node__' . $info->type);
-  $config->save();
+  $settings = config('metatag.settings');
+  $settings->clear('metatag_enable_node__' . $info->type);
+  $settings->save();
 }
 
 /**
@@ -2731,7 +2670,7 @@ function metatag_node_type_delete($info) {
 function metatag_taxonomy_vocabulary_insert($vocabulary) {
   if (metatag_entity_supports_metatags('taxonomy_term')) {
     if (metatag_entity_type_enable('taxonomy_term', $vocabulary->machine_name)) {
-      drupal_set_message(t('Metatag support has been enabled for the @label vocabulary.', array('@label' => $vocabulary->name)));
+      backdrop_set_message(t('Metatag support has been enabled for the @label vocabulary.', array('@label' => $vocabulary->name)));
     }
   }
 }
@@ -2742,9 +2681,9 @@ function metatag_taxonomy_vocabulary_insert($vocabulary) {
  * When a vocabulary is deleted, remove the corresponding Metatag setting.
  */
 function metatag_taxonomy_vocabulary_delete($info) {
-  $config = config('metatag.settings');
-  $config->clear('metatag_enable_taxonomy_term__' . $info->machine_name);
-  $config->save();
+  $settings = config('metatag.settings');
+  $settings->clear('metatag_enable_taxonomy_term__' . $info->machine_name);
+  $settings->save();
 }
 
 /**
@@ -2826,14 +2765,14 @@ function metatag_entity_translation_delete($entity_type, $entity, $langcode) {
  * @see i18n_string_translate()
  */
 function metatag_translate_metatag($string, $tag_name, $context, $langcode = NULL, $update = TRUE) {
-  $config = config('metatag.settings');
-  if (module_exists('i18n_string') && !$config->get('i18n_disabled')) {
+  $settings = config('metatag.settings');
+  if (module_exists('i18n_string') && !$settings->get('i18n_disabled')) {
     // By default do not add meta tags to admin pages. To enable meta tags on
     // admin pages set the 'metatag_tag_admin_pages' setting to TRUE.
     static $page_is_admin;
     if (is_null($page_is_admin)) {
       $page_is_admin = FALSE;
-      if (path_is_admin(current_path()) && !$config->get('tag_admin_pages')) {
+      if (path_is_admin(current_path()) && !$settings->get('tag_admin_pages')) {
         $page_is_admin = TRUE;
       }
     }
@@ -2846,13 +2785,13 @@ function metatag_translate_metatag($string, $tag_name, $context, $langcode = NUL
     // unnecessary entity_extract_ids() call when i18n isn't being used.
     if (is_array($context)) {
       // Optionally disable output generation.
-      if (!$config->get('i18n_translate_output')) {
+      if (!$settings->get('i18n_translate_output')) {
         return $string;
       }
 
       // Output generation was enabled, so continue as normal.
       $new_context = 'output:';
-      if (drupal_is_front_page()) {
+      if (backdrop_is_front_page()) {
         $new_context .= 'frontpage';
       }
       // If this is an entity page, use the entity as the context.
@@ -2865,7 +2804,7 @@ function metatag_translate_metatag($string, $tag_name, $context, $langcode = NUL
         // Trim this to avoid SQL errors on the {locales_source} table.
         // length = 255 - strlen('metatag:output:page:') - strlen(metatag);
         $strlen = 255 - strlen('metatag:output:page:' . $tag_name);
-        $new_context .= 'page:' . drupal_substr(current_path(), 0, $strlen);
+        $new_context .= 'page:' . backdrop_substr(current_path(), 0, $strlen);
       }
       $context = $new_context;
     }
@@ -2884,11 +2823,11 @@ function metatag_translate_metatag($string, $tag_name, $context, $langcode = NUL
     }
 
     // By default disable the watchdog logging of translation messages.
-    $options['watchdog'] = $config->get('i18n_enable_watchdog');
+    $options['watchdog'] = $settings->get('i18n_enable_watchdog');
 
     // Triggers hook_metatag_i18n_context_alter() - allows the i18n string to
     // be altered before being used.
-    drupal_alter('metatag_i18n_context', $context, $tag_name);
+    backdrop_alter('metatag_i18n_context', $context, $tag_name);
 
     // If the context was erased just send back the original string - it's
     // unlikely, but it could happen.
@@ -2955,11 +2894,11 @@ function metatag_translations_update($metatags, $context) {
   $config = config('metatag.settings');
 
   // Update the i18n string.
-  if (module_exists('i18n_string') && !$config->get('i18n_disabled')) {
+  if (module_exists('i18n_string') && !$settings->get('i18n_disabled')) {
     $options = array();
 
     // By default disable the watchdog logging of translation messages.
-    $options['watchdog'] = $config->get('i18n_enable_watchdog');
+    $options['watchdog'] = $settings->get('i18n_enable_watchdog');
 
     foreach ($metatags as $tag_name => $data) {
       // Revert the context, so that it can be changed if needed.
@@ -2968,7 +2907,7 @@ function metatag_translations_update($metatags, $context) {
       if (!empty($data['value']) && is_string($data['value'])) {
         // Triggers hook_metatag_i18n_context_alter() - allows the i18n string
         // to be altered before being used.
-        drupal_alter('metatag_i18n_context', $context, $tag_name);
+        backdrop_alter('metatag_i18n_context', $context, $tag_name);
 
         // Don't do anything if the context was erased - it's unlikely, but it
         // could happen.
@@ -2997,11 +2936,11 @@ function metatag_translations_delete($metatags, $context) {
   $config = config('metatag.settings');
 
   // Update the i18n string.
-  if (module_exists('i18n_string') && !$config->get('i18n_disabled')) {
+  if (module_exists('i18n_string') && !$settings->get('i18n_disabled')) {
     $options = array();
 
     // By default disable the watchdog logging of translation messages.
-    $options['watchdog'] = $config->get('i18n_enable_watchdog');
+    $options['watchdog'] = $settings->get('i18n_enable_watchdog');
 
     foreach ($metatags as $tag_name => $data) {
       // Revert the context, so that it can be changed if needed.
@@ -3010,7 +2949,7 @@ function metatag_translations_delete($metatags, $context) {
       if (!empty($data['value']) && is_string($data['value'])) {
         // Triggers hook_metatag_i18n_context_alter() - allows the i18n string
         // to be altered before being used.
-        drupal_alter('metatag_i18n_context', $context, $tag_name);
+        backdrop_alter('metatag_i18n_context', $context, $tag_name);
 
         // Don't do anything if the context was erased - it's unlikely, but it
         // could happen.
@@ -3030,7 +2969,7 @@ function metatag_translations_delete($metatags, $context) {
  */
 function i18n_string_metatag_config_insert($config) {
   $context = 'metatag_config:' . $config->instance;
-  metatag_translations_update($config->config, $context);
+  metatag_translations_update($config['config'], $context);
 }
 
 /**
@@ -3046,5 +2985,5 @@ function i18n_string_metatag_config_update($config) {
  */
 function i18n_string_metatag_config_delete($config) {
   $context = 'metatag_config:' . $config->instance;
-  metatag_translations_delete($config->config, $context);
+  metatag_translations_delete($config['config'], $context);
 }

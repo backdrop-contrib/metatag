@@ -4,7 +4,7 @@
  * Metatag primary classes.
  */
 
-interface DrupalMetaTagInterface {
+interface MetaTagInterface {
 
   /**
    * Constructor
@@ -32,7 +32,7 @@ interface DrupalMetaTagInterface {
 
 }
 
-class DrupalDefaultMetaTag implements DrupalMetaTagInterface {
+class MetaTagDefault implements MetaTagInterface {
 
   protected $info;
   protected $data = array('value' => '');
@@ -221,7 +221,7 @@ class DrupalDefaultMetaTag implements DrupalMetaTagInterface {
 /**
  * Text-based meta tag controller.
  */
-class DrupalTextMetaTag extends DrupalDefaultMetaTag {
+class MetaTagText extends MetaTagDefault {
 
   /**
    * {@inheritdoc}
@@ -366,7 +366,7 @@ class DrupalTextMetaTag extends DrupalDefaultMetaTag {
 /**
  * Link type meta tag controller.
  */
-class DrupalLinkMetaTag extends DrupalTextMetaTag {
+class MetaTagLink extends MetaTagText {
 
   /**
    * {@inheritdoc}
@@ -404,10 +404,10 @@ class DrupalLinkMetaTag extends DrupalTextMetaTag {
 /**
  * Title meta tag controller.
  *
- * This extends DrupalTextMetaTag as we need to alter variables in
+ * This extends MetaTagText as we need to alter variables in
  * template_preprocess_html() rather output a normal meta tag.
  */
-class DrupalTitleMetaTag extends DrupalTextMetaTag {
+class MetaTagTitle extends MetaTagText {
 
   /**
    * {@inheritdoc}
@@ -426,7 +426,7 @@ class DrupalTitleMetaTag extends DrupalTextMetaTag {
 /**
  * Multiple value meta tag controller.
  */
-class DrupalListMetaTag extends DrupalDefaultMetaTag {
+class MetaTagList extends MetaTagDefault {
 
   /**
    * {@inheritdoc}
@@ -479,18 +479,17 @@ class DrupalListMetaTag extends DrupalDefaultMetaTag {
 /**
  * Date interval meta tag controller.
  */
-class DrupalDateIntervalMetaTag extends DrupalDefaultMetaTag {
+class MetaTagDateInterval extends MetaTagDefault {
 
   /**
    * {@inheritdoc}
    */
   public function getForm(array $options = array()) {
     $form['value'] = array(
-      '#type' => 'textfield',
+      '#type' => 'number',
+      '#min' => 0,
       '#title' => t('!title interval', array('!title' => $this->info['label'])),
       '#default_value' => isset($this->data['value']) ? $this->data['value'] : '',
-      '#element_validate' => array('element_validate_integer_positive'),
-      '#maxlength' => 4,
       '#description' => isset($this->info['description']) ? $this->info['description'] : '',
     );
     $form['period'] = array(

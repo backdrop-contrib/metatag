@@ -109,53 +109,6 @@ function metatag_requirements($phase) {
  * Implements hook_schema().
  */
 function metatag_schema() {
-  $schema['metatag_config'] = array(
-    'description' => 'Storage of meta tag configuration and defaults.',
-    'export' => array(
-      'key' => 'instance',
-      'key name' => 'Instance',
-      'primary key' => 'cid',
-      'identifier' => 'config',
-      'default hook' => 'metatag_config_default',
-      'api' => array(
-        'owner' => 'metatag',
-        'api' => 'metatag',
-        'minimum_version' => 1,
-        'current_version' => 1,
-      ),
-      'cache defaults' => TRUE,
-      'default cache bin' => 'cache_metatag',
-    ),
-    'fields' => array(
-      'cid' => array(
-        'type' => 'serial',
-        'unsigned' => TRUE,
-        'not null' => TRUE,
-        'description' => 'The primary identifier for a metatag configuration set.',
-        'no export' => TRUE,
-      ),
-      'instance' => array(
-        'type' => 'varchar',
-        'length' => 255,
-        'not null' => TRUE,
-        'default' => '',
-        'description' => 'The machine-name of the configuration, typically entity-type:bundle.',
-      ),
-      'config' => array(
-        'type' => 'blob',
-        'size' => 'big',
-        'not null' => TRUE,
-        'serialize' => TRUE,
-        'description' => 'Serialized data containing the meta tag configuration.',
-        'translatable' => TRUE,
-      ),
-    ),
-    'primary key' => array('cid'),
-    'unique keys' => array(
-      'instance' => array('instance'),
-    ),
-  );
-
   $schema['metatag'] = array(
     'fields' => array(
       'entity_type' => array(

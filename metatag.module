@@ -14,7 +14,7 @@ define('METATAG_STORAGE_OVERRIDDEN', 'overridden');
 function metatag_config_info() {
   // Metatag settings.
   $prefixes['metatag.settings'] = array(
-    'label' => t('Metatag Settings'),
+    'label' => t('Metatag settings'),
     'group' => t('Configuration'),
   );
 
@@ -309,16 +309,16 @@ function metatag_config_save($data) {
   $name = str_replace(':', '.', $data['instance']);
   $config = config('metatag.instance.' . $name);
   $is_new = $config->isNew();
-  $config->set('data', $data);
-
   if ($is_new) {
     $config->set('storage', METATAG_STORAGE_CUSTOM);
   }
-
   if ($config->get('storage') == METATAG_STORAGE_DEFAULT) {
     $config->set('storage', METATAG_STORAGE_OVERRIDDEN);
   }
 
+  foreach ($data as $key => $value) {
+    $config->set($key, $value);
+  }
   $config->save();
 
   if ($is_new) {
@@ -1305,13 +1305,13 @@ function metatag_metatags_form(array &$form, $instance, array $metatags = array(
   // Show a different intro message for entity pages vs config pages.
   if (isset($form['#entity'])) {
     $form['metatags']['intro_text'] = array(
-      '#markup' => '<p>' . t('Configure default values for meta tags below. Tokens, e.g. "[node:summary]" will automatically insert the corresponding information for each page.') . '</p>',
+      '#markup' => '<p>' . t('Configure meta tags below. Tokens, e.g. "[node:summary]" will automatically insert the corresponding information for each page.') . '</p>',
       '#weight' => -10,
     );
   }
   else {
     $form['metatags']['intro_text'] = array(
-      '#markup' => '<p>' . t('Configure default values for meta tags below. Tokens, e.g. "[node:summary]" will automatically insert the corresponding information for each page.') . '</p>',
+      '#markup' => '<p>' . t('Configure meta tags below. Tokens, e.g. "[node:summary]" will automatically insert the corresponding information for each page.') . '</p>',
       '#weight' => -10,
     );
   }

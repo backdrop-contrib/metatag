@@ -97,9 +97,12 @@ function metatag_config_overview() {
     $operations = array();
     if (metatag_config_access('disable', $config)) {
       $operations['edit'] = array(
-        'title' => ($config['storage'] == METATAG_STORAGE_OVERRIDDEN) ? t('Edit') : t('Override'),
+        'title' => t('Edit'),
         'href' => 'admin/config/search/metatags/config/' . $config['instance'],
       );
+      if ($config['storage'] == METATAG_STORAGE_DEFAULT) {
+        $operations['edit'] = t('Override');
+      }
     }
     if (metatag_config_access('enable', $config)) {
       $operations['enable'] = array(
@@ -182,7 +185,7 @@ function _metatag_config_instance_get_available_options() {
 
   foreach ($instances as $instance => $instance_info) {
     if (metatag_config_load($instance)) {
-      //continue; // @todo uncomment me.
+      continue;
     }
 
     $parents = metatag_config_get_parent_instances($instance, FALSE);
@@ -236,7 +239,7 @@ function metatag_config_add_form($form, &$form_state) {
 
 function metatag_config_add_form_submit($form, &$form_state) {
   form_state_values_clean($form_state);
-  $config = (object) $form_state['values'];
+  $config = $form_state['values'];
   metatag_config_save($config);
   $form_state['redirect'] = 'admin/config/search/metatags/config/' . $config['instance'];
 }
@@ -397,10 +400,9 @@ function metatag_bulk_revert_form() {
   $form['update'] = array(
     '#type' => 'checkboxes',
     '#required' => TRUE,
-    '#title' => t('Select the entities to revert'),
+    '#title' => t('Remove meta tags for all content of these types:'),
     '#options' => $options,
     '#default_value' => array(),
-    '#description' => t('All meta tags will be removed for all content of the selected entities.'),
   );
 
   $metatags = metatag_get_info();
@@ -416,27 +418,29 @@ function metatag_bulk_revert_form() {
     $form['tags'] = array(
       '#type' => 'checkboxes',
       '#required' => FALSE,
-      '#title' => t('Select the tags to revert'),
-      '#description' => t('If you select any tags, only those tags will be reverted.'),
+      '#title' => t('Only revert these tags:'),
+      '#description' => t('If no options are selected, all tags will be reverted.'),
       '#options' => $options,
     );
   }
 
-  $languages = language_list();
-  $options = array(
-    LANGUAGE_NONE => t('Language neutral'),
-  );
-  foreach ($languages as $language) {
-    $options[$language->langcode] = $language->name;
-  }
+  if (module_exists('translation')) {
+    $languages = language_list();
+    $options = array(
+      LANGUAGE_NONE => t('Language neutral'),
+    );
+    foreach ($languages as $language) {
+      $options[$language->langcode] = $language->name;
+    }
 
-  $form['languages'] = array(
-    '#type' => 'checkboxes',
-    '#required' => FALSE,
-    '#title' => t('Select the languages to revert'),
-    '#description' => t('If you select any languages, only tags for those languages will be reverted.'),
-    '#options' => $options,
-  );
+    $form['languages'] = array(
+      '#type' => 'checkboxes',
+      '#required' => FALSE,
+      '#title' => t('Only revert tags for these languages:'),
+      '#description' => t('If no options are selected, all languages will be reverted.'),
+      '#options' => $options,
+    );
+  }
 
   $form['submit'] = array(
     '#type' => 'submit',

@@ -131,12 +131,6 @@ function metatag_config_overview() {
         'href' => 'admin/config/search/metatags/config/' . $config['instance'] . '/delete',
       );
     }
-    /* @todo replace this with Config Mgmt UI goto.
-    $operations['export'] = array(
-      'title' => t('Export'),
-      'href' => 'admin/config/search/metatags/config/' . $config['instance'] . '/export',
-    );
-    */
     if (module_exists('i18n_string') && !$settings->get('i18n_disabled', FALSE)) {
       $operations['translate'] = array(
         'title' => t('Translate'),
@@ -369,11 +363,6 @@ function metatag_config_delete_form_submit($form, &$form_state) {
   backdrop_set_message($title);
 
   $form_state['redirect'] = 'admin/config/search/metatags';
-}
-
-function metatag_config_export_form($config) {
-  ctools_include('export');
-  return backdrop_get_form('ctools_export_form', ctools_export_crud_export('metatag_config', $config), t('Export'));
 }
 
 /**

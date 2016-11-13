@@ -167,7 +167,7 @@ function metatag_config_overview() {
         backdrop_get_path('module', 'metatag') . '/css/metatag.admin.css',
       ),
     ),
-    '#suffix' => '<p>' . t('Any items marked "Unknown" are configurations in the system for entity types or bundles which have been disabled via the API or the <a href="@url">Settings page</a>; they will not be used.', array('@url' => url('admin/config/search/metatags/settings'))) . '</p>',
+    '#suffix' => '<p>' . t('Any items marked "Unknown" will not be used. They are likely for page types that have been deleted or disabled. See the <a href="@url">Settings page</a>.', array('@url' => url('admin/config/search/metatags/settings'))) . '</p>',
   );
 
   return $build;

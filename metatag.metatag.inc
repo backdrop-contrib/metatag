@@ -149,7 +149,7 @@ function metatag_metatag_info() {
 
   $info['tags']['title'] = array(
     'label' => t('Page title'),
-    'description' => t("The text to display in the title bar of a visitor's web browser when they view this page. This meta tag may also be used as the title of the page when a visitor bookmarks or favorites this page."),
+    'description' => t("The text to display in the title bar of web browsers. This value may also be used as the title for a bookmark."),
     'class' => 'MetaTagTitle',
     'group' => 'basic',
     'weight' => ++$weight,
@@ -157,7 +157,7 @@ function metatag_metatag_info() {
 
   $info['tags']['description'] = array(
     'label' => t('Description'),
-    'description' => t("A brief and concise summary of the page's content, preferably 150 characters or less. The description meta tag may be used by search engines to display a snippet about the page in search results."),
+    'description' => t("A concise summary of the page's content, preferably 150 characters or less. The description meta tag may be used by in search results."),
     'class' => 'MetaTagText',
     'group' => 'basic',
     'weight' => ++$weight,
@@ -170,7 +170,7 @@ function metatag_metatag_info() {
 
   $info['tags']['abstract'] = array(
     'label' => t('Abstract'),
-    'description' => t("A brief and concise summary of the page's content, preferably 150 characters or less. The abstract meta tag may be used by search engines for archiving purposes."),
+    'description' => t("A oncise summary of the page's content, preferably 150 characters or less. The abstract meta tag may be used for archiving purposes."),
     'class' => 'MetaTagText',
     'group' => 'basic',
     'weight' => ++$weight,
@@ -183,7 +183,7 @@ function metatag_metatag_info() {
 
   $info['tags']['keywords'] = array(
     'label' => t('Keywords'),
-    'description' => t("A comma-separated list of keywords about the page. This meta tag is <em>not</em> supported by most search engines anymore."),
+    'description' => t("A comma-separated list of keywords about the page. This meta tag is <strong>not</strong> supported by most search engines anymore."),
     'class' => 'MetaTagText',
     'group' => 'basic',
     'weight' => ++$weight,
@@ -192,7 +192,7 @@ function metatag_metatag_info() {
   // More advanced meta tags.
   $info['tags']['robots'] = array(
     'label' => t('Robots'),
-    'description' => t("Provides search engines with specific directions for what to do when this page is indexed."),
+    'description' => t("Provides specific directions for what to do when this page is indexed by robots."),
     'class' => 'MetaTagList',
     'group' => 'advanced',
     'weight' => ++$weight,
@@ -200,12 +200,12 @@ function metatag_metatag_info() {
       '#options' => array(
         'index' => t('Allow search engines to index this page (assumed).'),
         'follow' => t('Allow search engines to follow links on this page (assumed).'),
-        'noindex' => t('Prevents search engines from indexing this page.'),
-        'nofollow' => t('Prevents search engines from following links on this page.'),
-        'noarchive' => t('Prevents cached copies of this page from appearing in search results.'),
-        'nosnippet' => t('Prevents descriptions from appearing in search results, and prevents page caching.'),
-        'noodp' => t('Blocks the <a href="!opendirectory">Open Directory Project</a> description from appearing in search results.', array('!opendirectory' => 'http://www.dmoz.org/')),
-        'noydir' => t('Prevents Yahoo! from listing this page in the <a href="@ydir">Yahoo! Directory</a>.', array('@ydir' => 'http://dir.yahoo.com/')),
+        'noindex' => t('Prevent search engines from indexing this page.'),
+        'nofollow' => t('Prevent search engines from following links on this page.'),
+        'noarchive' => t('Prevent cached copies of this page from appearing in search results.'),
+        'nosnippet' => t('Prevent descriptions from appearing in search results, and prevents page caching.'),
+        'noodp' => t('Block the <a href="!opendirectory">Open Directory Project</a> description from appearing in search results.', array('!opendirectory' => 'http://www.dmoz.org/')),
+        'noydir' => t('Prevent Yahoo! from listing this page in the <a href="@ydir">Yahoo! Directory</a>.', array('@ydir' => 'http://dir.yahoo.com/')),
         'noimageindex' => t('Prevent search engines from indexing images on this page.'),
         'notranslate' => t('Prevent search engines from offering to translate this page in search results.'),
       ),

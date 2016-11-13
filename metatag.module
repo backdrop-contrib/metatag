@@ -310,6 +310,15 @@ function metatag_config_save($data) {
   $config = config('metatag.instance.' . $name);
   $is_new = $config->isNew();
   $config->set('data', $data);
+
+  if ($is_new) {
+    $config->set('storage', METATAG_STORAGE_CUSTOM);
+  }
+
+  if ($config->get('storage') == METATAG_STORAGE_DEFAULT) {
+    $config->set('storage', METATAG_STORAGE_OVERRIDDEN);
+  }
+
   $config->save();
 
   if ($is_new) {
@@ -328,7 +337,9 @@ function metatag_config_save($data) {
  * Delete a metatag configuration file.
  */
 function metatag_config_delete($data) {
-  //$config = metatag_config_load($data['instance']);
+  // Replace colons with dots.
+  $name = str_replace(':', '.', $data['instance']);
+  $config = config('metatag.instance.' . $name);
   $config->delete();
 
   // Allow modules to act upon the record deletion using
@@ -1235,7 +1246,7 @@ function metatag_metatags_values($instance, array $metatags = array(), array $op
  *   An array of metatag data.
  * @param array $options
  *   (optional) An array of options including the following keys and values:
- *   - token types: An array of token types to be passed to theme_token_tree().
+ *   - token types: An array of types to be passed to theme_token_tree_link().
  */
 function metatag_metatags_form(array &$form, $instance, array $metatags = array(), array $options = array()) {
   $info = metatag_get_info();
@@ -1294,13 +1305,13 @@ function metatag_metatags_form(array &$form, $instance, array $metatags = array(
   // Show a different intro message for entity pages vs config pages.
   if (isset($form['#entity'])) {
     $form['metatags']['intro_text'] = array(
-      '#markup' => '<p>' . t('Configure the meta tags below. Tokens, e.g. "[node:summary]", automatically insert the corresponding information from that field or value, which helps to avoid redundant meta data and possible search engine penalization; see the "Browse available tokens" popup for more details.') . '</p>',
+      '#markup' => '<p>' . t('Configure default values for meta tags below. Tokens, e.g. "[node:summary]" will automatically insert the corresponding information for each page.') . '</p>',
       '#weight' => -10,
     );
   }
   else {
     $form['metatags']['intro_text'] = array(
-      '#markup' => '<p>' . t('Configure the meta tags below. Use tokens (see the "Browse available tokens" popup) to avoid redundant meta data and search engine penalization. For example, a \'keyword\' value of "example" will be shown on all content using this configuration, whereas using the [node:field_keywords] automatically inserts the "keywords" values from the current entity (node, term, etc).') . '</p>',
+      '#markup' => '<p>' . t('Configure default values for meta tags below. Tokens, e.g. "[node:summary]" will automatically insert the corresponding information for each page.') . '</p>',
       '#weight' => -10,
     );
   }
@@ -1397,12 +1408,12 @@ function metatag_metatags_form(array &$form, $instance, array $metatags = array(
   if ($form['metatags']['#access']) {
     // Check if each meta tag group is being displayed.
     if (!empty($group_metatag_access)) {
-      // Built the token browser link. For value "all" theme_token_tree()
+      // Built the token browser link. For value "all" theme_token_tree_link()
       // compares with string, not array.
       if (in_array('all', $options['token types'])) {
         $options['token types'] = 'all';
       }
-      $token_listing_link = theme('token_tree',
+      $token_listing_link = theme('token_tree_link',
         array(
           'token_types' => $options['token types'],
           'dialog' => TRUE,
@@ -1420,7 +1431,8 @@ function metatag_metatags_form(array &$form, $instance, array $metatags = array(
           }
 
           // Add the token browser popup link.
-          $form['metatags'][$langcode][$group_key]['#description'] .= $token_listing_link;
+          $form['metatags'][$langcode][$group_key]['#description'] .= t('Tip: Use tokens to avoid redundant meta data and to prevent search engine penalization.');
+          $form['metatags'][$langcode][$group_key]['#description'] .= ' ' . $token_listing_link;
         }
       }
     }
@@ -2232,10 +2244,10 @@ function metatag_config_access($op, $config = NULL) {
     return !$config['disabled'];
   }
   elseif ($op == 'delete') {
-    return ($config['storage'] & METATAG_STORAGE_OVERRIDDEN) && !($config['storage'] & METATAG_STORAGE_DEFAULT);
+    return ($config['storage'] == METATAG_STORAGE_CUSTOM);
   }
   elseif ($op == 'revert') {
-    return ($config['storage'] & METATAG_STORAGE_OVERRIDDEN) && ($config['storage'] & METATAG_STORAGE_DEFAULT);
+    return ($config['storage'] == METATAG_STORAGE_OVERRIDDEN);
   }
 
   return FALSE;

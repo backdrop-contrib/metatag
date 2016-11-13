@@ -97,7 +97,7 @@ function metatag_config_overview() {
     $operations = array();
     if (metatag_config_access('disable', $config)) {
       $operations['edit'] = array(
-        'title' => ($config['storage'] & METATAG_STORAGE_OVERRIDDEN) ? t('Edit') : t('Override'),
+        'title' => ($config['storage'] == METATAG_STORAGE_OVERRIDDEN) ? t('Edit') : t('Override'),
         'href' => 'admin/config/search/metatags/config/' . $config['instance'],
       );
     }
@@ -340,10 +340,17 @@ function metatag_config_disable($data) {
 
 function metatag_config_delete_form($form, &$form_state, $config) {
   $form['instance'] = array('#type' => 'value', '#value' => $config['instance']);
+  $form['metatag_action'] = array('#type' => 'value', '#value' => '');
 
   $label = metatag_config_instance_label($config['instance']);
-  $delete = metatag_config_access('delete', $config);
-  $title = $delete ? t('Are you sure you want to delete the meta tag defaults for @label?', array('@label' => $label)) : t('Are you sure you want to revert the meta tag defaults for @label?', array('@label' => $label));
+  if (metatag_config_access('delete', $config)) {
+    $title = t('Are you sure you want to delete the meta tag defaults for @label?', array('@label' => $label));
+    $form['metatag_action']['#value'] = 'delete';
+  }
+  else {
+    $title = t('Are you sure you want to revert the meta tag defaults for @label?', array('@label' => $label));
+    $form['metatag_action']['#value'] = 'revert';
+  }
 
   return confirm_form(
     $form,
@@ -358,9 +365,14 @@ function metatag_config_delete_form_submit($form, &$form_state) {
   metatag_config_delete($config);
 
   $label = metatag_config_instance_label($config['instance']);
-  $delete = metatag_config_access('delete', $config);
-  $title = $delete ? t('The meta tag defaults for @label have been deleted.', array('@label' => $label)) : t('The meta tag defaults for @label have been reverted.', array('@label' => $label));
-  backdrop_set_message($title);
+  if ($form['metatag_action']['#value'] == 'delete') {
+    $title = t('The meta tag defaults for @label have been deleted.', array('@label' => $label));
+  }
+  else {
+    // Put back the default config.
+    config_install_default_config('metatag', 'metatag.instance.' . $form_state['values']['instance']);
+    $title = t('The meta tag defaults for @label have been reverted.', array('@label' => $label));
+  }
 
   $form_state['redirect'] = 'admin/config/search/metatags';
 }

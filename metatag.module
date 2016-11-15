@@ -229,6 +229,52 @@ function metatag_flush_caches() {
 }
 
 /**
+ * Load a metatag configuration record with all the defaults merged in.
+ *
+ * For example, given the configuration instance 'node:article', this function
+ * will load the configuration records for 'node:article', then 'node', and
+ * then finally 'global', with each attempt using an array merge.
+ *
+ * The levels of defaults is arranged by splitting the $instance variable by
+ * the colon character, and always using a 'global' instance at the end.
+ */
+function metatag_config_load_with_defaults($instance, $include_global = TRUE) {
+  $defaults = &backdrop_static(__FUNCTION__, array());
+
+  // Use the current page's locale.
+  $langcode = $GLOBALS['language_content']->language;
+
+  // Statically cache defaults since they can include multiple levels.
+  $cid = "config:{$instance}:{$langcode}" . ($include_global ? ':withglobal' : ':withoutglobal');
+
+  if (!isset($defaults[$cid])) {
+    if ($cache = metatag_cache_get($cid)) {
+      $defaults[$cid] = $cache->data;
+    }
+    else {
+      $defaults[$cid] = array();
+      $instances = metatag_config_get_parent_instances($instance, $include_global);
+      $configs = metatag_config_load_multiple($instances);
+      foreach ($instances as $key) {
+        // Ignore disabled configurations.
+        if (!isset($configs[$key]) || !empty($configs[$key]->disabled)) {
+          continue;
+        }
+
+        // Add config to the defaults array.
+        if (!empty($configs[$key]->config)) {
+          $defaults[$cid] += $configs[$key]->config;
+        }
+      }
+
+      metatag_cache_set($cid, $defaults[$cid]);
+    }
+  }
+
+  return $defaults[$cid];
+}
+
+/**
  * Load a metatag configuration record (not the JSON file).
  */
 function metatag_config_load($instance) {
@@ -1086,8 +1132,7 @@ function metatag_generate_entity_metatags($entity, $entity_type, $langcode = NUL
     // Include token replacement data. Don't reload the entity object as doing
     // so would conflict with content editorial workflows.
     if (!empty($entity_id)) {
-      $token_type = token_get_entity_mapping('entity', $entity_type);
-      $options['token data'][$token_type] = $entity;
+      $options['token data'][$entity_type] = $entity;
     }
 
     // Render the metatags and save to the cache.
@@ -1302,19 +1347,10 @@ function metatag_metatags_form(array &$form, $instance, array $metatags = array(
     '#multilingual' => TRUE,
     '#tree' => TRUE,
   );
-  // Show a different intro message for entity pages vs config pages.
-  if (isset($form['#entity'])) {
-    $form['metatags']['intro_text'] = array(
-      '#markup' => '<p>' . t('Configure meta tags below. Tokens, e.g. "[node:summary]" will automatically insert the corresponding information for each page.') . '</p>',
-      '#weight' => -10,
-    );
-  }
-  else {
-    $form['metatags']['intro_text'] = array(
-      '#markup' => '<p>' . t('Configure meta tags below. Tokens, e.g. "[node:summary]" will automatically insert the corresponding information for each page.') . '</p>',
-      '#weight' => -10,
-    );
-  }
+  $form['metatags']['intro_text'] = array(
+    '#markup' => '<p>' . t('Configure meta tags below. Tokens, e.g. "[node:summary]" will be replaced with corresponding values.') . '</p>',
+    '#weight' => -10,
+  );
 
   // Only support vertical tabs if there is a vertical tab element.
   foreach (element_children($form) as $key) {
@@ -1431,7 +1467,7 @@ function metatag_metatags_form(array &$form, $instance, array $metatags = array(
           }
 
           // Add the token browser popup link.
-          $form['metatags'][$langcode][$group_key]['#description'] .= t('Tip: Use tokens to avoid redundant meta data and to prevent search engine penalization.');
+          $form['metatags'][$langcode][$group_key]['#description'] .= t('Tip: Use tokens to avoid redundancy and to prevent search engine penalization.');
           $form['metatags'][$langcode][$group_key]['#description'] .= ' ' . $token_listing_link;
         }
       }
@@ -1859,8 +1895,9 @@ function metatag_field_attach_form($entity_type, $entity, &$form, &$form_state, 
     $metatags = array();
   }
 
+  $info = entity_get_info($entity_type);
   $options['token types'] = array(
-    token_get_entity_mapping('entity', $entity_type),
+    $info['token type'],
   );
   $options['context'] = $entity_type;
 

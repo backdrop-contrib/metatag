@@ -1691,7 +1691,7 @@ function metatag_page_build(&$page) {
     return;
   }
 
-  // The front page has special consideration. Also, check if this is an error
+  // The home page has special consideration. Also, check if this is an error
   // (403/404) page, those also require separate handling.
   $instance = 'global:frontpage';
   if ((backdrop_is_front_page() && metatag_config_is_enabled($instance))

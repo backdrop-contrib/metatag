@@ -1,0 +1,21 @@
+{
+    "_config_name": "metatag.instance.node",
+    "module": "metatag",
+    "storage": "default",
+    "instance": "node",
+    "disabled": false,
+    "config": {
+        "title": {
+            "value": "[node:title] | [current-page:pager][site:name]"
+        },
+        "description": {
+            "value": "[node:summary]"
+        },
+        "canonical": {
+            "value": "[current-page:url:absolute]"
+        },
+        "shortlink": {
+            "value": "[current-page:url:unaliased]"
+        }
+    }
+}

@@ -158,6 +158,8 @@ function metatag_config_overview() {
     $rows[$config['instance']] = $row;
   }
 
+  $suffix = '<small>' . t('Items marked as "Unknown" will not be used. They are likely for page types that have been disabled on the <a href="@url">Settings page</a>, or deleted.', array('@url' => url('admin/config/search/metatags/settings'))) . '</small>';
+
   $build['config_table'] = array(
     '#theme' => 'table',
     '#header' => array(
@@ -177,7 +179,7 @@ function metatag_config_overview() {
         backdrop_get_path('module', 'metatag') . '/css/metatag.admin.css',
       ),
     ),
-    '#suffix' => '<p>' . t('Any items marked "Unknown" will not be used. They are likely for page types that have been deleted or disabled. See the <a href="@url">Settings page</a>.', array('@url' => url('admin/config/search/metatags/settings'))) . '</p>',
+    '#suffix' => $suffix,
   );
 
   return $build;
@@ -622,7 +624,7 @@ function metatag_admin_settings_form() {
   $form['entities'] = array(
     '#type' => 'fieldset',
     '#title' => t('Allow Meta tags'),
-    '#description' => t('Specity on which forms meta tag information can be defined.'),
+    '#description' => t('Specity where meta tag information can be defined.'),
     '#collapsible' => TRUE,
     '#collapsed' => FALSE,
   );
@@ -635,7 +637,6 @@ function metatag_admin_settings_form() {
         '#type' => 'checkbox',
         '#title' => t($entity_info['label']),
         '#default_value' => $entity_enabled,
-        '#description' => t('Enable meta tags for all pages of this type.'),
       );
 
       // Some entities, e.g. User, (core) File, have a single bundle with the
@@ -670,45 +671,42 @@ function metatag_admin_settings_form() {
     }
   }
 
-  $form['i18n'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Internationalization options'),
-    '#description' => t('Additional options are available when using the <a href="@url">Internationalization module</a>.', array('@url' => 'https://www.drupal.org/project/i18n')),
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-  );
-  $form['i18n']['i18n_disabled'] = array(
-    '#title' => t('Disable i18n integration'),
-    '#type' => 'checkbox',
-    '#description' => t('If the i18n_string module is enabled but the site does not need to translate Metatag strings, the integration may be disabled to avoid a large volume of records being added to the translation system.'),
-    '#default_value' => $settings->get('i18n_disabled'),
-    '#disabled' => !module_exists('i18n_string'),
-  );
-  $form['i18n']['i18n_translate_output'] = array(
-    '#title' => t('Translate output'),
-    '#type' => 'checkbox',
-    '#description' => t('Optionally translate the final page output.'),
-    '#default_value' => $settings->get('i18n_translate_output'),
-    '#disabled' => !module_exists('i18n_string'),
-  );
-  $form['i18n']['i18n_enable_watchdog'] = array(
-    '#title' => t('Enable logging of translations to Watchdog'),
-    '#type' => 'checkbox',
-    '#description' => t('Optionally log to Watchdog any changes that happen.'),
-    '#default_value' => $settings->get('i18n_enable_watchdog'),
-    '#disabled' => !module_exists('i18n_string'),
-  );
+  if (module_exists(i18n)) {
+    $form['i18n'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Internationalization options'),
+      '#description' => t('Additional options are available when using the <a href="@url">Internationalization module</a>.', array('@url' => 'https://www.drupal.org/project/i18n')),
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+    );
+    $form['i18n']['i18n_disabled'] = array(
+      '#title' => t('Disable i18n integration'),
+      '#type' => 'checkbox',
+      '#description' => t('If the i18n_string module is enabled but the site does not need to translate Metatag strings, the integration may be disabled to avoid a large volume of records being added to the translation system.'),
+      '#default_value' => $settings->get('i18n_disabled'),
+      '#disabled' => !module_exists('i18n_string'),
+    );
+    $form['i18n']['i18n_translate_output'] = array(
+      '#title' => t('Translate output'),
+      '#type' => 'checkbox',
+      '#description' => t('Optionally translate the final page output.'),
+      '#default_value' => $settings->get('i18n_translate_output'),
+      '#disabled' => !module_exists('i18n_string'),
+    );
+    $form['i18n']['i18n_enable_watchdog'] = array(
+      '#title' => t('Enable logging of translations to Watchdog'),
+      '#type' => 'checkbox',
+      '#description' => t('Optionally log to Watchdog any changes that happen.'),
+      '#default_value' => $settings->get('i18n_enable_watchdog'),
+      '#disabled' => !module_exists('i18n_string'),
+    );
+  }
 
   $form['advanced'] = array(
     '#type' => 'fieldset',
     '#title' => t('Advanced settings'),
     '#collapsible' => TRUE,
-    //'#collapsed' => TRUE,
-  );
-  $form['advanced']['load_defaults'] = array(
-    '#type' => 'checkbox',
-    '#title' => t("Provide sensible default values for meta tags"),
-    '#default_value' => $settings->get('load_defaults'),
+    '#collapsed' => TRUE,
   );
   $form['advanced']['load_all_pages'] = array(
     '#type' => 'checkbox',

@@ -102,7 +102,7 @@ function metatag_metatag_config_default() {
  */
 function metatag_metatag_config_instance_info() {
   $info['global']           = array('label' => t('Global'));
-  $info['global:frontpage'] = array('label' => t('Front page'));
+  $info['global:frontpage'] = array('label' => t('Home page'));
   $info['global:403']       = array('label' => t('403 access denied'));
   $info['global:404']       = array('label' => t('404 page not found'));
 

@@ -1,10 +1,9 @@
 {
-    "_config_name": "metatag.instance.global",
+    "_config_name": "metatag.instance.global.404",
     "module": "metatag",
     "storage": "default",
-    "instance": "global",
-    "api_version": 1,
-    "disabled": false,
+    "instance": "global:404",
+    "disabled": true,
     "config": {
         "title": {
             "value": "[current-page:title] | [current-page:pager][site:name]"
@@ -13,7 +12,10 @@
             "value": "Backdrop CMS (http://backdropcms.org)"
         },
         "canonical": {
-            "value": "[current-page:url:absolute]"
+            "value": "[site:url]"
+        },
+        "shortlink": {
+            "value": "[site:url]"
         }
     }
 }

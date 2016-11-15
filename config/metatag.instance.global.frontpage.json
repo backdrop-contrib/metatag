@@ -1,0 +1,18 @@
+{
+    "_config_name": "metatag.instance.global.frontpage",
+    "module": "metatag",
+    "storage": "default",
+    "instance": "global:frontpage",
+    "disabled": false,
+    "config": {
+        "title": {
+            "value": "[site:name] | [current-page:pager]"
+        },
+        "canonical": {
+            "value": "[site:url]"
+        },
+        "shortlink": {
+            "value": "[site:url]"
+        }
+    }
+}

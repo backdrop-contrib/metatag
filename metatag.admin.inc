@@ -22,7 +22,11 @@ function metatag_config_overview() {
   $metatags = metatag_get_info('tags');
 
   $names = config_get_names_with_prefix('metatag.instance');
-  $configs = config_load_multiple($names);
+  $config_files = config_load_multiple($names);
+  $configs = array();
+  foreach ($config_files as $config) {
+    $configs[$config['instance']] = $config;
+  }
 
   uksort($configs, '_metatag_config_instance_sort');
 
@@ -31,7 +35,7 @@ function metatag_config_overview() {
     $row = array();
 
     // Style disabled configurations differently.
-    if (!empty($config->disabled)) {
+    if ($config['disabled']) {
       $row['class'][] = 'disabled';
     }
 
@@ -52,7 +56,7 @@ function metatag_config_overview() {
       }
       else {
         $inherits[$parent] = metatag_config_instance_label($parent);
-        if (!empty($configs[$parent]->disabled)) {
+        if (!empty($configs[$parent]['disabled'])) {
           $inherits[$parent] .= ' ' . t('(disabled)');
         }
       }
@@ -68,6 +72,10 @@ function metatag_config_overview() {
     foreach ($config['config'] as $metatag => $data) {
       // Skip meta tags that were disabled.
       if (empty($metatags[$metatag])) {
+        continue;
+      }
+      // Skip meta tags that were not specifically defined.
+      if (empty($data['value'])) {
         continue;
       }
       $summary[] = array(
@@ -95,13 +103,13 @@ function metatag_config_overview() {
     $row['data']['details'] = $details;
 
     $operations = array();
-    if (metatag_config_access('disable', $config)) {
+    if (metatag_config_access('edit', $config)) {
       $operations['edit'] = array(
         'title' => t('Edit'),
         'href' => 'admin/config/search/metatags/config/' . $config['instance'],
       );
       if ($config['storage'] == METATAG_STORAGE_DEFAULT) {
-        $operations['edit'] = t('Override');
+        $operations['edit']['title'] = t('Override');
       }
     }
     if (metatag_config_access('enable', $config)) {
@@ -147,7 +155,6 @@ function metatag_config_overview() {
         '#attributes' => array('class' => array('links', 'inline')),
       ),
     );
-
     $rows[$config['instance']] = $row;
   }
 

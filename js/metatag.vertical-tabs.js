@@ -6,9 +6,9 @@
 (function ($) {
   'use strict';
 
-Drupal.behaviors.metatagFieldsetSummaries = {
+Backdrop.behaviors.metatagFieldsetSummaries = {
   attach: function (context) {
-    $('fieldset.metatags-form', context).drupalSetSummary(function (context) {
+    $('fieldset.metatags-form', context).BackdropSetSummary(function (context) {
       var vals = [];
       $("input[type='text'], select, textarea", context).each(function() {
         var input_field = $(this).attr('name');
@@ -27,13 +27,13 @@ Drupal.behaviors.metatagFieldsetSummaries = {
           return true;
         }
         var label = $("label[for='" + $(this).attr('id') + "']").text();
-        vals.push(Drupal.t('@label: @value', {
+        vals.push(Backdrop.t('@label: @value', {
           '@label': $.trim(label),
-          '@value': Drupal.truncate($(this).val(), 25) || Drupal.t('None')
+          '@value': Backdrop.truncate($(this).val(), 25) || Backdrop.t('None')
         }));
       });
       if (vals.length === 0) {
-        return Drupal.t('Using defaults');
+        return Backdrop.t('Using defaults');
       }
       else {
         return vals.join('<br />');
@@ -45,7 +45,7 @@ Drupal.behaviors.metatagFieldsetSummaries = {
 /**
  * Encode special characters in a plain-text string for display as HTML.
  */
-Drupal.truncate = function (str, limit) {
+Backdrop.truncate = function (str, limit) {
   if (str.length > limit) {
     return str.substr(0, limit) + '...';
   }

@@ -91,13 +91,13 @@ class DrupalMaskIconMetaTag extends DrupalTextMetaTag {
 
     // Add header information if desired.
     if (!empty($this->info['header'])) {
-      $element['#attached']['drupal_add_http_header'][] = array($this->info['header'], $value);
+      $element['#attached']['backdrop_add_http_header'][] = array($this->info['header'], $value);
     }
 
     $elements[] = array($element, $element['#id']);
 
     return array(
-      '#attached' => array('drupal_add_html_head' => $elements),
+      '#attached' => array('backdrop_add_html_head' => $elements),
     );
   }
 

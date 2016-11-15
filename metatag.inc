@@ -139,7 +139,7 @@ class MetaTagDefault implements MetaTagInterface {
 
         // Add header information if desired.
         if (!empty($this->info['header'])) {
-          $element['#attached']['drupal_add_http_header'][] = array($this->info['header'], $value);
+          $element['#attached']['backdrop_add_http_header'][] = array($this->info['header'], $value);
         }
 
         $elements[] = array($element, $element['#id']);
@@ -148,7 +148,7 @@ class MetaTagDefault implements MetaTagInterface {
 
     if (!empty($elements)) {
       return array(
-        '#attached' => array('drupal_add_html_head' => $elements),
+        '#attached' => array('backdrop_add_html_head' => $elements),
       );
     }
   }
@@ -272,7 +272,7 @@ class MetaTagText extends MetaTagDefault {
 
     // Support for dependencies, using Form API's #states system.
     // @see metatag.api.php.
-    // @see https://api.drupal.org/drupal_process_states
+    // @see https://api.drupal.org/backdrop_process_states
     if (!empty($this->info['dependencies'])) {
       foreach ($this->info['dependencies'] as $specs) {
         $form['value']['#states']['visible'][':input[name*="[' . $specs['dependency'] . '][' . $specs['attribute'] . ']"]'] = array(
@@ -302,7 +302,7 @@ class MetaTagText extends MetaTagDefault {
     if (empty($options['raw'])) {
       // Give other modules the opportunity to use hook_metatag_pattern_alter()
       // to modify defined token patterns and values before replacement.
-      drupal_alter('metatag_pattern', $value, $options['token data'], $this->info['name']);
+      backdrop_alter('metatag_pattern', $value, $options['token data'], $this->info['name']);
       $value = token_replace($value, $options['token data'], $options);
     }
 
@@ -391,11 +391,11 @@ class MetaTagLink extends MetaTagText {
     if (!isset($this->info['header']) || !empty($this->info['header'])) {
       // Also send the generator in the HTTP header.
       // @todo This does not support 'rev' or alternate link headers.
-      $element['#attached']['drupal_add_http_header'][] = array('Link', '<' . $value . '>;' . drupal_http_header_attributes(array('rel' => $element['#name'])), TRUE);
+      $element['#attached']['backdrop_add_http_header'][] = array('Link', '<' . $value . '>;' . backdrop_http_header_attributes(array('rel' => $element['#name'])), TRUE);
     }
 
     return array(
-      '#attached' => array('drupal_add_html_head' => array(array($element, $element['#id']))),
+      '#attached' => array('backdrop_add_html_head' => array(array($element, $element['#id']))),
     );
   }
 
@@ -415,8 +415,8 @@ class MetaTagTitle extends MetaTagText {
   public function getElement(array $options = array()) {
     $element = array();
     if ($value = $this->getValue($options)) {
-      $element['#attached']['metatag_set_preprocess_variable'][] = array('html', 'head_title', $value);
-      $element['#attached']['metatag_set_preprocess_variable'][] = array('html', 'head_array', array('title' => $value));
+      $element['#attached']['metatag_set_preprocess_variable'][] = array('body', 'head_title', $value);
+      $element['#attached']['metatag_set_preprocess_variable'][] = array('body', 'head_array', array('title' => $value));
     }
     return $element;
   }

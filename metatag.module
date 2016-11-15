@@ -242,7 +242,7 @@ function metatag_config_load_with_defaults($instance, $include_global = TRUE) {
   $defaults = &backdrop_static(__FUNCTION__, array());
 
   // Use the current page's locale.
-  $langcode = $GLOBALS['language_content']->language;
+  $langcode = $GLOBALS['language_content']->langcode;
 
   // Statically cache defaults since they can include multiple levels.
   $cid = "config:{$instance}:{$langcode}" . ($include_global ? ':withglobal' : ':withoutglobal');
@@ -517,7 +517,10 @@ function metatag_metatags_load_multiple($entity_type, array $entity_ids, array $
       }
     }
 
-    $metatags[$record->entity_id][$record->revision_id][$record->langcode] = $data;
+    // We use `language` (instead of `langcode`) because that's the column name.
+    if ($record->language) {
+      $metatags[$record->entity_id][$record->revision_id][$record->language] = $data;
+    }
   }
 
   return $metatags;
@@ -1071,12 +1074,6 @@ function metatag_generate_entity_metatags($entity, $entity_type, $langcode = NUL
     $langcode = $entity_language;
   }
 
-  // Other scenarios.
-  else {
-    // There's no need to do anything else - either there are meta tag values
-    // created for the requested language or there aren't.
-  }
-
   $cid = FALSE;
   $key = FALSE;
   $metatag_variants = array();
@@ -1183,7 +1180,6 @@ function metatags_get_entity_metatags($entity_id, $entity_type, $langcode = NULL
  */
 function metatag_metatags_view($instance, array $metatags = array(), array $options = array()) {
   $output = array();
-
 
   // Convert language codes to a language object.
   if (isset($options['language']) && is_string($options['language'])) {
@@ -1323,7 +1319,6 @@ function metatag_metatags_form(array &$form, $instance, array $metatags = array(
     'instance' => $instance,
   );
 
-  // Trigger hook_metatag_token_types_alter().
   // Allow the defined tokens to be modified.
   backdrop_alter('metatag_token_types', $options);
 
@@ -1711,32 +1706,48 @@ function metatag_page_get_metatags() {
 }
 
 /**
- * Implements hook_page_build(). @todo remove this.
+ * Prepare meta tags for addition to head.
+ *
+ * @return (array) $tags
+ *   Array of metatags for addition to the page with preprocess_page().
  */
-function metatag_page_build(&$page) {
-  $config = config('metatag.settings');
+function metatag_prepare_tags() {
+  $tags = array();
+  $settings = config('metatag.settings');
+
   // By default do not add meta tags to admin pages. To enable meta tags on
   // admin pages set the 'tag_admin_pages' setting to TRUE.
   if (path_is_admin(current_path()) && !$settings->get('tag_admin_pages')) {
     return;
   }
 
-  // Special consideration for the Me module, which uses the "user/me" path and
-  // will cause problems.
-  if (arg(0) == 'user' && arg(1) == 'me' && function_exists('me_menu_alter')) {
-    return;
+  // Generate the cache ID parts.
+  $cid_parts = array(
+    'instance' => $instance,
+  );
+
+  // The home page has special consideration.
+  if (backdrop_is_front_page()) {
+    $instance = 'global:frontpage';
+    if (metatag_config_is_enabled($instance)) {
+      // Generate the cache ID.
+      $cid = metatag_cache_default_cid_parts($cid_parts);
+
+      if ($cache = metatag_cache_get($cid)) {
+        $metatags = $cache->data;
+      }
+      else {
+        $metatags = metatag_metatags_view($instance, array());
+        metatag_cache_set($cid, $metatags);
+      }
+
+      $tags[$instance] = $metatags;
+    }
   }
 
-  // The home page has special consideration. Also, check if this is an error
-  // (403/404) page, those also require separate handling.
-  $instance = 'global:frontpage';
-  if ((backdrop_is_front_page() && metatag_config_is_enabled($instance))
-    || ($instance = metatag_is_error_page())) {
-
+  // Error (403/404) pages have special consideration.
+  elseif (($instance = metatag_is_error_page()) && metatag_config_is_enabled($instance)) {
     // Generate the cache ID.
-    $cid_parts = array(
-      'instance' => $instance,
-    );
     $cid = metatag_cache_default_cid_parts($cid_parts);
 
     if ($cache = metatag_cache_get($cid)) {
@@ -1747,25 +1758,22 @@ function metatag_page_build(&$page) {
       metatag_cache_set($cid, $metatags);
     }
 
-    $page[$region]['metatags'][$instance] = $metatags;
+    $tags[$instance] = $metatags;
   }
 
   // Load any meta tags assigned via metatag_page_set_metatags(). Note: this
   // must include the necessary defaults.
   else {
-    $page[$region]['metatags'] += metatag_page_get_metatags();
+    $tags += metatag_page_get_metatags();
   }
 
   // If no meta tags were loaded at least load the global defaults. This may be
   // disabled, see README.txt for details.
-  if (empty($page[$region]['metatags']) && $settings->get('load_all_pages')) {
+  if (empty($tags) && $settings->get('load_all_pages')) {
     $instance = 'global';
 
     // Generate the cache ID.
-    $cid_parts = array(
-      'instance' => $instance,
-      'path' => request_path(),
-    );
+    $cid_parts['path'] = request_path();
     $cid = metatag_cache_default_cid_parts($cid_parts);
 
     if ($cache = metatag_cache_get($cid)) {
@@ -1775,8 +1783,10 @@ function metatag_page_build(&$page) {
       $metatags = metatag_metatags_view($instance, array());
       metatag_cache_set($cid, $metatags);
     }
-    $page[$region]['metatags'][$instance] = $metatags;
+    $tags[$instance] = $metatags;
   }
+
+  return $tags;
 }
 
 /**
@@ -2019,10 +2029,10 @@ function metatag_get_value($metatag, array $data, array $options = array()) {
 }
 
 /**
- * Set a variable to be altered in metatag_preprocess_html().
+ * Set a variable to be altered in metatag_preprocess_page().
  *
  * @see metatag_get_preprocess_variables()
- * @see metatag_preprocess_html()
+ * @see metatag_preprocess_page()
  * @see metatag_preprocess_maintenance_page()
  */
 function metatag_set_preprocess_variable($hook, $variable, $value) {
@@ -2034,7 +2044,7 @@ function metatag_set_preprocess_variable($hook, $variable, $value) {
  * Return an array of variables to be altered in preprocess functions.
  *
  * @see metatag_set_preprocess_variable()
- * @see metatag_preprocess_html()
+ * @see metatag_preprocess_page()
  * @see metatag_preprocess_maintenance_page()
  */
 function metatag_get_preprocess_variables($hook) {
@@ -2046,6 +2056,8 @@ function metatag_get_preprocess_variables($hook) {
  * Implements hook_preprocess_page().
  */
 function metatag_preprocess_page(&$variables) {
+  // Get all the prepared tags.
+  metatag_prepare_tags();
   foreach (metatag_get_preprocess_variables('page') as $variable => $value) {
     $variables[$variable] = $value;
   }

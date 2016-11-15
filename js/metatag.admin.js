@@ -6,7 +6,7 @@
 (function ($) {
   'use strict';
 
-Drupal.behaviors.metatagUIConfigListing = {
+Backdrop.behaviors.metatagUIConfigListing = {
   attach: function (context) {
     // Hidden elements to be visible if JavaScript is enabled.
     $('.js-show').show();

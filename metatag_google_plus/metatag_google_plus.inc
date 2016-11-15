@@ -19,7 +19,7 @@ class DrupalSchemaMetaTag extends DrupalTextMetaTag {
   public function getElement(array $options = array()) {
     $element = array();
     $value = $this->getValue($options);
-    $element['#attached']['metatag_set_preprocess_variable'][] = array('html', 'itemtype', $value);
+    $element['#attached']['metatag_set_preprocess_variable'][] = array('body', 'itemtype', $value);
     return $element;
   }
 }

@@ -110,7 +110,7 @@ function hook_metatag_get_entity_metatags_instance_alter(&$instance, $entity, $e
   if ($entity_type == 'user') {
     // Split config instances based on user roles.
     foreach (array_reverse(user_roles(), TRUE) as $rid => $role) {
-      if ($rid == DRUPAL_AUTHENTICATED_RID) {
+      if ($rid == BACKDROP_AUTHENTICATED_RID) {
         continue;
       }
 
@@ -243,10 +243,10 @@ function hook_metatag_config_delete($config) {
  *         most meta tags use "value" as the attribute name.
  *       'condition' - The state condition to be checked against, e.g. "filled"
  *         to check text values, "checked" for a checkbox, "value" to compare
- *         the raw selection; see https://api.drupal.org/drupal_process_states
+ *         the raw selection; see https://api.drupal.org/backdrop_process_states
  *         for more details.
  *       'value' - The field value to check the 'condition' against. see
- *         https://api.drupal.org/drupal_process_states for further details.
+ *         https://api.drupal.org/backdrop_process_states for further details.
  *   Groups:
  *     'label' - The name for this group.
  *     'description' - A detailed explanation of these meta tags.
@@ -283,8 +283,8 @@ function hook_metatag_info_alter(&$info) {
  *   All of the options used to generate the meta tags.
  */
 function hook_metatag_metatags_view_alter(&$output, $instance, $options) {
-  if (isset($output['description']['#attached']['drupal_add_html_head'][0][0]['#value'])) {
-    $output['description']['#attached']['drupal_add_html_head'][0][0]['#value'] = 'O rly?';
+  if (isset($output['description']['#attached']['backdrop_add_html_head'][0][0]['#value'])) {
+    $output['description']['#attached']['backdrop_add_html_head'][0][0]['#value'] = 'O rly?';
   }
 }
 

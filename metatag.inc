@@ -133,8 +133,8 @@ class MetaTagDefault implements MetaTagInterface {
         $element = $base_element + array(
           '#tag' => 'meta',
           '#attributes' => array(
-            '#name' => $this->info['name'],
-            '#value' => $value,
+            'name' => $this->info['name'],
+            'value' => $value,
           ),
           //'#id' => 'metatag_' . $this->info['name'] . '_' . $ctr,
           '#weight' => $this->getWeight(),
@@ -145,7 +145,7 @@ class MetaTagDefault implements MetaTagInterface {
           $element['#attached']['backdrop_add_http_header'][] = array($this->info['header'], $value);
         }
 
-        $elements[] = $element;
+        $elements[$ctr] = $element;
       }
     }
 
@@ -386,8 +386,8 @@ class MetaTagLink extends MetaTagText {
     $element += array(
       '#tag' => 'link',
       '#attributes' => array(
-        '#name' => $this->info['name'],
-        '#value' => $value,
+        'name' => $this->info['name'],
+        'value' => $value,
       ),
       //'#id' => 'metatag_' . $this->info['name'],
       '#weight' => $this->getWeight(),

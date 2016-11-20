@@ -92,6 +92,8 @@ class MetaTagDefault implements MetaTagInterface {
   /**
    * Get the HTML tag for this meta tag.
    *
+   * @todo find out why this supports multiple elements, possibly remove.
+   *
    * @return array
    *   A render array for this meta tag.
    */
@@ -129,11 +131,12 @@ class MetaTagDefault implements MetaTagInterface {
 
         // Combine the base configuration for this meta tag with the value.
         $element = $base_element + array(
-          '#theme' => 'metatag',
           '#tag' => 'meta',
-          '#id' => 'metatag_' . $this->info['name'] . '_' . $ctr,
-          '#name' => $this->info['name'],
-          '#value' => $value,
+          '#attributes' => array(
+            '#name' => $this->info['name'],
+            '#value' => $value,
+          ),
+          //'#id' => 'metatag_' . $this->info['name'] . '_' . $ctr,
           '#weight' => $this->getWeight(),
         );
 
@@ -142,14 +145,15 @@ class MetaTagDefault implements MetaTagInterface {
           $element['#attached']['backdrop_add_http_header'][] = array($this->info['header'], $value);
         }
 
-        $elements[] = array($element, $element['#id']);
+        $elements[] = $element;
       }
     }
 
-    if (!empty($elements)) {
-      return array(
-        '#attached' => array('backdrop_add_html_head' => $elements),
-      );
+    if (count($elements) === 1) {
+      return $elements[0];
+    }
+    elseif (!empty($elements)) {
+      return $elements;
     }
   }
 
@@ -380,11 +384,12 @@ class MetaTagLink extends MetaTagText {
     }
 
     $element += array(
-      '#theme' => 'metatag_link_rel',
       '#tag' => 'link',
-      '#id' => 'metatag_' . $this->info['name'],
-      '#name' => $this->info['name'],
-      '#value' => $value,
+      '#attributes' => array(
+        '#name' => $this->info['name'],
+        '#value' => $value,
+      ),
+      //'#id' => 'metatag_' . $this->info['name'],
       '#weight' => $this->getWeight(),
     );
 
@@ -394,11 +399,8 @@ class MetaTagLink extends MetaTagText {
       $element['#attached']['backdrop_add_http_header'][] = array('Link', '<' . $value . '>;' . backdrop_http_header_attributes(array('rel' => $element['#name'])), TRUE);
     }
 
-    return array(
-      '#attached' => array('backdrop_add_html_head' => array(array($element, $element['#id']))),
-    );
+    return $element;
   }
-
 }
 
 /**
@@ -415,12 +417,13 @@ class MetaTagTitle extends MetaTagText {
   public function getElement(array $options = array()) {
     $element = array();
     if ($value = $this->getValue($options)) {
-      $element['#attached']['metatag_set_preprocess_variable'][] = array('body', 'head_title', $value);
-      $element['#attached']['metatag_set_preprocess_variable'][] = array('body', 'head_array', array('title' => $value));
+      $element = array(
+        '#tag' => 'title',
+        '#value' => $value,
+      );
     }
     return $element;
   }
-
 }
 
 /**

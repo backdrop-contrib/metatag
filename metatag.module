@@ -1058,9 +1058,7 @@ function metatag_generate_entity_metatags($entity, $entity_type, $langcode = NUL
     $langcode = $GLOBALS['language_content']->langcode;
   }
 
-  // This entity doesn't have any languages defined, i.e. it uses 'und'. This
-  // can't conflict with loading the wrong language as entities either have no
-  // language or they have specific one(s), they can't have both.
+  // This entity doesn't have any languages defined, i.e. it uses 'und'.
   if ($entity_language == LANGUAGE_NONE) {
     $langcode = LANGUAGE_NONE;
   }
@@ -1068,8 +1066,7 @@ function metatag_generate_entity_metatags($entity, $entity_type, $langcode = NUL
   // If there are no meta tags for the currently identified language, and there
   // *are* meta tags defined for the entity's default language, use the entity's
   // default language's values, unless the "Don't load entity's default
-  // language values if no languages match" option is enabled on the advanced
-  // settings page.
+  // language values if no languages match" option is enabled.
   elseif (empty($entity->metatags[$langcode]) && !empty($entity->metatags[$entity_language]) && !$settings->get('entity_no_lang_default')) {
     $langcode = $entity_language;
   }
@@ -1090,9 +1087,9 @@ function metatag_generate_entity_metatags($entity, $entity_type, $langcode = NUL
       'bundle' => $bundle,
       'entity_id' => $entity_id,
       'revision_id' => $revision_id,
-      // Cache separately based on the language of the passed-in entity and the
-      // overall active language of the page.
+      // Overall active language for the page.
       'langcode' => $langcode,
+      // Language of the passed-in entity.
       'language_content' => $GLOBALS['language_content']->langcode,
       'view_mode' => $view_mode,
     );
@@ -1126,8 +1123,8 @@ function metatag_generate_entity_metatags($entity, $entity_type, $langcode = NUL
       $options['language'] = $languages[$langcode];
     }
 
-    // Include token replacement data. Don't reload the entity object as doing
-    // so would conflict with content editorial workflows.
+    // Include token replacement data. (Don't reload the entity object as doing
+    // so would conflict with content editorial workflows.)
     if (!empty($entity_id)) {
       $options['token data'][$entity_type] = $entity;
     }
@@ -1141,6 +1138,9 @@ function metatag_generate_entity_metatags($entity, $entity_type, $langcode = NUL
       metatag_cache_set($cid, $metatag_variants);
     }
   }
+
+  dpm('metatag_generate_entity_metatags');
+  dpm($output);
 
   return $output;
 }
@@ -1165,7 +1165,7 @@ function metatags_get_entity_metatags($entity_id, $entity_type, $langcode = NULL
 }
 
 /**
- * Build a renderable array of meta tag output.
+ * Build a renderable array of meta tag data suitable for use in backdrop_add_html_head().
  *
  * @param string $instance
  *   The configuration instance key of the meta tags to use, e.g.
@@ -1177,6 +1177,8 @@ function metatags_get_entity_metatags($entity_id, $entity_type, $langcode = NULL
  *   - language: A language object.
  *   - token data: An array of data to pass into token_replace() during
  *                 meta tag value generation.
+ *
+ * @see backdrop_add_html_head().
  */
 function metatag_metatags_view($instance, array $metatags = array(), array $options = array()) {
   $output = array();
@@ -1225,8 +1227,10 @@ function metatag_metatags_view($instance, array $metatags = array(), array $opti
     }
   }
 
-  // Allow the output meta tags to be modified using
-  // hook_metatag_metatags_view_alter().
+  dpm('metatag_metatags_view');
+  dpm($output);
+
+  // Allow the output meta tags to be modified.
   backdrop_alter('metatag_metatags_view', $output, $instance, $options);
 
   return $output;
@@ -2029,46 +2033,48 @@ function metatag_get_value($metatag, array $data, array $options = array()) {
 }
 
 /**
- * Set a variable to be altered in metatag_preprocess_page().
- *
- * @see metatag_get_preprocess_variables()
- * @see metatag_preprocess_page()
- * @see metatag_preprocess_maintenance_page()
- */
-function metatag_set_preprocess_variable($hook, $variable, $value) {
-  $variables = &backdrop_static(__FUNCTION__, array());
-  $variables[$hook][$variable] = $value;
-}
-
-/**
- * Return an array of variables to be altered in preprocess functions.
- *
- * @see metatag_set_preprocess_variable()
- * @see metatag_preprocess_page()
- * @see metatag_preprocess_maintenance_page()
- */
-function metatag_get_preprocess_variables($hook) {
-  $variables = backdrop_static('metatag_set_preprocess_variable', array());
-  return isset($variables[$hook]) ? $variables[$hook] : array();
-}
-
-/**
  * Implements hook_preprocess_page().
+ *
+ * @see metatag_preprocess_maintenance_page().
  */
 function metatag_preprocess_page(&$variables) {
-  // Get all the prepared tags.
-  metatag_prepare_tags();
-  foreach (metatag_get_preprocess_variables('page') as $variable => $value) {
-    $variables[$variable] = $value;
+  // Prepare all the tags, including doing token replacements.
+  $metatags = metatag_prepare_tags();
+  // Add each metatag to page header.
+  foreach ($metatags as $key => $value) {
+    foreach ($value as $tag => $data) {
+      // The title tag is special.
+      if ($tag == 'title') {
+        $variables['head_title'] = check_plain($data['#value']);
+      }
+      // ALl other tags are assumed 'meta' tags.
+      else {
+        backdrop_add_html_head($value);
+      }
+    }
   }
 }
 
 /**
  * Implements hook_preprocess_maintenance_page().
+ *
+ * @see metatag_preprocess_page().
  */
 function metatag_preprocess_maintenance_page(&$variables) {
-  foreach (metatag_get_preprocess_variables('page') as $variable => $value) {
-    $variables[$variable] = $value;
+  // Prepare all the tags, including doing token replacements.
+  $metatags = metatag_prepare_tags();
+  // Add each metatag to page header.
+  foreach ($metatags as $key => $value) {
+    foreach ($value as $tag => $data) {
+      // The title tag is special.
+      if ($tag == 'title') {
+        $variables['head_title'] = check_plain($data['#value']);
+      }
+      // ALl other tags are assumed 'meta' tags.
+      else {
+        backdrop_add_html_head($value);
+      }
+    }
   }
 }
 

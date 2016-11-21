@@ -8,7 +8,7 @@
 
 Backdrop.behaviors.metatagFieldsetSummaries = {
   attach: function (context) {
-    $('fieldset.metatags-form', context).BackdropSetSummary(function (context) {
+    $('fieldset.metatags-form', context).backdropSetSummary(function (context) {
       var vals = [];
       $("input[type='text'], select, textarea", context).each(function() {
         var input_field = $(this).attr('name');

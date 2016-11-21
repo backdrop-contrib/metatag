@@ -712,6 +712,12 @@ function metatag_admin_settings_form() {
     '#collapsible' => TRUE,
     '#collapsed' => TRUE,
   );
+  $form['advanced']['cache_output'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Cache meta tag output'),
+    '#description' => t('When disabled, all meta tag output will be generated on request (disabling this setting may slow down your site).'),
+    '#default_value' => $settings->get('cache_output'),
+  );
   $form['advanced']['load_all_pages'] = array(
     '#type' => 'checkbox',
     '#title' => t('Always output meta tags, even if global default'),
@@ -732,21 +738,14 @@ function metatag_admin_settings_form() {
   );
   $form['advanced']['tag_admin_pages'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Also output meta tags on admin pages'),
-    '#description' => t('When disabled, meta tags will not be output on administrative pages.'),
+    '#title' => t('Output meta tags on administrative pages also'),
+    '#description' => t('When disabled, meta tags will only be output on public-facing pages.'),
     '#default_value' => $settings->get('tag_admin_pages'),
   );
   $form['advanced']['extended_permissions'] = array(
     '#type' => 'checkbox',
     '#title' => t('Provide a permission for each individual meta tag'),
-    '#description' => t('Provides increased flexibility for the editorial process, but increases complexity in permissions configuration.'),
     '#default_value' => $settings->get('extended_permissions'),
-  );
-  $form['advanced']['cache_output'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Cache meta tag output'),
-    '#description' => t('When disabled, all meta tag output will be generated on request and may adversely impact performance.'),
-    '#default_value' => $settings->get('cache_output'),
   );
   $form['advanced']['token_sanitize'] = array(
     '#type' => 'checkbox',
@@ -754,9 +753,9 @@ function metatag_admin_settings_form() {
     '#default_value' => $settings->get('token_sanitize'),
   );
   $form['advanced']['pager_string'] = array(
-    '#title' => t('Custom pager string'),
+    '#title' => t('Replace the token [current-page:pager] with the following custom pager string:'),
     '#type' => 'textfield',
-    '#description' => t('When the page includes a pager and the URL contains "?page=42", the token [current-page:pager] may be added to differentiate between two pages that would otherwise have the same meta tags. The value "PAGER" (must be in uppercase) will be replaced by the actual page count. Note: the pager will only output if the page number is 2 or above and the string "page=NUMBER" is in the URL.'),
+    '#description' => t('The value "PAGER" (must be in uppercase) will be replaced by the actual page count. Note: the pager will only output if the page number is 2 or above and the string "page=NUMBER" is in the URL.'),
     '#default_value' => $settings->get('pager_string'),
   );
 

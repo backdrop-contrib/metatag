@@ -4,7 +4,7 @@
  * A base class for the Metatag tests, provides shared methods.
  */
 
-abstract class MetatagTestHelper extends DrupalWebTestCase {
+abstract class MetatagTestHelper extends BackdropWebTestCase {
   /**
    * Admin user.
    *
@@ -21,10 +21,6 @@ abstract class MetatagTestHelper extends DrupalWebTestCase {
     $modules[] = 'node';
     $modules[] = 'taxonomy';
 
-    // Requirements.
-    $modules[] = 'ctools';
-    $modules[] = 'token';
-
     // Metatag modules. Only enable the main module, submodules will be tested
     // separately.
     $modules[] = 'metatag';
@@ -39,11 +35,11 @@ abstract class MetatagTestHelper extends DrupalWebTestCase {
    * Load the Performance admin page and clear all caches.
    */
   function clearAllCaches() {
-    $this->drupalGet('admin/config/development/performance');
+    $this->backdropGet('admin/config/development/performance');
     $this->assertResponse(200);
     $this->assertText(t('Performance'));
     $this->assertText(t('Clear cache'));
-    $this->drupalPost(NULL, array(), t('Clear all caches'));
+    $this->backdropPost(NULL, array(), t('Clear all caches'));
     $this->assertResponse(200);
     $this->assertText(t('Caches cleared'));
   }
@@ -53,7 +49,7 @@ abstract class MetatagTestHelper extends DrupalWebTestCase {
    */
   function createContentType($machine_name, $label) {
     // Create a content type.
-    $content_type = $this->drupalCreateContentType(array(
+    $content_type = $this->backdropCreateContentType(array(
       'type' => $machine_name,
       'name' => $label,
     ));
@@ -83,11 +79,11 @@ abstract class MetatagTestHelper extends DrupalWebTestCase {
     );
 
     // Reset the static variable used to identify permissions, otherwise it's
-    // possible the permissions check in drupalCreateUser will fail.
+    // possible the permissions check in backdropCreateUser will fail.
     $this->checkPermissions(array(), TRUE);
     cache_clear_all();
 
-    return $this->drupalCreateUser(array_merge($permissions, $extra_permissions));
+    return $this->backdropCreateUser(array_merge($permissions, $extra_permissions));
   }
 
   /**
@@ -106,11 +102,11 @@ abstract class MetatagTestHelper extends DrupalWebTestCase {
     );
 
     // Reset the static variable used to identify permissions, otherwise it's
-    // possible the permissions check in drupalCreateUser will fail.
+    // possible the permissions check in backdropCreateUser will fail.
     $this->checkPermissions(array(), TRUE);
     cache_clear_all();
 
-    return $this->drupalCreateUser(array_merge($permissions, $extra_permissions));
+    return $this->backdropCreateUser(array_merge($permissions, $extra_permissions));
   }
 
   /**
@@ -134,7 +130,7 @@ abstract class MetatagTestHelper extends DrupalWebTestCase {
     $vocabulary = new stdClass();
     $vocabulary->name = $vocab_name;
     $vocabulary->description = $vocab_name;
-    $vocabulary->machine_name = drupal_strtolower($vocab_name);
+    $vocabulary->machine_name = backdrop_strtolower($vocab_name);
     $vocabulary->help = '';
     $vocabulary->weight = mt_rand(0, 10);
     if (!empty($content_type)) {
@@ -186,8 +182,6 @@ abstract class MetatagTestHelper extends DrupalWebTestCase {
    * entity.
    *
    * @todo Expand to cover more meta tags.
-   *
-   * @see metatag_test_metatag_config_default()
    */
   function getTestDefaults() {
     return array(
@@ -203,11 +197,11 @@ abstract class MetatagTestHelper extends DrupalWebTestCase {
       // 'standout' => array('value' => ''),
       // 'robots' => array('value' => ''),
       // 'standout' => array('value' => ''),
-      'generator' => array('value' => 'Drupal 7 (http://drupal.org)'),
+      'generator' => array('value' => 'Backdrop CMS (http://backdropcms.org)'),
       // 'standout' => array('value' => ''),
       // 'image_src' => array('value' => ''),
       'canonical' => array('value' => '[current-page:url:absolute]'),
-      'shortlink' => array('value' => '[current-page:url:unaliased]'),
+      // 'shortlink' => array('value' => '[current-page:url:unaliased]'),
       // 'publisher' => array('value' => ''),
       // 'author' => array('value' => ''),
       // 'original-source' => array('value' => ''),
@@ -223,21 +217,21 @@ abstract class MetatagTestHelper extends DrupalWebTestCase {
    */
   public function addSiteLanguage($langcode) {
     // Load the language-add page.
-    $this->drupalGet('admin/config/regional/language/add');
+    $this->backdropGet('admin/config/regional/language/add');
     $this->assertResponse(200, 'Loaded the language-add admin page.');
 
     // Submit the language-add form.
     $args = array(
       'langcode' => $langcode,
     );
-    $this->drupalPost(NULL, $args, t('Add language'));
+    $this->backdropPost(NULL, $args, t('Add language'));
     $this->assertResponse(200);
 
     // Verify that the browser was returned to the main languages admin page.
     $this->assertEqual($this->getUrl(), url('admin/config/regional/language', array('absolute' => TRUE)), 'Redirected back to the main languages admin page.');
 
     // Clear the language list cache so it can be reloaded.
-    drupal_static_reset('language_list');
+    backdrop_static_reset('language_list');
 
     // Get all language definitions.
     $languages = language_list();
@@ -262,10 +256,10 @@ abstract class MetatagTestHelper extends DrupalWebTestCase {
     }
 
     // Log in as the admin user.
-    $this->drupalLogin($this->adminUser);
+    $this->backdropLogin($this->adminUser);
 
     // Load the admin page, just to have a point of reference.
-    $this->drupalGet('admin');
+    $this->backdropGet('admin');
     $this->assertResponse(200, 'Loaded the main admin page.');
 
     // Add French.
@@ -276,7 +270,7 @@ abstract class MetatagTestHelper extends DrupalWebTestCase {
 
     // Enable URL language detection and selection.
     $edit = array('language[enabled][locale-url]' => '1');
-    $this->drupalPost('admin/config/regional/language/configure', $edit, t('Save settings'));
+    $this->backdropPost('admin/config/regional/language/configure', $edit, t('Save settings'));
     $this->assertResponse(200);
   }
 
@@ -408,7 +402,7 @@ abstract class MetatagTestHelper extends DrupalWebTestCase {
    */
   function saveTranslationString($lid, $context, $langcode, $string_source, $string_target) {
     // Load the translation page for the front page's title tag.
-    $this->drupalGet('admin/config/regional/translate/edit/' . $lid);
+    $this->backdropGet('admin/config/regional/translate/edit/' . $lid);
     $this->assertResponse(200, 'Loaded the front page title tag string translation page.');
     $this->assertEqual($this->getUrl(), url('admin/config/regional/translate/edit/' . $lid, array('absolute' => TRUE)));
 
@@ -444,7 +438,7 @@ abstract class MetatagTestHelper extends DrupalWebTestCase {
     $edit = array(
       "translations[{$langcode}]" => $string_target,
     );
-    $this->drupalPost(NULL, $edit, t('Save translations'));
+    $this->backdropPost(NULL, $edit, t('Save translations'));
     $this->assertResponse(200);
 
     // Confirm the save worked.
@@ -523,12 +517,12 @@ abstract class MetatagTestHelper extends DrupalWebTestCase {
    */
   function generateByPathConfig($test_object) {
     // Verify the "add context" page works.
-    $this->drupalGet('admin/config/search/metatags/context');
+    $this->backdropGet('admin/config/search/metatags/context');
     $this->assertResponse(200);
     $this->assertText(t('Add a meta tag by path'));
 
     // Verify the "add context" page works.
-    $this->drupalGet('admin/config/search/metatags/context/add');
+    $this->backdropGet('admin/config/search/metatags/context/add');
     $this->assertResponse(200);
     $this->assertText(t('The unique ID for this metatag path context rule. This must contain only lower case letters, numbers and underscores.'));
 
@@ -537,7 +531,7 @@ abstract class MetatagTestHelper extends DrupalWebTestCase {
       'name' => $test_object->name,
     );
 
-    $this->drupalPost('admin/config/search/metatags/context/add', $values, t('Add and configure'));
+    $this->backdropPost('admin/config/search/metatags/context/add', $values, t('Add and configure'));
     $this->assertResponse(200);
   }
 
@@ -555,7 +549,7 @@ abstract class MetatagTestHelper extends DrupalWebTestCase {
       'metatags[und][abstract][value]' => $test_object->abstract,
       'metatags[und][keywords][value]' => $test_object->keywords,
     );
-    $this->drupalPost('admin/config/search/metatags/context/' . $test_object->name, $edit, t('Save'));
+    $this->backdropPost('admin/config/search/metatags/context/' . $test_object->name, $edit, t('Save'));
     $this->assertResponse(200);
   }
 
@@ -566,7 +560,7 @@ abstract class MetatagTestHelper extends DrupalWebTestCase {
    *   Metatag mapping object.
    */
   function checkByPathConfig($test_object) {
-    $this->drupalGet($test_object->path);
+    $this->backdropGet($test_object->path);
     $this->assertResponse(200);
 
     // Manually test the page title.
@@ -606,7 +600,7 @@ abstract class MetatagTestHelper extends DrupalWebTestCase {
       'translation' => 'all',
       'group' => 'metatag',
     );
-    $this->drupalPost('admin/config/regional/translate/translate', $search, t('Filter'));
+    $this->backdropPost('admin/config/regional/translate/translate', $search, t('Filter'));
     $this->assertResponse(200, 'Loaded the translation admin page.');
 
     // Confirm there are strings to translate.
@@ -698,7 +692,7 @@ abstract class MetatagTestHelper extends DrupalWebTestCase {
    */
   function assertUserEntityTags($user) {
     // Load the user's profile page.
-    $this->drupalGet('user/' . $user->uid);
+    $this->backdropGet('user/' . $user->uid);
     $this->assertResponse(200);
 
     // Verify the title is using the custom default for this vocabulary.

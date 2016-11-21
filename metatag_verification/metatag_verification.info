@@ -1,7 +1,8 @@
 name = Metatag: Verification
-description = "Various meta tags for verifying ownership of a site."
+description = "Add meta tags for verifying ownership of a site."
 package = SEO
-core = 7.x
+backdrop = 1.x
+
 dependencies[] = metatag
 
 ; Tests.

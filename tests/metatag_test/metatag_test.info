@@ -1,8 +1,8 @@
 name = Meta Tag Test
 description = Helper module for testing metatag.module.
-core = 7.x
+backdrop = 1.x
+
+dependencies[] = metatag
 
 ; Don't show this on the modules admin page.
 hidden = TRUE
-
-dependencies[] = metatag

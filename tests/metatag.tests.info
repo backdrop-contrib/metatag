@@ -1,0 +1,6 @@
+[MetatagCoreUnitTest]
+name = Metatag unit tests
+description = Test basic meta tag functionality for entities.
+group = Metatag
+file = metatag.unit.test
+

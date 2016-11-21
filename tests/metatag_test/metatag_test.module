@@ -1,13 +1,8 @@
 <?php
-
 /**
- * Implements hook_ctools_plugin_api().
+ * @file
+ * Helper module for testing metatag.module.
  */
-function metatag_test_ctools_plugin_api($owner, $api) {
-  if ($owner == 'metatag' && $api == 'metatag') {
-    return array('version' => 1);
-  }
-}
 
 /**
  * Implements hook_menu().
@@ -43,4 +38,34 @@ function metatag_test_menu() {
  */
 function metatag_test_page_callback() {
   return t('Test page.');
+}
+
+/**
+ * Implements hook_metatag_info().
+ */
+function metatag_test_metatag_info() {
+  $info['groups']['testing'] = array(
+    'label' => t('Testing'),
+    'form' => array(
+      '#weight' => 100,
+    ),
+  );
+
+  $info['test:foo'] = array(
+    'label' => t('Foo meta tag'),
+    'description' => t('Testing metatag.'),
+    'class' => 'DrupalTextMetaTag',
+    'group' => 'testing',
+  );
+
+  return $info;
+}
+
+/**
+ * Implements hook_metatag_config_default_alter().
+ */
+function metatag_test_metatag_config_default_alter(array &$configs) {
+  if (isset($configs['test:foo'])) {
+    $configs['test:foo']['config']['title']['value'] = 'Test altered title';
+  }
 }

@@ -5,61 +5,20 @@
  */
 
 /**
- * Provides a default configuration for Metatag intances.
+ * The function hook_metatag_config_default() is not necessary in Backdrop CMS.
  *
- * This hook allows modules to provide their own Metatag instances which can
- * either be used as-is or as a "starter" for users to build from.
- *
- * This hook should be placed in MODULENAME.metatag.inc and it will be auto-
- * loaded. MODULENAME.metatag.inc *must* be in the same directory as the
- * .module file which *must* also contain an implementation of
- * hook_ctools_plugin_api, preferably with the same code as found in
- * metatag_ctools_plugin_api().
- *
- * The $config->disabled boolean attribute indicates whether the Metatag
- * instance should be enabled (FALSE) or disabled (TRUE) by default.
- *
- * @return array
- *   An associative array containing the structures of Metatag instances, as
- *   generated from the Export tab, keyed by the Metatag config name.
- *
- * @see metatag_metatag_config_default()
- * @see metatag_ctools_plugin_api()
+ * To provide default configurations for metatag configs, simply place a config
+ * JSON file into the 'config' directory within the module. The file will be
+ * copied over to the active directory when the module is enabled.
  */
-function hook_metatag_config_default() {
-  $configs = array();
-
-  $config = array(
-    'instance' => 'config1',
-    'api_version' => '1',
-    'disabled' => FALSE,
-    'config' => array(
-      'title' => array('value' => '[current-page:title] | [site:name]'),
-      'generator' => array('value' => 'Drupal 7 (http://drupal.org)'),
-      'canonical' => array('value' => '[current-page:url:absolute]'),
-      'shortlink' => array('value' => '[current-page:url:unaliased]'),
-    ),
-  );
-  $configs[$config['instance'] = $config;
-
-  $config = array(
-    'instance' => 'config1',
-    'api_version' => '1',
-    'disabled' => FALSE,
-    'config' => array(
-      'title' => array('value' => '[user:name] | [site:name]'),
-    ),
-  );
-  $configs[$config['instance'] = $config;
-
-  return $configs;
-}
 
 /**
- * Allow the exported configurations to be changed prior to being cached.
+ * Allows the default configuration to be changed prior to being cached.
  */
 function hook_metatag_config_default_alter(&$config) {
-  $config['config']['title'] = '[current-page:title] | foo bar baz';
+  if ($config['instance'] == 'test') {
+    $config['config']['title'] = '[current-page:title] | foo bar';
+  }
 }
 
 /**
@@ -71,10 +30,12 @@ function hook_metatag_config_default_alter(&$config) {
  * weights and loading priorities cause the submodules' settings to run after
  * those of any custom modules.
  *
- * @see hook_metatag_config_default()
  * @see hook_metatag_config_default_alter()
  */
 function hook_metatag_bundled_config_alter(&$config) {
+  if ($config['instance'] == 'test') {
+    $config['config']['title'] = '[current-page:title] | foo bar baz';
+  }
 }
 
 /**

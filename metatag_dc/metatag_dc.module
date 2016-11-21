@@ -5,15 +5,6 @@
  */
 
 /**
- * Implements hook_ctools_plugin_api().
- */
-function metatag_dc_ctools_plugin_api($owner, $api) {
-  if ($owner == 'metatag' && $api == 'metatag') {
-    return array('version' => 1);
-  }
-}
-
-/**
  * Implements hook_theme().
  */
 function metatag_dc_theme() {

@@ -4,6 +4,7 @@
     "storage": "default",
     "instance": "global:frontpage",
     "disabled": false,
+    "api_version": 1,
     "config": {
         "title": {
             "value": "[site:name] | [current-page:pager]"

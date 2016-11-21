@@ -5,6 +5,8 @@
  */
 
 abstract class MetatagTestHelper extends BackdropWebTestCase {
+  protected $profile = 'minimal';
+
   /**
    * Admin user.
    *
@@ -127,12 +129,10 @@ abstract class MetatagTestHelper extends BackdropWebTestCase {
     }
 
     // Create a vocabulary.
-    $vocabulary = new stdClass();
+    $vocabulary = new TaxonomyVocabulary();
     $vocabulary->name = $vocab_name;
     $vocabulary->description = $vocab_name;
     $vocabulary->machine_name = backdrop_strtolower($vocab_name);
-    $vocabulary->help = '';
-    $vocabulary->weight = mt_rand(0, 10);
     if (!empty($content_type)) {
       $vocabulary->nodes = array($content_type => $content_type);
     }
@@ -162,12 +162,13 @@ abstract class MetatagTestHelper extends BackdropWebTestCase {
     }
 
     // Create an object to save.
-    $term = new stdClass();
-    $term->name = $term_name;
-    $term->description = $term_name;
-    // Use the first available text format.
-    $term->format = db_query_range('SELECT format FROM {filter_format}', 0, 1)->fetchField();
-    $term->vid = $vocabulary->vid;
+    $term = entity_create('taxonomy_term', array(
+      'name' => $term_name,
+      'description' => $term_name,
+      'format' => filter_default_format(),
+      'vocabulary' => $vocabulary->machine_name,
+      'langcode' => LANGUAGE_NONE,
+    ));
 
     // Save the term.
     taxonomy_term_save($term);

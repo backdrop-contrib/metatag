@@ -5,16 +5,6 @@
  */
 
 class MetatagCoreTermTest extends MetatagTestHelper {
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Metatag core tests for terms',
-      'description' => 'Test Metatag edit functionality for terms.',
-      'group' => 'Metatag',
-    );
-  }
 
   /**
    * {@inheritdoc}
@@ -51,73 +41,61 @@ class MetatagCoreTermTest extends MetatagTestHelper {
 
       // Needed for the vocabulary.
       'administer taxonomy',
-      'edit terms in ' . $vocabulary->vid,
-      'delete terms in ' . $vocabulary->vid,
+      'edit terms in ' . $vocabulary->machine_name,
+      'delete terms in ' . $vocabulary->machine_name,
 
       // Needed for the Path module.
       'create url aliases',
     );
     $this->adminUser = $this->createAdminUser($perms);
-    $this->drupalLogin($this->adminUser);
+    $this->backdropLogin($this->adminUser);
 
     // Assign default values for the new vocabulary.
 
     // Load the "add default configuration" page.
-    $this->drupalGet('admin/config/search/metatags/config/add');
+    $this->backdropGet('admin/config/search/metatags/config/add');
     $this->assertResponse(200);
 
     // Verify the page loaded correct.
     $this->assertText(t('Select the type of default meta tags you would like to add.'));
 
     // Submit the initial form to select an entity bundle.
-    $this->drupalPost(NULL, array(
+    $this->backdropPost(NULL, array(
       'instance' => 'taxonomy_term:' . $vocabulary->name,
     ), t('Add and configure'));
     $this->assertResponse(200);
-
-    // @todo Update this to extract the H1 tag.
     $this->assertText(strip_tags('Taxonomy term: ' . $vocabulary->name));
 
     // Submit the form with some values.
-    $this->drupalPost(NULL, array(
+    $this->backdropPost(NULL, array(
       'metatags[und][abstract][value]' => '[term:name]',
     ), t('Save'));
     $this->assertResponse(200);
 
     // Verify the page loaded correct.
-    $this->assertText(strip_tags(t('The meta tag defaults for @label have been saved.', array('@label' => 'Taxonomy term: ' . $vocabulary->name))));
+    $this->assertRaw(format_string('The meta tag defaults for @label have been saved.', array('@label' => 'Taxonomy term: ' . $vocabulary->name)));
 
     // Verify that the user was redirected to the settings page again.
     $this->assertEqual($this->getUrl(), url('admin/config/search/metatags', array('absolute' => TRUE)));
 
     // Create a test term.
+    $term = $this->createTerm($vocabulary, $term_name);
 
-    // Load the term form.
-    $this->drupalGet('admin/structure/taxonomy/' . $vocabulary->machine_name . '/add');
-    $this->assertResponse(200);
+    // Verify that it's possible to submit values to the term's edit form.
+    $this->backdropGet('taxonomy/term/'. $term->tid . '/edit');
 
-    // Verify the page loaded correctly.
-    // @todo Update this to extract the H1 tag.
-    // $this->assertText(strip_tags(t('Create @name', array('@name' => $vocabulary->name))));
-
-    // Verify that it's possible to submit values to the form.
-    $this->drupalPost(NULL, array(
+    $this->backdropPost(NULL, array(
       'metatags[und][abstract][value]' => '[term:name] ponies',
-      'name' => $term_name,
+      'path[auto]' => FALSE,
       'path[alias]' => $term_path,
     ), t('Save'));
     $this->assertResponse(200);
 
-    // Verify that the node saved correctly.
-    $t_args = array('%name' => $term_name);
-    // This doesn't work for some reason, it seems the HTML is stripped off
-    // during output so the %name's standard Drupal wrappers don't match.
-    // $this->assertText(t('Created new term %name.', $t_args));
-    // .. so this has to be done instead.
-    $this->assertText(strip_tags(t('Created new term %name.', $t_args)));
+    // Verify that the term saved correctly.
+    $this->assertRaw(format_string('Updated term %name.', array('%name' => $term_name)));
 
     // Verify the term data saved correctly.
-    $this->drupalGet($term_path);
+    $this->backdropGet($term_path);
     $this->assertResponse(200);
 
     // Try to extract the 'edit' link.
@@ -159,5 +137,6 @@ class MetatagCoreTermTest extends MetatagTestHelper {
     $xpath = $this->xpath("//meta[@name='abstract']");
     $this->assertEqual(count($xpath), 1, 'Exactly one abstract meta tag found.');
     $this->assertEqual($xpath[0]['content'], "Who likes magic ponies");
+
   }
 }

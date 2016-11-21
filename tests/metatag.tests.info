@@ -10,3 +10,22 @@ description = Tests that each of the Metatag base tags work correctly.
 group = Metatag
 file = metatag.tags.test
 
+[MetatagCoreNodeTest]
+name = Metatag core tests for nodes
+description = Test Metatag edit functionality for nodes.
+group = Metatag
+file = metatag.node.test
+
+[MetatagCoreTermTest]
+name = Metatag core tests for terms
+description = Test Metatag edit functionality for terms.
+group = Metatag
+file = metatag.term.test
+
+[MetatagCoreUserTest]
+name = Metatag core tests for users
+description = Test Metatag edit functionality for users.
+group = Metatag
+file = metatag.user.test
+
+

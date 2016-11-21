@@ -5,16 +5,6 @@
  */
 
 class MetatagCoreUserTest extends MetatagTestHelper {
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Metatag core tests for users',
-      'description' => 'Test Metatag edit functionality for users.',
-      'group' => 'Metatag',
-    );
-  }
 
   /**
    * Tests creation of a standard entity.
@@ -24,50 +14,43 @@ class MetatagCoreUserTest extends MetatagTestHelper {
     if (!isset($this->adminUser)) {
       $this->adminUser = $this->createAdminUser();
     }
-    $this->drupalLogin($this->adminUser);
+    $this->backdropLogin($this->adminUser);
 
     // Assign default values for the new vocabulary.
 
     // Load the page for overriding the User configuration.
-    $this->drupalGet('admin/config/search/metatags/config/user');
+    $this->backdropGet('admin/config/search/metatags/config/user');
     $this->assertResponse(200);
 
     // Verify the page loaded correct.
-    // @todo Update this to extract the H1 tag.
-    $this->assertText(strip_tags('User'));
+    $this->assertText('User');
 
     // Submit the form with some values.
-    $this->drupalPost(NULL, array(
+    $this->backdropPost(NULL, array(
       'metatags[und][abstract][value]' => '[user:name]',
     ), t('Save'));
     $this->assertResponse(200);
 
-    // Verify the page loaded correct.
+    // Verify the page loaded correctly.
     $this->assertText(strip_tags(t('The meta tag defaults for @label have been saved.', array('@label' => 'User'))));
 
     // Verify that the user was redirected to the settings page again.
     $this->assertEqual($this->getUrl(), url('admin/config/search/metatags', array('absolute' => TRUE)));
 
     // Load the user's edit form.
-    $this->drupalGet('user/' . $this->adminUser->uid . '/edit');
+    $this->backdropGet('user/' . $this->adminUser->uid . '/edit');
     $this->assertResponse(200);
 
     // Verify the page loaded correctly.
-    // @todo Update this to extract the H1 tag.
-    // $this->assertText(strip_tags(t('Create @name', array('@name' => $vocabulary->name))));
+    $this->assertRaw($this->adminUser->name);
 
     // Verify that it's possible to submit values to the form.
-    $this->drupalPost(NULL, array(
+    $this->backdropPost(NULL, array(
       'metatags[und][abstract][value]' => '[user:name] ponies',
     ), t('Save'));
     $this->assertResponse(200);
 
     // Verify that the user object saved correctly.
-    // $t_args = array('%name' => $this->adminUser->name);
-    // This doesn't work for some reason, it seems the HTML is stripped off
-    // during output so the %name's standard Drupal wrappers don't match.
-    // $this->assertText(t('The changes have been saved.'));
-    // .. so this has to be done instead.
     $this->assertText(strip_tags(t('The changes have been saved.')));
 
     // Manually load the admin account.
@@ -81,6 +64,7 @@ class MetatagCoreUserTest extends MetatagTestHelper {
         ),
       ),
     );
+
     $this->assertEqual($expected, $account->metatags);
 
     // Confirm the user profile tags work correctly.

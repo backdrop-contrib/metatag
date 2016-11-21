@@ -134,9 +134,8 @@ class MetaTagDefault implements MetaTagInterface {
           '#tag' => 'meta',
           '#attributes' => array(
             'name' => $this->info['name'],
-            'value' => $value,
+            'content' => $value,
           ),
-          //'#id' => 'metatag_' . $this->info['name'] . '_' . $ctr,
           '#weight' => $this->getWeight(),
         );
 
@@ -369,6 +368,7 @@ class MetaTagText extends MetaTagDefault {
 
 /**
  * Link type meta tag controller.
+ * <link rel="canonical" href="https://moz.com/blog" />
  */
 class MetaTagLink extends MetaTagText {
 
@@ -386,17 +386,16 @@ class MetaTagLink extends MetaTagText {
     $element += array(
       '#tag' => 'link',
       '#attributes' => array(
-        'name' => $this->info['name'],
-        'value' => $value,
+        'rel' => $this->info['name'],
+        'href' => $value,
       ),
-      //'#id' => 'metatag_' . $this->info['name'],
       '#weight' => $this->getWeight(),
     );
 
     if (!isset($this->info['header']) || !empty($this->info['header'])) {
       // Also send the generator in the HTTP header.
       // @todo This does not support 'rev' or alternate link headers.
-      $element['#attached']['backdrop_add_http_header'][] = array('Link', '<' . $value . '>;' . backdrop_http_header_attributes(array('rel' => $element['#attributes']['name'])), TRUE);
+      $element['#attached']['backdrop_add_http_header'][] = array('Link', '<' . $value . '>;' . backdrop_http_header_attributes(array('rel' => $element['#attributes']['rel'])), TRUE);
     }
 
     return $element;

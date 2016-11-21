@@ -51,6 +51,8 @@ function metatag_autoload_info() {
     'MetatagCoreNodeTest' => 'tests/metatag.node.test',
     'MetatagCoreTermTest' => 'tests/metatag.term.test',
     'MetatagCoreUserTest' => 'tests/metatag.user.test',
+    // Handling of core's default meta tags.
+    'MetatagCoreTagRemovalTest' => 'tests/metatag.core_tag_removal.test',
   );
 }
 
@@ -492,7 +494,7 @@ function metatag_metatags_load_multiple($entity_type, array $entity_ids, array $
       $settings->set('has_revision_id', TRUE);
     }
     else {
-      watchdog('metatag', 'The database updates need to be ran.', array(), WATCHDOG_WARNING);
+      watchdog('metatag', 'The database updates need to be run.', array(), WATCHDOG_WARNING);
       return array();
     }
   }
@@ -1136,7 +1138,9 @@ function metatag_generate_entity_metatags($entity, $entity_type, $langcode = NUL
     // Include token replacement data. (Don't reload the entity object as doing
     // so would conflict with content editorial workflows.)
     if (!empty($entity_id)) {
-      $options['token data'][$entity_type] = $entity;
+      $info = entity_get_info($entity_type);
+      $token_type = $info['token type'];
+      $options['token data'][$token_type] = $entity;
     }
 
     // Render the metatags and save to the cache.
@@ -1501,10 +1505,31 @@ function metatag_metatags_form(array &$form, $instance, array $metatags = array(
  */
 function metatag_metatags_form_submit($form, &$form_state) {
   if (!empty($form_state['values']['metatags'])) {
-    // Unset meta tag values that equal their default values.
     foreach ($form_state['values']['metatags'] as $langcode => $values) {
+      // Unset meta tag values that equal their default values.
       if (!empty($form['metatags'][$langcode]['#metatag_defaults'])) {
         metatag_filter_values_from_defaults($form_state['values']['metatags'][$langcode], $form['metatags'][$langcode]['#metatag_defaults']);
+      }
+      // Remove any empty values to decrease clutter.
+      foreach ($form_state['values']['metatags'][$langcode] as $key => $tag) {
+        if (empty($tag['value'])) {
+          unset($form_state['values']['metatags'][$langcode][$key]);
+        }
+        else if ($key == 'robots') {
+          // Special handling for when all the checkboxes are empty.
+          $all_unchecked = TRUE;
+          foreach ($form_state['values']['metatags'][$langcode][$key]['value'] as $subkey => $checkbox) {
+            if (isset($form['metatags'][$langcode]['advanced'][$key]['value']['#value'][$subkey])) {
+              $form_value = $form['metatags'][$langcode]['advanced'][$key]['value']['#value'][$subkey];
+              if (!($checkbox === 0 && ($form_value === 0 || $form_value == ''))) {
+                $all_unchecked = FALSE;
+              }
+            }
+          }
+          if ($all_unchecked) {
+            unset($form_state['values']['metatags'][$langcode][$key]);
+          }
+        }
       }
     }
 
@@ -2301,6 +2326,10 @@ function metatag_config_access($op, $config = NULL) {
     return FALSE;
   }
 
+  if (!isset($config['disabled'])) {
+    $config['disabled'] = FALSE;
+  }
+
   if ($op == 'edit') {
     return !$config['disabled'];
   }
@@ -2363,15 +2392,22 @@ function metatag_config_is_enabled($instance, $include_defaults = FALSE, $includ
  *   A string indicating the language code to be used.
  */
 function metatag_entity_get_language($entity_type, $entity) {
-  // Determine the entity's language, af
-  $langcode = $entity->langcode;
+  if (is_array($entity)) {
+    $info = entity_get_info($entity_type);
+    $class = $info['entity class'];
+    $entity = new $class($entity);
+  }
 
-  // If no matching language was found, which will happen for e.g. terms and
-  // users, it is normally recommended to use the system default language.
-  // However, as the system default language can change, this could potentially
-  // cause data loss / confusion problems; as a result use the system "no
-  // language" value to avoid any potential problems.
-  if (empty($langcode)) {
+  // Determine the entity's language.
+  if (property_exists($entity, 'langcode')) {
+    $langcode = $entity->langcode;
+  }
+
+  // If no matching language was found it is normally recommended to use the
+  // system default language. However, as the system default language can
+  // change, this could potentially cause data loss / confusion problems; as a
+  // result use the system "no language" value to avoid any potential problems.
+  else {
     $langcode = LANGUAGE_NONE;
   }
 

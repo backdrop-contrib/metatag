@@ -4,6 +4,7 @@
     "storage": "default",
     "instance": "node",
     "disabled": false,
+    "api_version": 1,
     "config": {
         "title": {
             "value": "[node:title] | [current-page:pager][site:name]"

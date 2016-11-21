@@ -9,9 +9,6 @@ configure = admin/config/search/metatags
 ; Search API integration.
 files[] = metatag.search_api.inc
 
-; Handling of core's default meta tags.
-files[] = tests/metatag.core_tag_removal.test
-
 ; The custom Bulk Revert functionality.
 files[] = tests/metatag.bulk_revert.test
 

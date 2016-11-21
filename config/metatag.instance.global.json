@@ -3,8 +3,8 @@
     "module": "metatag",
     "storage": "default",
     "instance": "global",
-    "api_version": 1,
     "disabled": false,
+    "api_version": 1,
     "config": {
         "title": {
             "value": "[current-page:title] | [current-page:pager][site:name]"

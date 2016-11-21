@@ -34,7 +34,23 @@ function metatag_config_info() {
  */
 function metatag_autoload_info() {
   return array(
+    // The main classes.
+    'MetaTagInterface' => 'metatag.inc',
+    'MetaTagDefault' => 'metatag.inc',
+    'MetaTagText' => 'metatag.inc',
+    'MetaTagLink' => 'metatag.inc',
+    'MetaTagTitle' => 'metatag.inc',
+    'MetaTagList' => 'metatag.inc',
+    'MetaTagDateInterval' => 'metatag.inc',
+    // Tests.
     'MetatagTestHelper' => 'tests/metatag.helper.test',
+    'MetatagCoreUnitTest' => 'tests/metatag.unit.test',
+    // Basic tag testing.
+    'MetatagTagsTest' => 'tests/metatag.tags.test',
+    // Core entities.
+    'MetatagCoreNodeTest' => 'tests/metatag.node.test',
+    'MetatagCoreTermTest' => 'tests/metatag.term.test',
+    'MetatagCoreUserTest' => 'tests/metatag.user.test',
   );
 }
 

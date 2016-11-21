@@ -396,7 +396,7 @@ class MetaTagLink extends MetaTagText {
     if (!isset($this->info['header']) || !empty($this->info['header'])) {
       // Also send the generator in the HTTP header.
       // @todo This does not support 'rev' or alternate link headers.
-      $element['#attached']['backdrop_add_http_header'][] = array('Link', '<' . $value . '>;' . backdrop_http_header_attributes(array('rel' => $element['#name'])), TRUE);
+      $element['#attached']['backdrop_add_http_header'][] = array('Link', '<' . $value . '>;' . backdrop_http_header_attributes(array('rel' => $element['#attributes']['name'])), TRUE);
     }
 
     return $element;
@@ -407,7 +407,7 @@ class MetaTagLink extends MetaTagText {
  * Title meta tag controller.
  *
  * This extends MetaTagText as we need to alter variables in
- * template_preprocess_html() rather output a normal meta tag.
+ * template_preprocess_page() rather than output a normal meta tag.
  */
 class MetaTagTitle extends MetaTagText {
 

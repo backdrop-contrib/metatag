@@ -158,7 +158,7 @@ function metatag_config_overview() {
     $rows[$config['instance']] = $row;
   }
 
-  $suffix = '<small>' . t('Items marked as "Unknown" will not be used. They are likely for page types that have been disabled on the <a href="@url">Settings page</a>, or deleted.', array('@url' => url('admin/config/search/metatags/settings'))) . '</small>';
+  $suffix = '<small>' . t('Items marked as "Unknown" will not be used. They are likely for types of pages that have been deleted or disabled on the <a href="@url">Settings page</a>.', array('@url' => url('admin/config/search/metatags/settings'))) . '</small>';
 
   $build['config_table'] = array(
     '#theme' => 'table',
@@ -390,9 +390,10 @@ function metatag_config_delete_form_submit($form, &$form_state) {
 }
 
 /**
- * Form constructor to revert nodes to their default metatags.
+ * Form constructor: Reverts to default metatags.
  *
  * @see metatag_bulk_revert_form_submit()
+ *
  * @ingroup forms
  */
 function metatag_bulk_revert_form() {
@@ -454,6 +455,9 @@ function metatag_bulk_revert_form() {
   $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Revert'),
+    '#attributes' => array(
+      'class' => array('button-primary'),
+    ),
   );
 
   return $form;

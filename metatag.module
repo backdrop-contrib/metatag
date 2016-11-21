@@ -4,6 +4,7 @@
  * Primary hook implementations for Metatag.
  */
 
+// Define config storage state values.
 define('METATAG_STORAGE_CUSTOM', 'custom');
 define('METATAG_STORAGE_DEFAULT', 'default');
 define('METATAG_STORAGE_OVERRIDDEN', 'overridden');
@@ -26,34 +27,6 @@ function metatag_config_info() {
   );
 
   return $prefixes;
-}
-
-/**
- * Implements hook_theme().
- */
-function metatag_theme() {
-  $info['metatag'] = array(
-    'render element' => 'element',
-    'file' => 'metatag.theme.inc',
-  );
-  $info['metatag_http_equiv'] = array(
-    'render element' => 'element',
-    'file' => 'metatag.theme.inc',
-  );
-  $info['metatag_link_rel'] = array(
-    'render element' => 'element',
-    'file' => 'metatag.theme.inc',
-  );
-  $info['metatag_link_rev'] = array(
-    'render element' => 'element',
-    'file' => 'metatag.theme.inc',
-  );
-  $info['metatag_property'] = array(
-    'render element' => 'element',
-    'file' => 'metatag.theme.inc',
-  );
-
-  return $info;
 }
 
 /**
@@ -122,6 +95,25 @@ function metatag_menu() {
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   );
+  $items['admin/config/search/metatags/settings'] = array(
+    'title' => 'Settings',
+    'page callback' => 'backdrop_get_form',
+    'page arguments' => array('metatag_admin_settings_form'),
+    'access arguments' => array('administer meta tags'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 30,
+    'file' => 'metatag.admin.inc',
+  );
+  $items['admin/config/search/metatags/bulk-revert'] = array(
+    'title' => 'Bulk revert',
+    'page callback' => 'backdrop_get_form',
+    'page arguments' => array('metatag_bulk_revert_form'),
+    'access arguments' => array('administer meta tags'),
+    'type' => MENU_LOCAL_TASK,
+    'weight' => 40,
+    'file' => 'metatag.admin.inc',
+  );
+
   $items['admin/config/search/metatags/config/add'] = array(
     'title' => 'Add default meta tags',
     'page callback' => 'backdrop_get_form',
@@ -166,7 +158,6 @@ function metatag_menu() {
     'access callback' => 'metatag_config_access',
     'access arguments' => array('revert', 5),
     'file' => 'metatag.admin.inc',
-    'type' => MENU_LOCAL_TASK,
   );
   $items['admin/config/search/metatags/config/%metatag_config/delete'] = array(
     'title' => 'Delete',
@@ -174,24 +165,6 @@ function metatag_menu() {
     'page arguments' => array('metatag_config_delete_form', 5),
     'access callback' => 'metatag_config_access',
     'access arguments' => array('delete', 5),
-    'file' => 'metatag.admin.inc',
-  );
-  $items['admin/config/search/metatags/settings'] = array(
-    'title' => 'Settings',
-    'page callback' => 'backdrop_get_form',
-    'page arguments' => array('metatag_admin_settings_form'),
-    'access arguments' => array('administer meta tags'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 30,
-    'file' => 'metatag.admin.inc',
-  );
-  $items['admin/config/search/metatags/bulk-revert'] = array(
-    'title' => 'Bulk revert',
-    'page callback' => 'backdrop_get_form',
-    'page arguments' => array('metatag_bulk_revert_form'),
-    'access arguments' => array('administer meta tags'),
-    'type' => MENU_LOCAL_TASK,
-    'weight' => 40,
     'file' => 'metatag.admin.inc',
   );
 

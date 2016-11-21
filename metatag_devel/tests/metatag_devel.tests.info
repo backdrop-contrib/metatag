@@ -1,0 +1,5 @@
+[MetatagDevelest]
+name = Metatag Devel tests
+description = Test the Metatag:Devel module.
+group = Metatag
+file = metatag_devel.test

@@ -5,6 +5,15 @@
  */
 
 /**
+ * Implements hook_autoload_info().
+ */
+function metatag_devel_autoload_info() {
+  return array(
+    'MetatagDevelest' => 'tests/metatag_devel.test',
+  );
+}
+
+/**
  * Implements hook_form_FORM_ID_alter() for devel_generate_content_form.
  *
  * Add extra options.
@@ -109,10 +118,10 @@ function metatag_devel_node_insert($node) {
           else {
             $options = $tag_info['form']['#options'];
           }
-          $metatags[$tag]['value'] = array_rand(drupal_map_assoc($options));
+          $metatags[$tag]['value'] = array_rand(backdrop_map_assoc($options));
 
           // Support checkboxes, which require the default value be an array.
-          if ($tag_info['class'] == 'DrupalListMetaTag') {
+          if ($tag_info['class'] == 'BackdropListMetaTag') {
             $metatags[$tag]['value'] = array($metatags[$tag]['value']);
           }
         }

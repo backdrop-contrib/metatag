@@ -29,26 +29,28 @@
 function hook_metatag_config_default() {
   $configs = array();
 
-  $config = new stdClass();
-  $config->instance = 'config1';
-  $config->api_version = 1;
-  $config->disabled = FALSE;
-  $config->config = array(
-    'title' => array('value' => '[current-page:title] | [site:name]'),
-    'generator' => array('value' => 'Drupal 7 (http://drupal.org)'),
-    'canonical' => array('value' => '[current-page:url:absolute]'),
-    'shortlink' => array('value' => '[current-page:url:unaliased]'),
+  $config = array(
+    'instance' => 'config1',
+    'api_version' => '1',
+    'disabled' => FALSE,
+    'config' => array(
+      'title' => array('value' => '[current-page:title] | [site:name]'),
+      'generator' => array('value' => 'Drupal 7 (http://drupal.org)'),
+      'canonical' => array('value' => '[current-page:url:absolute]'),
+      'shortlink' => array('value' => '[current-page:url:unaliased]'),
+    ),
   );
-  $configs[$config->instance] = $config;
+  $configs[$config['instance'] = $config;
 
-  $config = new stdClass();
-  $config->instance = 'config2';
-  $config->api_version = 1;
-  $config->disabled = FALSE;
-  $config->config = array(
-    'title' => array('value' => '[user:name] | [site:name]'),
+  $config = array(
+    'instance' => 'config1',
+    'api_version' => '1',
+    'disabled' => FALSE,
+    'config' => array(
+      'title' => array('value' => '[user:name] | [site:name]'),
+    ),
   );
-  $configs[$config->instance] = $config;
+  $configs[$config['instance'] = $config;
 
   return $configs;
 }
@@ -57,6 +59,7 @@ function hook_metatag_config_default() {
  * Allow the exported configurations to be changed prior to being cached.
  */
 function hook_metatag_config_default_alter(&$config) {
+  $config['config']['title'] = '[current-page:title] | foo bar baz';
 }
 
 /**

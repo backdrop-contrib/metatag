@@ -26,8 +26,10 @@ function metatag_token_info() {
     }
     $info['tokens']['metatag'][$value['name']] = array(
       'name' => $label,
-      'description' => $value['description'],
     );
+    if (isset($value['description'])) {
+      $info['tokens']['metatag'][$value['name']]['description'] = $value['description'];
+    }
   }
 
   if (module_exists('taxonomy')) {

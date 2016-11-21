@@ -30,6 +30,15 @@ function metatag_config_info() {
 }
 
 /**
+ * Implements hook_autoload_info().
+ */
+function metatag_autoload_info() {
+  return array(
+    'MetatagTestHelper' => 'tests/metatag.helper.test',
+  );
+}
+
+/**
  * Implements hook_hook_info().
  */
 function metatag_hook_info() {
@@ -230,13 +239,13 @@ function metatag_config_load_with_defaults($instance, $include_global = TRUE) {
       $configs = metatag_config_load_multiple($instances);
       foreach ($instances as $key) {
         // Ignore disabled configurations.
-        if (!isset($configs[$key]) || !empty($configs[$key]->disabled)) {
+        if (!isset($configs[$key]) || !empty($configs[$key]['disabled'])) {
           continue;
         }
 
         // Add config to the defaults array.
-        if (!empty($configs[$key]->config)) {
-          $defaults[$cid] += $configs[$key]->config;
+        if (!empty($configs[$key]['config'])) {
+          $defaults[$cid] += $configs[$key]['config'];
         }
       }
 
@@ -270,8 +279,16 @@ function metatag_config_create($instance) {
  * Load multiple metatag configuration files.
  */
 function metatag_config_load_multiple(array $instances) {
-  // Load the data.
-  $configs = config_get_names_with_prefix('metatag.instance');
+  if (!empty($instances)) {
+    $configs = array();
+    foreach ($instances as $instance) {
+      $filename = 'metatag.instance.' . str_replace(':', '.', $instance);
+      $configs[$instance] = config_get($filename);
+    }
+  }
+  else {
+    $configs = config_get_names_with_prefix('metatag.instance');
+  }
 
   // Translate the configuration.
   $settings = config('metatag.settings');
@@ -1694,17 +1711,12 @@ function metatag_prepare_tags() {
     return;
   }
 
-  // Generate the cache ID parts.
-  $cid_parts = array(
-    'instance' => $instance,
-  );
-
   // The home page has special consideration.
   if (backdrop_is_front_page()) {
     $instance = 'global:frontpage';
     if (metatag_config_is_enabled($instance)) {
       // Generate the cache ID.
-      $cid = metatag_cache_default_cid_parts($cid_parts);
+      $cid = metatag_cache_default_cid_parts(array('instance' => $instance));
 
       if ($cache = metatag_cache_get($cid)) {
         $metatags = $cache->data;
@@ -1721,7 +1733,7 @@ function metatag_prepare_tags() {
   // Error (403/404) pages have special consideration.
   elseif (($instance = metatag_is_error_page()) && metatag_config_is_enabled($instance)) {
     // Generate the cache ID.
-    $cid = metatag_cache_default_cid_parts($cid_parts);
+    $cid = metatag_cache_default_cid_parts(array('instance' => $instance));
 
     if ($cache = metatag_cache_get($cid)) {
       $metatags = $cache->data;
@@ -1746,7 +1758,10 @@ function metatag_prepare_tags() {
     $instance = 'global';
 
     // Generate the cache ID.
-    $cid_parts['path'] = request_path();
+    $cid_parts = array(
+      'instance' => $instance,
+      'path' => request_path(),
+    );
     $cid = metatag_cache_default_cid_parts($cid_parts);
 
     if ($cache = metatag_cache_get($cid)) {
@@ -2009,15 +2024,20 @@ function metatag_get_value($metatag, array $data, array $options = array()) {
 function metatag_preprocess_page(&$variables) {
   // Prepare all the tags, including doing token replacements.
   $metatags = metatag_prepare_tags();
+
   // Add each metatag to page header.
-  foreach ($metatags as $instance => $set) {
-    foreach ($set as $tag => $data) {
-      // The title tag is special.
-      if ($tag == 'title') {
-        $variables['head_title'] = check_plain($data['#value']);
-      }
-      else {
-        backdrop_add_html_head($data, 'metatag_preprocess_page-' . $tag);
+  if (is_array($metatags) && !empty($metatags)) {
+    foreach ($metatags as $instance => $set) {
+      if (is_array($set) && !empty($set)) {
+        foreach ($set as $tag => $data) {
+          // The title tag is special.
+          if ($tag == 'title') {
+            $variables['head_title'] = check_plain($data['#value']);
+          }
+          else {
+            backdrop_add_html_head($data, 'metatag_preprocess_page-' . $tag);
+          }
+        }
       }
     }
   }

@@ -664,6 +664,12 @@ function metatag_admin_settings_form() {
                 'class' => array('metatag-bundle-checkbox'),
               ),
               '#states' => array(
+                'unchecked' => array(
+                  ':input[name="metatag_enable_' . $entity_type . '"]' => array('checked' => FALSE),
+                ),
+                'checked' => array(
+                  ':input[name="metatag_enable_' . $entity_type . '"]' => array('checked' => TRUE),
+                ),
                 'visible' => array(
                   ':input[name="metatag_enable_' . $entity_type . '"]' => array('checked' => TRUE),
                 ),

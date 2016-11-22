@@ -11,6 +11,21 @@ shared across social networks. The Open Graph submodule in particular, will help
 with Facebook, Pinterest, LinkedIn, etc (see below).
 
 
+Pre-Release Information
+-----------------------
+
+This is a pre-release of the meta-tag module. We are currently seeking testers,
+feedback, and direction on which submodules to work on next.
+
+The following sub-modules have been ported to Backdrop CMS in this release:
+* metatag
+* metatag devel
+* metatag verification
+
+All 1.x-0.17.x tags will be used to denote pre-release status. The first
+official release will be numbered 1.x-1.17.0.
+
+
 Installation
 ------------
 

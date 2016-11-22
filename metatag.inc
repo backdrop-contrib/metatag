@@ -4,7 +4,7 @@
  * Metatag primary classes.
  */
 
-interface MetaTagInterface {
+interface BackdropMetaTagInterface {
 
   /**
    * Constructor
@@ -32,7 +32,7 @@ interface MetaTagInterface {
 
 }
 
-class MetaTagDefault implements MetaTagInterface {
+class BackdropDefaultMetaTag implements BackdropMetaTagInterface {
 
   protected $info;
   protected $data = array('value' => '');
@@ -224,7 +224,7 @@ class MetaTagDefault implements MetaTagInterface {
 /**
  * Text-based meta tag controller.
  */
-class MetaTagText extends MetaTagDefault {
+class BackdropTextMetaTag extends BackdropDefaultMetaTag {
 
   /**
    * {@inheritdoc}
@@ -370,7 +370,7 @@ class MetaTagText extends MetaTagDefault {
  * Link type meta tag controller.
  * <link rel="canonical" href="https://moz.com/blog" />
  */
-class MetaTagLink extends MetaTagText {
+class BackdropLinkMetaTag extends BackdropTextMetaTag {
 
   /**
    * {@inheritdoc}
@@ -405,10 +405,10 @@ class MetaTagLink extends MetaTagText {
 /**
  * Title meta tag controller.
  *
- * This extends MetaTagText as we need to alter variables in
+ * This extends BackdropTextMetaTag as we need to alter variables in
  * template_preprocess_page() rather than output a normal meta tag.
  */
-class MetaTagTitle extends MetaTagText {
+class BackdropTitleMetaTag extends BackdropTextMetaTag {
 
   /**
    * {@inheritdoc}
@@ -428,7 +428,7 @@ class MetaTagTitle extends MetaTagText {
 /**
  * Multiple value meta tag controller.
  */
-class MetaTagList extends MetaTagDefault {
+class BackdropListMetaTag extends BackdropDefaultMetaTag {
 
   /**
    * {@inheritdoc}
@@ -481,7 +481,7 @@ class MetaTagList extends MetaTagDefault {
 /**
  * Date interval meta tag controller.
  */
-class MetaTagDateInterval extends MetaTagDefault {
+class BackdropDateIntervalMetaTag extends BackdropDefaultMetaTag {
 
   /**
    * {@inheritdoc}

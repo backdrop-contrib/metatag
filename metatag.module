@@ -35,17 +35,18 @@ function metatag_config_info() {
 function metatag_autoload_info() {
   return array(
     // The main classes.
-    'MetaTagInterface' => 'metatag.inc',
-    'MetaTagDefault' => 'metatag.inc',
-    'MetaTagText' => 'metatag.inc',
-    'MetaTagLink' => 'metatag.inc',
-    'MetaTagTitle' => 'metatag.inc',
-    'MetaTagList' => 'metatag.inc',
-    'MetaTagDateInterval' => 'metatag.inc',
+    'BackdropMetaTagInterface' => 'metatag.inc',
+    'BackdropDefaultMetaTag' => 'metatag.inc',
+    'BackdropTextMetaTag' => 'metatag.inc',
+    'BackdropLinkMetaTag' => 'metatag.inc',
+    'BackdropTitleMetaTag' => 'metatag.inc',
+    'BackdropListMetaTag' => 'metatag.inc',
+    'BackdropDateIntervalMetaTag' => 'metatag.inc',
     // Tests.
     'MetatagTestHelper' => 'tests/metatag.helper.test',
     'MetatagCoreUnitTest' => 'tests/metatag.unit.test',
     // Basic tag testing.
+    'MetatagTagsTestBase' => 'tests/metatag.tags.test',
     'MetatagTagsTest' => 'tests/metatag.tags.test',
     // Core entities.
     'MetatagCoreNodeTest' => 'tests/metatag.node.test',

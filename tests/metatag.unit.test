@@ -8,6 +8,7 @@
  * @todo These aren't really unit tests, we might need to fix that.
  */
 class MetatagCoreUnitTest extends MetatagTestHelper {
+  protected $profile = 'standard';
 
   /**
    * Test the metatag_config_load_with_defaults() function.
@@ -15,7 +16,6 @@ class MetatagCoreUnitTest extends MetatagTestHelper {
   public function testConfigLoadDefaults() {
     // Load the global defaults, inc the fake entity.
     $defaults = metatag_config_load_with_defaults('test:foo');
-    //ksort($defaults);
 
     // Load example value and verify it's the same as the global.
     $extra_tags = array(
@@ -23,7 +23,6 @@ class MetatagCoreUnitTest extends MetatagTestHelper {
       'test:foo' => array('value' => 'foobar'),
     );
     $new_values = array_merge($extra_tags, $this->getTestDefaults());
-    //ksort($new_values);
 
     // Confirm that the values are equal.
     $this->assertEqual($defaults, $new_values);

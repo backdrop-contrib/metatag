@@ -9,17 +9,6 @@ class MetatagVerificationTagsTest extends MetatagTagsTestBase {
   /**
    * {@inheritdoc}
    */
-  public static function getInfo() {
-    return array(
-      'name' => 'Metatag tags: Verification',
-      'description' => 'Test the Verification meta tags.',
-      'group' => 'Metatag',
-    );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public $tags = array(
     'baidu-site-verification',
     'google-site-verification',

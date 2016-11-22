@@ -1,0 +1,12 @@
+[MetatagVerificationTest]
+name = Metatag Verification tests
+description = Test the Metatag:Verification module.
+group = Metatag
+file = metatag_verification.test
+
+[MetatagVerificationTagsTest]
+name = Metatag tags: Verification
+description = Test the Verification meta tags.
+group = Metatag
+file = metatag_verification.tags.test
+

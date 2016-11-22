@@ -727,7 +727,7 @@ function metatag_admin_settings_form() {
   $form['advanced']['leave_core_tags'] = array(
     '#type' => 'checkbox',
     '#title' => t('Always output canonical, shortlink, and generator meta tags'),
-    '#description' => t('When disabled, the meta tags for canonical, shortlink, and generator will be removed when values are not explicitly provided.'),
+    '#description' => t('When disabled, the meta tags for canonical, shortlink, and generator will be removed when not provided.'),
     '#default_value' => $settings->get('leave_core_tags'),
   );
   $form['advanced']['entity_no_lang_default'] = array(

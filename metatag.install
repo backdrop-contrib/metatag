@@ -257,61 +257,61 @@ function metatag_install() {
  */
 function metatag_uninstall() {
   // This variable is created via hook_enable.
-  variable_del('schema_installed');
+  variable_del('metatag_schema_installed');
 
   // Used to control whether 403/404 pages are cached.
-  variable_del('cache_error_pages');
+  variable_del('metatag_cache_error_pages');
 
   // Used to make meta tags display on admin pages.
-  variable_del('tag_admin_pages');
+  variable_del('metatag_tag_admin_pages');
 
   // Temp variables, just in case they weren't removed already.
-  variable_del('skip_update_7017');
+  variable_del('metatag_skip_update_7017');
 
   // Used to note that the schema for the main {metatag} table were sufficiently
   // updated.
-  variable_del('has_revision_id');
+  variable_del('metatag_has_revision_id');
 
   // Used to force an entity's default language values to be used if nothing
   // else matched.
-  variable_del('entity_no_lang_default');
+  variable_del('metatag_entity_no_lang_default');
 
   // Optionally disable the default configurations.
-  variable_del('load_defaults');
+  variable_del('metatag_load_defaults');
 
   // Optionally disables the output cache.
-  variable_del('cache_output');
+  variable_del('metatag_cache_output');
 
   // Customizable pager string.
-  variable_del('pager_string');
+  variable_del('metatag_pager_string');
 
   // Optionally enable translations of final output.
-  variable_del('i18n_translate_output');
+  variable_del('metatag_i18n_translate_output');
 
   // Optionally enable the automatic watchdog logging of i18n strings.
-  variable_del('i18n_enable_watchdog');
+  variable_del('metatag_i18n_enable_watchdog');
 
   // Optionally disable the i18n integration.
-  variable_del('i18n_disabled');
+  variable_del('metatag_i18n_disabled');
 
   // Optionally output core's meta tags.
-  variable_del('leave_core_tags');
+  variable_del('metatag_leave_core_tags');
 
   // Optionally enable individual permissions for each meta tag.
-  variable_del('extended_permissions');
+  variable_del('metatag_extended_permissions');
 
   // Optionally load meta tags on admin pages.
-  variable_del('load_all_pages');
+  variable_del('metatag_load_all_pages');
 
   // Sanitize token replacement output.
-  variable_del('token_sanitize');
+  variable_del('metatag_token_sanitize');
 
   // Remove all possible 'enable' variables.
   foreach (entity_get_info() as $entity_type => $entity_info) {
-    variable_del('enable_' . $entity_type);
+    variable_del('metatag_enable_' . $entity_type);
     if (!empty($entity_info['bundles'])) {
       foreach ($entity_info['bundles'] as $bundle_name => $bundle_info) {
-        variable_del('enable_' . $entity_type . '__' . $bundle_name);
+        variable_del('metatag_enable_' . $entity_type . '__' . $bundle_name);
       }
     }
   }

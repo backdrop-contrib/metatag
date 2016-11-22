@@ -2115,75 +2115,68 @@ function metatag_preprocess_maintenance_page(&$variables) {
 /**
  * Implements hook_html_head_alter().
  *
- * Hide tags added by core that are now handled by metatag.
+ * Hide tags added by core that are overridden by metatag.
  */
 function metatag_html_head_alter(&$elements) {
-  $metatags = array();
-  $other_tags = array();
-  foreach ($elements as $key => $data) {
-    // Identify meta tags added by the Metatag module.
-    if (strpos($key, 'metatag_') === 0) {
-      $metatags[] = $key;
-    }
-    // Identify meta tags added by other modules.
-    else {
-      $other_tags[] = $key;
-    }
-  }
+  // These 3 tags are always removed without the 'leave core tags' setting.
+  $core_tags = array('generator', 'canonical', 'shortlink');
+  // These attributes are how the tags above can be determined.
+  $metatag_attrs = array('name', 'rel');
 
-  // The meta tag keys to look for.
-  $metatag_keys = array('name', 'property');
+  // Check the 'leave core tags' setting.
+  if (!config_get('metatag.settings', 'leave_core_tags')) {
+    foreach ($elements as $key => &$element) {
+      // Do not remove meta tags provided by Metatag.
+      if (strpos($key, 'metatag_') === 0) {
+        continue;
+      }
 
-  // Attributes to look for.
-  $attributes = array('name', 'rel');
-
-  // Look for meta tags that were added by other modules and hide them.
-  foreach ($metatags as $metatag_name) {
-    $metatag = &$elements[$metatag_name];
-
-    // Setting the #access attribute to these will stop them from being output
-    // but still leave the tags present for other modules to interact with.
-    foreach ($other_tags as $other_tag) {
-      $other = &$elements[$other_tag];
-
-      // Look for other meta tags that have one of the defined attributes which
-      // matches one of the values from Metatag's tag.
-      foreach ($attributes as $attribute) {
-        if (isset($other['#attributes'], $other['#attributes'][$attribute]) && is_string($other['#attributes'][$attribute])) {
-          foreach ($metatag_keys as $metatag_key) {
-            if (isset($metatag[$metatag_key])) {
-              if (strtolower($other['#attributes'][$attribute]) == $metatag[$metatag_key]) {
-                $other['#access'] = FALSE;
-              }
-            }
+      if (!empty($element['#attributes'])) {
+        foreach ($element['#attributes'] as $attr_key => $attr_value) {
+          $attr_value = strtolower($attr_value); // Account for G in generator.
+          // Only hide the metatag if it's one we care about.
+          if (in_array($attr_key, $metatag_attrs) && in_array($attr_value, $core_tags)) {
+            // Setting the #access attribute to these will stop them from being output
+            // but still leave the tags present for other modules to interact with.
+            $elements[$key]['#access'] = FALSE;
           }
         }
       }
     }
   }
 
-  // If the 'leave core tags' option is disabled then the following meta tags
-  // will be removed if they're provided by core.
-  if (config_get('metatag.settings', 'leave_core_tags')) {
-    $core_tags = array(
-      'generator',
-      'canonical',
-      'shortlink',
-    );
-    foreach ($elements as $name => &$element) {
-      // Ignore meta tags provided by Metatag.
-      if (strpos($name, 'metatag_') === 0) {
-        continue;
+  else {
+    $overridden = array();
+    $closer_inspection = array();
+    // Loop through the elements once to determine which need a closer look.
+    foreach ($elements as $key => $data) {
+      // Identify meta tags not added by the Metatag module.
+      if (!(strpos($key, 'metatag_') === 0)) {
+        $closer_inspection[$key] = $elements[$key];
       }
-
-      // Setting the #access attribute to these will stop them from being output
-      // but still leave the tags present for other modules to interact with.
-      foreach ($core_tags as $tag) {
-        if (!empty($element['#attributes']['rel']) && $element['#attributes']['rel'] == $tag) {
-          $element['#access'] = FALSE;
+      else {
+        // Record the important metatags attributes.
+        foreach ($data['#attributes'] as $attr_key => $attr_value) {
+          if (in_array($attr_key, $metatag_attrs) && in_array($attr_value, $core_tags)) {
+            $overridden[$attr_key] = $attr_value;
+          }
         }
-        elseif (!empty($element['#attributes']['name']) && strtolower($element['#attributes']['name']) == $tag) {
-          $element['#access'] = FALSE;
+      }
+    }
+
+    // Examine the other meta tags to see if we have any duplicates.
+    foreach ($closer_inspection as $key => $data) {
+      // Check attributes.
+      foreach ($closer_inspection[$key]['#attributes'] as $attr_key => $attr_value) {
+        $attr_value = strtolower($attr_value); // Account for G in generator.
+        // Only hide the metatag if it's one we care about.
+        if (in_array($attr_key, $metatag_attrs) && in_array($attr_value, $core_tags)) {
+          // Only hide metatag if another is provided.
+          if (isset($overridden[$attr_key]) && $overridden[$attr_key] == $attr_value) {
+            // Setting the #access attribute to these will stop them from being output
+            // but still leave the tags present for other modules to interact with.
+            $elements[$key]['#access'] = FALSE;
+          }
         }
       }
     }

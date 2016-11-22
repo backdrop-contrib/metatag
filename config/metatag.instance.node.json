@@ -14,9 +14,6 @@
         },
         "canonical": {
             "value": "[current-page:url:absolute]"
-        },
-        "shortlink": {
-            "value": "[current-page:url:unaliased]"
         }
     }
 }

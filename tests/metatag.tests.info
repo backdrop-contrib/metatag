@@ -5,7 +5,7 @@ group = Metatag
 file = metatag.unit.test
 
 [MetatagTagsTest]
-name = Metatag tags: Basic
+name = Metatag base tag tests
 description = Tests that each of the Metatag base tags work correctly.
 group = Metatag
 file = metatag.tags.test
@@ -28,4 +28,9 @@ description = Test Metatag edit functionality for users.
 group = Metatag
 file = metatag.user.test
 
+[MetatagCoreTagRemovalTest]
+name = Metatag core tests for tag removal
+description = Test Metatag integration with the locale module.
+group = Metatag
+file = metatag.core_tag_removal.test
 

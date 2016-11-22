@@ -9,9 +9,6 @@
         "title": {
             "value": "[current-page:title] | [current-page:pager][site:name]"
         },
-        "generator": {
-            "value": "Backdrop CMS (http://backdropcms.org)"
-        },
         "canonical": {
             "value": "[site:url]"
         },

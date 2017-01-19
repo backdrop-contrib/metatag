@@ -180,7 +180,7 @@ class MetatagCoreWithI18nConfigTest extends MetatagTestHelper {
     $this->searchTranslationPage($string_en, $config_name);
 
     // Load the 'delete' page.
-    $this->drupalGet('admin/config/search/metatags/config/' . $instance . '/delete');
+    $this->drupalGet('admin/config/metadata/metatags/config/' . $instance . '/delete');
     $this->assertResponse(200);
 
     // Confirm this is the correct page.

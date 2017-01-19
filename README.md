@@ -43,13 +43,13 @@ Installation
      meta tags on each individual page (node, term, etc).
 
 - The main administrative page ("Administer >> Configuration >> Search and
-  metadata >> Metatag" or admin/config/search/metatags) controls the site-wide
+  metadata >> Metatag" or admin/config/metadata/metatags) controls the site-wide
   defaults. Global settings, Home page settings, and specific defaults for
   different kinds of content are defined here.
 
 - The list of configured sets of metatags may be controlled from the Settings
   page ("Administer >> Configuration >> Search and metadata >> Settings" or
-  admin/config/search/metatags/settings)
+  admin/config/metadata/metatags/settings)
 
 - In order to provide a specific configuration per content type, vocabulary,
   etc, click "Add default meta tags".

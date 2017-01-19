@@ -11,25 +11,25 @@ group = Metatag
 file = metatag.tags.test
 
 [MetatagCoreNodeTest]
-name = Metatag core tests for nodes
+name = Metatag tests for nodes
 description = Test Metatag edit functionality for nodes.
 group = Metatag
 file = metatag.node.test
 
 [MetatagCoreTermTest]
-name = Metatag core tests for terms
+name = Metatag tests for terms
 description = Test Metatag edit functionality for terms.
 group = Metatag
 file = metatag.term.test
 
 [MetatagCoreUserTest]
-name = Metatag core tests for users
+name = Metatag tests for users
 description = Test Metatag edit functionality for users.
 group = Metatag
 file = metatag.user.test
 
 [MetatagCoreTagRemovalTest]
-name = Metatag core tests for tag removal
+name = Metatag tests for tag removal
 description = Test Metatag integration with the locale module.
 group = Metatag
 file = metatag.core_tag_removal.test

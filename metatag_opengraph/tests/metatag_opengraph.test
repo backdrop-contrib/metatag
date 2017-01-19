@@ -34,7 +34,7 @@ class MetatagOpenGraphTest extends MetatagTestHelper {
    * Confirm that it's possible to load the main admin page.
    */
   public function testAdminPage() {
-    $this->drupalGet('admin/config/search/metatags');
+    $this->drupalGet('admin/config/metadata/metatags');
     $this->assertResponse(200);
 
     // Confirm the page is correct.

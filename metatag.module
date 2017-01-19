@@ -109,19 +109,19 @@ function metatag_permission() {
  * Implements hook_menu().
  */
 function metatag_menu() {
-  $items['admin/config/search/metatags'] = array(
+  $items['admin/config/metadata/metatags'] = array(
     'title' => 'Metatag',
     'description' => 'Configure Metatag defaults.',
     'page callback' => 'metatag_config_overview',
     'access arguments' => array('administer meta tags'),
     'file' => 'metatag.admin.inc',
   );
-  $items['admin/config/search/metatags/config'] = array(
+  $items['admin/config/metadata/metatags/config'] = array(
     'title' => 'Defaults',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   );
-  $items['admin/config/search/metatags/settings'] = array(
+  $items['admin/config/metadata/metatags/settings'] = array(
     'title' => 'Settings',
     'page callback' => 'backdrop_get_form',
     'page arguments' => array('metatag_admin_settings_form'),
@@ -130,7 +130,7 @@ function metatag_menu() {
     'weight' => 30,
     'file' => 'metatag.admin.inc',
   );
-  $items['admin/config/search/metatags/bulk-revert'] = array(
+  $items['admin/config/metadata/metatags/bulk-revert'] = array(
     'title' => 'Bulk revert',
     'page callback' => 'backdrop_get_form',
     'page arguments' => array('metatag_bulk_revert_form'),
@@ -140,7 +140,7 @@ function metatag_menu() {
     'file' => 'metatag.admin.inc',
   );
 
-  $items['admin/config/search/metatags/config/add'] = array(
+  $items['admin/config/metadata/metatags/config/add'] = array(
     'title' => 'Add default meta tags',
     'page callback' => 'backdrop_get_form',
     'page arguments' => array('metatag_config_add_form'),
@@ -148,7 +148,7 @@ function metatag_menu() {
     'file' => 'metatag.admin.inc',
     'type' => MENU_LOCAL_ACTION,
   );
-  $items['admin/config/search/metatags/config/%metatag_config'] = array(
+  $items['admin/config/metadata/metatags/config/%metatag_config'] = array(
     'title callback' => 'metatag_config_title',
     'title arguments' => array(5),
     'page callback' => 'backdrop_get_form',
@@ -156,12 +156,12 @@ function metatag_menu() {
     'access arguments' => array('administer meta tags'),
     'file' => 'metatag.admin.inc',
   );
-  $items['admin/config/search/metatags/config/%metatag_config/edit'] = array(
+  $items['admin/config/metadata/metatags/config/%metatag_config/edit'] = array(
     'title' => 'Edit',
     'type' => MENU_DEFAULT_LOCAL_TASK,
     'weight' => -10,
   );
-  $items['admin/config/search/metatags/config/%metatag_config/enable'] = array(
+  $items['admin/config/metadata/metatags/config/%metatag_config/enable'] = array(
     'title' => 'Enable',
     'page callback' => 'metatag_config_enable',
     'page arguments' => array(5),
@@ -169,7 +169,7 @@ function metatag_menu() {
     'access arguments' => array('enable', 5),
     'file' => 'metatag.admin.inc',
   );
-  $items['admin/config/search/metatags/config/%metatag_config/disable'] = array(
+  $items['admin/config/metadata/metatags/config/%metatag_config/disable'] = array(
     'title' => 'Disable',
     'page callback' => 'metatag_config_disable',
     'page arguments' => array(5),
@@ -177,7 +177,7 @@ function metatag_menu() {
     'access arguments' => array('disable', 5),
     'file' => 'metatag.admin.inc',
   );
-  $items['admin/config/search/metatags/config/%metatag_config/revert'] = array(
+  $items['admin/config/metadata/metatags/config/%metatag_config/revert'] = array(
     'title' => 'Revert',
     'page callback' => 'backdrop_get_form',
     'page arguments' => array('metatag_config_delete_form', 5),
@@ -185,7 +185,7 @@ function metatag_menu() {
     'access arguments' => array('revert', 5),
     'file' => 'metatag.admin.inc',
   );
-  $items['admin/config/search/metatags/config/%metatag_config/delete'] = array(
+  $items['admin/config/metadata/metatags/config/%metatag_config/delete'] = array(
     'title' => 'Delete',
     'page callback' => 'backdrop_get_form',
     'page arguments' => array('metatag_config_delete_form', 5),
@@ -201,14 +201,14 @@ function metatag_menu() {
   // these pages on the config pages *do* check the setting, which is close
   // enough.
   if (module_exists('i18n_string')) {
-    $items['admin/config/search/metatags/config/%metatag_config/translate'] = array(
+    $items['admin/config/metadata/metatags/config/%metatag_config/translate'] = array(
       'title' => 'Translate',
       'access arguments' => array('administer meta tags'),
       'page callback' => 'i18n_string_object_translate_page',
       'page arguments' => array('metatag_config', 5),
       'type' => MENU_LOCAL_TASK,
     );
-    $items['admin/config/search/metatags/config/%metatag_config/translate/%i18n_language'] = array(
+    $items['admin/config/metadata/metatags/config/%metatag_config/translate/%i18n_language'] = array(
       'title' => 'Translate',
       'access arguments' => array('administer meta tags'),
       'page callback' => 'i18n_string_object_translate_page',

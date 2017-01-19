@@ -25,7 +25,7 @@ Configuration
     removed. It is possible to change this so that the meta tag is not removed
     by enabling the "Allow hreflang tag that matches the x-default tag" option
     on the main Metatag settings page:
-      admin/config/search/metatags/settings
+      admin/config/metadata/metatags/settings
 
 
 Credits / Contact

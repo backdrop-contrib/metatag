@@ -4,7 +4,7 @@ description = Adds support and an API to implement meta tags.
 package = SEO
 backdrop = 1.x
 
-configure = admin/config/search/metatags
+configure = admin/config/metadata/metatags
 
 ; The custom Bulk Revert functionality.
 files[] = tests/metatag.bulk_revert.test

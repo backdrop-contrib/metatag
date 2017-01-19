@@ -102,7 +102,7 @@ class MetatagCoreStringHandlingTest extends MetatagTestHelper {
       // Save the original string.
       'metatags[und][description][value]' => $desc_original,
     );
-    $this->drupalPost('admin/config/search/metatags/config/' . $instance, $edit, 'Save');
+    $this->drupalPost('admin/config/metadata/metatags/config/' . $instance, $edit, 'Save');
     $this->assertResponse(200);
 
     // Load the configuration object.

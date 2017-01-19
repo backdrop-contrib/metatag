@@ -518,12 +518,12 @@ abstract class MetatagTestHelper extends BackdropWebTestCase {
    */
   function generateByPathConfig($test_object) {
     // Verify the "add context" page works.
-    $this->backdropGet('admin/config/search/metatags/context');
+    $this->backdropGet('admin/config/metadata/metatags/context');
     $this->assertResponse(200);
     $this->assertText(t('Add a meta tag by path'));
 
     // Verify the "add context" page works.
-    $this->backdropGet('admin/config/search/metatags/context/add');
+    $this->backdropGet('admin/config/metadata/metatags/context/add');
     $this->assertResponse(200);
     $this->assertText(t('The unique ID for this metatag path context rule. This must contain only lower case letters, numbers and underscores.'));
 
@@ -532,7 +532,7 @@ abstract class MetatagTestHelper extends BackdropWebTestCase {
       'name' => $test_object->name,
     );
 
-    $this->backdropPost('admin/config/search/metatags/context/add', $values, t('Add and configure'));
+    $this->backdropPost('admin/config/metadata/metatags/context/add', $values, t('Add and configure'));
     $this->assertResponse(200);
   }
 
@@ -550,7 +550,7 @@ abstract class MetatagTestHelper extends BackdropWebTestCase {
       'metatags[und][abstract][value]' => $test_object->abstract,
       'metatags[und][keywords][value]' => $test_object->keywords,
     );
-    $this->backdropPost('admin/config/search/metatags/context/' . $test_object->name, $edit, t('Save'));
+    $this->backdropPost('admin/config/metadata/metatags/context/' . $test_object->name, $edit, t('Save'));
     $this->assertResponse(200);
   }
 

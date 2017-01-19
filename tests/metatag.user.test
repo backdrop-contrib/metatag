@@ -19,7 +19,7 @@ class MetatagCoreUserTest extends MetatagTestHelper {
     // Assign default values for the new vocabulary.
 
     // Load the page for overriding the User configuration.
-    $this->backdropGet('admin/config/search/metatags/config/user');
+    $this->backdropGet('admin/config/metadata/metatags/config/user');
     $this->assertResponse(200);
 
     // Verify the page loaded correct.
@@ -32,10 +32,10 @@ class MetatagCoreUserTest extends MetatagTestHelper {
     $this->assertResponse(200);
 
     // Verify the page loaded correctly.
-    $this->assertText(strip_tags(t('The meta tag defaults for @label have been saved.', array('@label' => 'User'))));
+    $this->assertText(strip_tags(t('The meta tag defaults for @label have been saved.', array('@label' => 'User account'))));
 
     // Verify that the user was redirected to the settings page again.
-    $this->assertEqual($this->getUrl(), url('admin/config/search/metatags', array('absolute' => TRUE)));
+    $this->assertEqual($this->getUrl(), url('admin/config/metadata/metatags', array('absolute' => TRUE)));
 
     // Load the user's edit form.
     $this->backdropGet('user/' . $this->adminUser->uid . '/edit');

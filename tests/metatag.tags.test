@@ -27,7 +27,7 @@ abstract class MetatagTagsTestBase extends MetatagTestHelper {
    */
   function testTagsArePresent() {
     // Load the global config.
-    $this->backdropGet('admin/config/search/metatags/config/global');
+    $this->backdropGet('admin/config/metadata/metatags/config/global');
     $this->assertResponse(200);
 
     // Confirm the various meta tags are available.
@@ -54,7 +54,7 @@ abstract class MetatagTagsTestBase extends MetatagTestHelper {
    */
   function testTagsAreSaveable() {
     // Load the global config.
-    $this->backdropGet('admin/config/search/metatags/config/global');
+    $this->backdropGet('admin/config/metadata/metatags/config/global');
     $this->assertResponse(200);
 
     // Update the Global defaults and test them.

@@ -8,7 +8,7 @@
  * Implements hook_menu().
  */
 function metatag_importer_menu() {
-  $items['admin/config/search/metatags/importer'] = array(
+  $items['admin/config/metadata/metatags/importer'] = array(
     'title' => 'Importer',
     'description' => 'Migrate settings and data from various modules to the Metatag module.',
     'page callback' => 'metatag_importer_admin_page',
@@ -16,8 +16,14 @@ function metatag_importer_menu() {
     'file' => 'metatag_importer.admin.inc',
     'type' => MENU_LOCAL_TASK,
   );
+  // @deprecated: Remove backwards-compatibility redirect in 2.0.
+  $items['admin/config/search/metatags/importer'] = array(
+    'page callback' => 'backdrop_goto_deprecated',
+    'page arguments' => array('admin/config/metadata/metatags/importer'),
+    'type' => MENU_CALLBACK,
+  );
 
-  $items['admin/config/search/metatags/importer/nodewords'] = array(
+  $items['admin/config/metadata/metatags/importer/nodewords'] = array(
     'title' => 'Import from Nodewords',
     'description' => 'Migrate settings and data from the Drupal 6 Nodewords module to the Drupal 7 Metatag module.',
     'page callback' => 'drupal_get_form',
@@ -26,8 +32,14 @@ function metatag_importer_menu() {
     'file' => 'metatag_importer.nodewords.inc',
     'type' => MENU_LOCAL_ACTION,
   );
+  // @deprecated: Remove backwards-compatibility redirect in 2.0.
+  $items['admin/config/search/metatags/importer/nodewords'] = array(
+    'page callback' => 'backdrop_goto_deprecated',
+    'page arguments' => array('admin/config/metadata/metatags/importer/nodewords'),
+    'type' => MENU_CALLBACK,
+  );
 
-  $items['admin/config/search/metatags/importer/page-title'] = array(
+  $items['admin/config/metadata/metatags/importer/page-title'] = array(
     'title' => 'Import from Page Title',
     'description' => 'Migrate settings and data from the Drupal 6 Nodewords module to the Drupal 7 Metatag module.',
     'page callback' => 'drupal_get_form',
@@ -35,6 +47,12 @@ function metatag_importer_menu() {
     'access arguments' => array('administer meta tags'),
     'file' => 'metatag_importer.page_title.inc',
     'type' => MENU_LOCAL_ACTION,
+  );
+  // @deprecated: Remove backwards-compatibility redirect in 2.0.
+  $items['admin/config/search/metatags/importer/page-title'] = array(
+    'page callback' => 'backdrop_goto_deprecated',
+    'page arguments' => array('admin/config/metadata/metatags/importer/page-title'),
+    'type' => MENU_CALLBACK,
   );
 
   return $items;

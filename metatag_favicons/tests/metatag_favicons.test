@@ -34,7 +34,7 @@ class MetatagFaviconsTest extends MetatagTestHelper {
    * Confirm that it's possible to load the main admin page.
    */
   public function testAdminPage() {
-    $this->drupalGet('admin/config/search/metatags');
+    $this->drupalGet('admin/config/metadata/metatags');
     $this->assertResponse(200);
 
     // Confirm the page is correct.
@@ -61,7 +61,7 @@ class MetatagFaviconsTest extends MetatagTestHelper {
     metatag_config_save($config);
 
     // Load the config page.
-    $this->drupalGet('admin/config/search/metatags');
+    $this->drupalGet('admin/config/metadata/metatags');
     $this->assertResponse(200);
 
     // Confirm the meta tag's value is on the page.

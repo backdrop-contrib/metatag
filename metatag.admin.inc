@@ -106,7 +106,7 @@ function metatag_config_overview() {
     if (metatag_config_access('edit', $config)) {
       $operations['edit'] = array(
         'title' => t('Edit'),
-        'href' => 'admin/config/search/metatags/config/' . $config['instance'],
+        'href' => 'admin/config/metadata/metatags/config/' . $config['instance'],
       );
       if ($config['storage'] == METATAG_STORAGE_DEFAULT) {
         $operations['edit']['title'] = t('Override');
@@ -115,7 +115,7 @@ function metatag_config_overview() {
     if (metatag_config_access('enable', $config)) {
       $operations['enable'] = array(
         'title' => t('Enable'),
-        'href' => 'admin/config/search/metatags/config/' . $config['instance'] . '/enable',
+        'href' => 'admin/config/metadata/metatags/config/' . $config['instance'] . '/enable',
         'query' => array(
           'token' => backdrop_get_token('enable-' . $config['instance']),
         ) + backdrop_get_destination(),
@@ -124,7 +124,7 @@ function metatag_config_overview() {
     if (metatag_config_access('disable', $config)) {
       $operations['disable'] = array(
         'title' => t('Disable'),
-        'href' => 'admin/config/search/metatags/config/' . $config['instance'] . '/disable',
+        'href' => 'admin/config/metadata/metatags/config/' . $config['instance'] . '/disable',
         'query' => array(
           'token' => backdrop_get_token('disable-' . $config['instance']),
         ) + backdrop_get_destination(),
@@ -133,19 +133,19 @@ function metatag_config_overview() {
     if (metatag_config_access('revert', $config)) {
       $operations['revert'] = array(
         'title' => t('Revert'),
-        'href' => 'admin/config/search/metatags/config/' . $config['instance'] . '/revert',
+        'href' => 'admin/config/metadata/metatags/config/' . $config['instance'] . '/revert',
       );
     }
     if (metatag_config_access('delete', $config)) {
       $operations['delete'] = array(
         'title' => t('Delete'),
-        'href' => 'admin/config/search/metatags/config/' . $config['instance'] . '/delete',
+        'href' => 'admin/config/metadata/metatags/config/' . $config['instance'] . '/delete',
       );
     }
     if (module_exists('i18n_string') && !$settings->get('i18n_disabled', FALSE)) {
       $operations['translate'] = array(
         'title' => t('Translate'),
-        'href' => 'admin/config/search/metatags/config/' . $config['instance'] . '/translate',
+        'href' => 'admin/config/metadata/metatags/config/' . $config['instance'] . '/translate',
       );
     }
     $row['data']['operations'] = array(
@@ -158,7 +158,7 @@ function metatag_config_overview() {
     $rows[$config['instance']] = $row;
   }
 
-  $suffix = '<small>' . t('Items marked as "Unknown" will not be used. They are likely for types of pages that have been deleted or disabled on the <a href="@url">Settings page</a>.', array('@url' => url('admin/config/search/metatags/settings'))) . '</small>';
+  $suffix = '<small>' . t('Items marked as "Unknown" will not be used. They are likely for types of pages that have been deleted or disabled on the <a href="@url">Settings page</a>.', array('@url' => url('admin/config/metadata/metatags/settings'))) . '</small>';
 
   $build['config_table'] = array(
     '#theme' => 'table',
@@ -240,7 +240,7 @@ function metatag_config_add_form($form, &$form_state) {
   $form['actions']['cancel'] = array(
     '#type' => 'link',
     '#title' => t('Cancel'),
-    '#href' => isset($_GET['destination']) ? $_GET['destination'] : 'admin/config/search/metatags',
+    '#href' => isset($_GET['destination']) ? $_GET['destination'] : 'admin/config/metadata/metatags',
   );
 
   return $form;
@@ -250,7 +250,7 @@ function metatag_config_add_form_submit($form, &$form_state) {
   form_state_values_clean($form_state);
   $config = $form_state['values'];
   metatag_config_save($config);
-  $form_state['redirect'] = 'admin/config/search/metatags/config/' . $config['instance'];
+  $form_state['redirect'] = 'admin/config/metadata/metatags/config/' . $config['instance'];
 }
 
 function metatag_config_edit_form($form, &$form_state, $config) {
@@ -299,7 +299,7 @@ function metatag_config_edit_form($form, &$form_state, $config) {
   $form['actions']['cancel'] = array(
     '#type' => 'link',
     '#title' => t('Cancel'),
-    '#href' => isset($_GET['destination']) ? $_GET['destination'] : 'admin/config/search/metatags',
+    '#href' => isset($_GET['destination']) ? $_GET['destination'] : 'admin/config/metadata/metatags',
   );
 
   $form['#submit'][] = 'metatag_config_edit_form_submit';
@@ -317,7 +317,7 @@ function metatag_config_edit_form_submit($form, &$form_state) {
   $label = metatag_config_instance_label($config['instance']);
   backdrop_set_message(t('The meta tag defaults for @label have been saved.', array('@label' => $label)));
 
-  $form_state['redirect'] = 'admin/config/search/metatags';
+  $form_state['redirect'] = 'admin/config/metadata/metatags';
 }
 
 function metatag_config_enable($data) {
@@ -367,7 +367,7 @@ function metatag_config_delete_form($form, &$form_state, $config) {
   return confirm_form(
     $form,
     $title,
-    'admin/config/search/metatags',
+    'admin/config/metadata/metatags',
     t('This action cannot be undone.')
   );
 }
@@ -386,7 +386,7 @@ function metatag_config_delete_form_submit($form, &$form_state) {
     $title = t('The meta tag defaults for @label have been reverted.', array('@label' => $label));
   }
 
-  $form_state['redirect'] = 'admin/config/search/metatags';
+  $form_state['redirect'] = 'admin/config/metadata/metatags';
 }
 
 /**

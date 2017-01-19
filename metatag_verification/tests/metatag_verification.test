@@ -23,7 +23,7 @@ class MetatagVerificationTest extends MetatagTestHelper {
    * Confirm that it's possible to load the main admin page.
    */
   public function testAdminPage() {
-    $this->backdropGet('admin/config/search/metatags');
+    $this->backdropGet('admin/config/metadata/metatags');
     $this->assertResponse(200);
 
     // Confirm the page is correct.

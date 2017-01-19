@@ -34,7 +34,7 @@ class MetatagImporterTest extends MetatagTestHelper {
    * Confirm that it's possible to load the importer admin page.
    */
   public function testAdminPage() {
-    $this->drupalGet('admin/config/search/metatags/importer');
+    $this->drupalGet('admin/config/metadata/metatags/importer');
     $this->assertResponse(200);
 
     // Confirm the page is loaded.

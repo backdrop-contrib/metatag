@@ -61,7 +61,7 @@ class MetatagCoreWithViewsTest extends MetatagTestHelper {
     $this->drupalLogin($this->adminUser);
 
     // Load the "add default configuration" page.
-    $this->drupalGet('admin/config/search/metatags/config/add');
+    $this->drupalGet('admin/config/metadata/metatags/config/add');
     $this->assertResponse(200);
 
     // Verify the page loaded correct.
@@ -86,7 +86,7 @@ class MetatagCoreWithViewsTest extends MetatagTestHelper {
     $this->assertText(strip_tags(t('The meta tag defaults for @label have been saved.', array('@label' => 'Taxonomy term: ' . $vocabulary->name))));
 
     // Verify that the user was redirected to the settings page again.
-    $this->assertEqual($this->getUrl(), url('admin/config/search/metatags', array('absolute' => TRUE)));
+    $this->assertEqual($this->getUrl(), url('admin/config/metadata/metatags', array('absolute' => TRUE)));
 
     // Create a test term.
 

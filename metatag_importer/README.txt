@@ -1,7 +1,7 @@
 Metatag: Importer
 -----------------
 This module imports data from other modules. An administrative interface is
-provided (admin/config/search/metatags/importer), as well as a series of Drush
+provided (admin/config/metadata/metatags/importer), as well as a series of Drush
 commands:
 * metatag-convert-page-title - Convert data from the Page Title module.
 

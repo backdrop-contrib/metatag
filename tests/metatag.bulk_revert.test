@@ -23,7 +23,7 @@ class MetatagBulkRevertTest extends MetatagTestHelper {
     $this->adminUser = $this->createAdminUser();
     $this->drupalLogin($this->adminUser);
 
-    $this->drupalGet('admin/config/search/metatags/bulk-revert');
+    $this->drupalGet('admin/config/metadata/metatags/bulk-revert');
     $this->assertResponse(200);
 
     // Confirm each of the entity checkboxes is present.

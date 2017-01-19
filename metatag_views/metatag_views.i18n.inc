@@ -29,9 +29,9 @@ function metatag_views_i18n_object_info() {
     //   '%did' => 'did',
     // ),
     // To produce edit links automatically.
-    // 'edit path' => 'admin/config/search/metatags/config/%instance',
+    // 'edit path' => 'admin/config/metadata/metatags/config/%instance',
     // Auto-generate a 'translate' tab.
-    // 'translate tab' => 'admin/config/search/metatags/config/%instance/translate',
+    // 'translate tab' => 'admin/config/metadata/metatags/config/%instance/translate',
 
     // Properties for string translation.
     'string translation' => array(
@@ -44,7 +44,7 @@ function metatag_views_i18n_object_info() {
       // Translatable properties of these objects, this will be added later.
       'properties' => array(),
       // The path to translate individual strings.
-      // 'translate path' => 'admin/config/search/metatags/config/%instance/translate/%i18n_language',
+      // 'translate path' => 'admin/config/metadata/metatags/config/%instance/translate/%i18n_language',
     ),
   );
 

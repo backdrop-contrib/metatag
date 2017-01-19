@@ -53,7 +53,7 @@ class MetatagCoreTermTest extends MetatagTestHelper {
     // Assign default values for the new vocabulary.
 
     // Load the "add default configuration" page.
-    $this->backdropGet('admin/config/search/metatags/config/add');
+    $this->backdropGet('admin/config/metadata/metatags/config/add');
     $this->assertResponse(200);
 
     // Verify the page loaded correct.
@@ -76,7 +76,7 @@ class MetatagCoreTermTest extends MetatagTestHelper {
     $this->assertRaw(format_string('The meta tag defaults for @label have been saved.', array('@label' => 'Taxonomy term: ' . $vocabulary->name)));
 
     // Verify that the user was redirected to the settings page again.
-    $this->assertEqual($this->getUrl(), url('admin/config/search/metatags', array('absolute' => TRUE)));
+    $this->assertEqual($this->getUrl(), url('admin/config/metadata/metatags', array('absolute' => TRUE)));
 
     // Create a test term.
     $term = $this->createTerm($vocabulary, $term_name);

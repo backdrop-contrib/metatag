@@ -5,7 +5,7 @@
     "entity_no_lang_default": 0,
     "tag_admin_pages": 0,
     "extended_permissions": 0,
-    "cache_output": 1,
+    "cache_output": 0,
     "leave_core_tags": 0,
     "token_sanitize": 0,
     "pager_string": "Page PAGER | ",

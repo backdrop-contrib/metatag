@@ -34,3 +34,8 @@ description = Test Metatag integration with the locale module.
 group = Metatag
 file = metatag.core_tag_removal.test
 
+[MetatagCoreOutputCachingTest]
+name = Metatag: output caching
+description = Test the output caching functionality in Metatag.
+group = Metatag
+file = metatag.output_caching.test

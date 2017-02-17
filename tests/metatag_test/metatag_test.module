@@ -30,6 +30,13 @@ function metatag_test_menu() {
     'page arguments' => array(13),
   ) + $defaults;
 
+  // User-specific meta tags.
+  $items['account-test-page'] = array(
+    'title' => 'User test page',
+    'description' => 'Test how user tokens are handled.',
+    'page callback' => 'metatag_test_user_page_callback',
+  ) + $defaults;
+
   return $items;
 }
 
@@ -68,4 +75,19 @@ function metatag_test_metatag_config_default_alter(array &$configs) {
   if (isset($configs['test:foo'])) {
     $configs['test:foo']['config']['title']['value'] = 'Test altered title';
   }
+}
+
+/**
+ * Simple page callback for the user test page.
+ */
+function metatag_test_user_page_callback() {
+  global $user;
+
+  $username = 'Anonymous visitor';
+  if (isset($user->name)) {
+    $username = $user->name;
+  }
+  backdrop_set_title('Hello ' . $username);
+
+  return t('Test page for user tokens.');
 }

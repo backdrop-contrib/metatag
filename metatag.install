@@ -485,3 +485,19 @@ function metatag_update_1000() {
   backdrop_static_reset('metatag_config_instance_info');
   backdrop_static_reset('metatag_get_info');
 }
+
+/**
+ * Disable output caching.
+ */
+function metatag_update_1001() {
+  $settings = config('metatag.settings');
+  $settings->set('cache_output', false);
+  $settings->save();
+}
+
+/**
+ * Clear all metatag output caches, it will be rebuild if needed.
+ */
+function metatag_update_1002() {
+  cache_clear_all('output:', 'cache_metatag', TRUE);
+}

@@ -2098,15 +2098,19 @@ function metatag_preprocess_maintenance_page(&$variables) {
   // Prepare all the tags, including doing token replacements.
   $metatags = metatag_prepare_tags();
   // Add each metatag to page header.
-  foreach ($metatags as $key => $value) {
-    foreach ($value as $tag => $data) {
-      // The title tag is special.
-      if ($tag == 'title') {
-        $variables['head_title'] = check_plain($data['#value']);
-      }
-      // ALl other tags are assumed 'meta' tags.
-      else {
-        backdrop_add_html_head($data, 'metatag_preprocess_maintenance_page');
+  if (is_array($metatags) && !empty($metatags)) {
+    foreach ($metatags as $instance => $set) {
+      if (is_array($set) && !empty($set)) {
+        foreach ($set as $tag => $data) {
+          // The title tag is special.
+          if ($tag == 'title') {
+            $variables['head_title'] = check_plain($data['#value']);
+          }
+          // ALl other tags are assumed 'meta' tags.
+          else {
+            backdrop_add_html_head($data, 'metatag_preprocess_maintenance_page');
+          }
+        }
       }
     }
   }

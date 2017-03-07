@@ -1,3 +1,4 @@
+type = module
 name = Metatag: Verification
 description = "Add meta tags for verifying ownership of a site."
 package = SEO

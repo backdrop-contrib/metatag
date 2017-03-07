@@ -4,23 +4,7 @@
  * Update scripts for the Metatag:Verification submodule.
  */
 
-/**
- * Implementations of hook_update_N().
- */
-
-/**
- * Remove the Alexa verification tag.
- */
-function metatag_verification_update_7100() {
-  module_load_include('install', 'metatag');
-  metatag_update_delete_config('alexaVerifyID');
+function metatag_verification_update_last_removed() {
+  // The last Drupal 7 update of the module that we can assume as been run.
+  return 7101;
 }
-
-/**
- * Remove the Yahoo verification tag.
- */
-function metatag_verification_update_7101() {
-  module_load_include('install', 'metatag');
-  metatag_update_delete_config('y_key');
-}
-

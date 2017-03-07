@@ -5,17 +5,6 @@
  */
 
 /**
- * Implements hook_autoload_info().
- */
-function metatag_verification_autoload_info() {
-  return array(
-    // Tests.
-    'MetatagVerificationTest' => 'tests/metatag_verification.test',
-    'MetatagVerificationTagsTest' => 'tests/metatag_verification.tags.test',
-  );
-}
-
-/**
  * Implements hook_metatag_info().
  */
 function metatag_verification_metatag_info() {

@@ -274,15 +274,6 @@ function metatag_config_load_with_defaults($instance, $include_global = TRUE) {
 }
 
 /**
- * Create a new metatag configuration file.
- */
-function metatag_config_create($instance) {
-  // Replace colons with dots.
-  $name = str_replace(':', '.', $instance);
-  return config('metatag.instance.' . $name);
-}
-
-/**
  * Load a metatag configuration record.
  *
  * @see metatag_config_load_multiple()

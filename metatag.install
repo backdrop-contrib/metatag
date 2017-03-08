@@ -398,28 +398,28 @@ function metatag_update_1000() {
 
   // Move old variables into new config.
   $settings = config('metatag.settings');
-  $settings->set('cache_error_pages', variable_get('metatag_cache_error_pages'));
-  $settings->set('tag_admin_pages', variable_get('metatag_tag_admin_pages'));
-  $settings->set('has_revision_id', variable_get('metatag_has_revision_id'));
-  $settings->set('entity_no_lang_default', variable_get('metatag_entity_no_lang_default'));
-  $settings->set('load_defaults', variable_get('metatag_load_defaults'));
-  $settings->set('cache_output', variable_get('metatag_cache_output'));
-  $settings->set('pager_string', variable_get('metatag_pager_string'));
-  $settings->set('i18n_translate_output', variable_get('metatag_i18n_translate_output'));
-  $settings->set('i18n_enable_watchdog', variable_get('metatag_i18n_enable_watchdog'));
-  $settings->set('i18n_disabled', variable_get('metatag_i18n_disabled'));
-  $settings->set('leave_core_tags', variable_get('metatag_leave_core_tags'));
-  $settings->set('extended_permissions', variable_get('metatag_extended_permissions'));
-  $settings->set('load_all_pages', variable_get('metatag_load_all_pages'));
-  $settings->set('token_sanitize', variable_get('metatag_token_sanitize'));
+  $settings->set('cache_error_pages', update_variable_get('metatag_cache_error_pages', FALSE));
+  $settings->set('tag_admin_pages', update_variable_get('metatag_tag_admin_pages', FALSE));
+  $settings->set('has_revision_id', update_variable_get('metatag_has_revision_id', FALSE));
+  $settings->set('entity_no_lang_default', update_variable_get('metatag_entity_no_lang_default', FALSE));
+  $settings->set('load_defaults', update_variable_get('metatag_load_defaults', TRUE));
+  $settings->set('cache_output', update_variable_get('metatag_cache_output', FALSE));
+  $settings->set('pager_string', update_variable_get('metatag_pager_string', 'Page PAGER | '));
+  $settings->set('i18n_translate_output', update_variable_get('metatag_i18n_translate_output', FALSE));
+  $settings->set('i18n_enable_watchdog', update_variable_get('metatag_i18n_enable_watchdog', FALSE));
+  $settings->set('i18n_disabled', update_variable_get('metatag_i18n_disabled', FALSE));
+  $settings->set('leave_core_tags', update_variable_get('metatag_leave_core_tags', FALSE));
+  $settings->set('extended_permissions', update_variable_get('metatag_extended_permissions', FALSE));
+  $settings->set('load_all_pages', update_variable_get('metatag_load_all_pages', TRUE));
+  $settings->set('token_sanitize', update_variable_get('metatag_token_sanitize', FALSE));
 
   // Replace all possible 'enable' variables.
   foreach (entity_get_info() as $entity_type => $entity_info) {
-    $settings->set('metatag_enable_' . $entity_type, variable_get('metatag_enable_' . $entity_type));
+    $settings->set('metatag_enable_' . $entity_type, update_variable_get('metatag_enable_' . $entity_type, TRUE));
     update_variable_del('metatag_enable_' . $entity_type);
     if (!empty($entity_info['bundles'])) {
       foreach ($entity_info['bundles'] as $bundle_name => $bundle_info) {
-        $settings->set('metatag_enable_' . $entity_type . '__' . $bundle_name, variable_get('metatag_enable_' . $entity_type . '__' . $bundle_name));
+        $settings->set('metatag_enable_' . $entity_type . '__' . $bundle_name, update_variable_get('metatag_enable_' . $entity_type . '__' . $bundle_name, TRUE));
         update_variable_del('metatag_enable_' . $entity_type . '__' . $bundle_name);
       }
     }

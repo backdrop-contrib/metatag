@@ -1,3 +1,7 @@
+;marking as hidden until ported.
+hidden = true
+
+type = module
 name = Metatag: Facebook
 description = "Provides support for Facebook's custom meta tags."
 package = SEO

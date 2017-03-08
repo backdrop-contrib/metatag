@@ -1,3 +1,7 @@
+;marking as hidden until ported.
+hidden = true
+
+type = module
 name = Metatag: OpenGraph Products
 description = Provides additional Open Graph Protocol meta tags for describing products.
 package = SEO

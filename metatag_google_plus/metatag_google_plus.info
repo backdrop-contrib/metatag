@@ -1,3 +1,7 @@
+;marking as hidden until ported.
+hidden = true
+
+type = module
 name = Metatag: Google+
 description = "Provides support for Google+ 'itemscope', 'author' and 'publisher' meta tags."
 package = SEO

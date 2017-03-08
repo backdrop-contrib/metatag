@@ -1,3 +1,7 @@
+;marking as hidden until ported.
+hidden = true
+
+type = module
 name = Metatag: Twitter Cards
 description = "Provides support for Twitter's Card meta tags."
 package = SEO

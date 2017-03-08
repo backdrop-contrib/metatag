@@ -1,3 +1,7 @@
+;marking as hidden until ported.
+hidden = true
+
+type = module
 name = Metatag: App Links
 description = "Provides support for applinks.org meta tags."
 package = SEO

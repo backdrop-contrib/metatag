@@ -1,3 +1,7 @@
+;marking as hidden until ported.
+hidden = true
+
+type = module
 name = Metatag: favicons
 description = "Provides support for many different favicons."
 package = SEO

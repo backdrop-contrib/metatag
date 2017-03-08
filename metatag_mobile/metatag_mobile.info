@@ -1,3 +1,7 @@
+;marking as hidden until ported.
+hidden = true
+
+type = module
 name = "Metatag: Mobile & UI Adjustments"
 description = "Provides support for meta tags used to control the mobile browser experience."
 package = SEO

@@ -1739,6 +1739,7 @@ function metatag_page_get_metatags() {
 function metatag_prepare_tags() {
   $tags = array();
   $settings = config('metatag.settings');
+  $cache_output = $settings->get('cache_output');
 
   // By default do not add meta tags to admin pages. To enable meta tags on
   // admin pages set the 'tag_admin_pages' setting to TRUE.
@@ -1763,7 +1764,9 @@ function metatag_prepare_tags() {
       }
       else {
         $metatags = metatag_metatags_view($instance, array());
-        metatag_cache_set($cid, $metatags);
+        if ($cache_output) {
+          metatag_cache_set($cid, $metatags);
+        }
       }
 
       $tags[$instance] = $metatags;
@@ -1780,7 +1783,9 @@ function metatag_prepare_tags() {
     }
     else {
       $metatags = metatag_metatags_view($instance, array());
-      metatag_cache_set($cid, $metatags);
+      if ($cache_output) {
+        metatag_cache_set($cid, $metatags);
+      }
     }
 
     $tags[$instance] = $metatags;
@@ -1809,7 +1814,9 @@ function metatag_prepare_tags() {
     }
     else {
       $metatags = metatag_metatags_view($instance, array());
-      metatag_cache_set($cid, $metatags);
+      if ($cache_output) {
+        metatag_cache_set($cid, $metatags);
+      }
     }
     $tags[$instance] = $metatags;
   }

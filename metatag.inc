@@ -204,15 +204,15 @@ class BackdropDefaultMetaTag implements BackdropMetaTagInterface {
    *   The argument converted to an absolute URL.
    */
   function convertUrlToAbsolute($url) {
-    // Convert paths relative to the hostname, that start with a slash, to
-    // ones that are relative to the Drupal root path; ignore protocol-relative
+    // Convert paths relative to the hostname that start with a slash, to ones
+    // that are relative to the Backdrop root path; ignore protocol-relative
     // URLs.
     if (strpos($url, base_path()) === 0 && strpos($url, '//') !== 0) {
       // Logic:
       // * Get the length of the base_path(),
       // * Get a portion of the image's path starting from the position equal
       //   to the base_path()'s length; this will result in a path relative
-      //   to the Drupal installation's base directory.
+      //   to the Backdrop installation's base directory.
       $len = strlen(base_path());
       $url = substr($url, $len);
     }

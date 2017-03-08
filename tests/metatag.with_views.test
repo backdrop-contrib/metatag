@@ -109,7 +109,7 @@ class MetatagCoreWithViewsTest extends MetatagTestHelper {
     // Verify that the node saved correctly.
     $t_args = array('%name' => $term_name);
     // This doesn't work for some reason, it seems the HTML is stripped off
-    // during output so the %name's standard Drupal wrappers don't match.
+    // during output so the %name's standard Backdrop wrappers don't match.
     // $this->assertText(t('Created new term %name.', $t_args));
     // .. so this has to be done instead.
     $this->assertText(strip_tags(t('Created new term %name.', $t_args)));

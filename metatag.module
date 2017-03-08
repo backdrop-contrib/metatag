@@ -1997,7 +1997,7 @@ function metatag_get_info($type = NULL, $name = NULL) {
         $info['tags'][$key] += array(
           // Merge in default values.
           'name' => $key,
-          'class' => 'DrupalTextMetaTag',
+          'class' => 'BackdropTextMetaTag',
         );
       }
 

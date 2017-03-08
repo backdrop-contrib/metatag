@@ -82,7 +82,7 @@ function metatag_dc_metatag_info() {
 
   // Basic tags.
   $defaults = array(
-    'class' => 'DrupalTextMetaTag',
+    'class' => 'BackdropTextMetaTag',
     'group' => 'dublin-core',
     'element' => array(
       '#type' => 'term',

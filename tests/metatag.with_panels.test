@@ -74,7 +74,7 @@ class MetatagCoreWithPanelsTest extends MetatagTestHelper {
     // $xpath = $this->xpath("//h1");
     $t_args = array('@type' => 'Test', '%title' => 'Who likes magic');
     // This doesn't work for some reason, it seems the HTML is stripped off
-    // during output so the %title's standard Drupal wrappers don't match.
+    // during output so the %title's standard Backdrop wrappers don't match.
     // $this->assertText(t('@type %title has been created.', $t_args));
     // .. so this has to be done instead.
     $this->assertText(strip_tags(t('@type %title has been created.', $t_args)));

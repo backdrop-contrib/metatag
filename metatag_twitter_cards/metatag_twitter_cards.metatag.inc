@@ -80,7 +80,7 @@ function metatag_twitter_cards_metatag_info() {
 
   // Defaults used for all cards.
   $defaults = array(
-    'class' => 'DrupalTextMetaTag',
+    'class' => 'BackdropTextMetaTag',
     'group' => 'twitter-cards',
     'element' => array(
       '#theme' => 'metatag_twitter_cards',

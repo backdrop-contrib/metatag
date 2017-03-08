@@ -19,7 +19,7 @@ function metatag_app_links_metatag_info() {
   // Default values for each meta tag.
   $defaults = array(
     'description' => '',
-    'class' => 'DrupalTextMetaTag',
+    'class' => 'BackdropTextMetaTag',
     'group' => 'app_links',
     'element' => array(
       '#theme' => 'metatag_property',

@@ -20,7 +20,7 @@ function metatag_opengraph_products_metatag_info() {
   // Default values for each meta tag.
   $defaults = array(
     'description' => '',
-    'class' => 'DrupalTextMetaTag',
+    'class' => 'BackdropTextMetaTag',
     'group' => 'open-graph-products',
     'element' => array(
       '#theme' => 'metatag_property',

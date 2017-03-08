@@ -88,7 +88,7 @@ function metatag_opengraph_metatag_info() {
   // Default values for each meta tag.
   $og_defaults = array(
     'description' => '',
-    'class' => 'DrupalTextMetaTag',
+    'class' => 'BackdropTextMetaTag',
     'group' => 'open-graph',
     'element' => array(
       '#theme' => 'metatag_property',

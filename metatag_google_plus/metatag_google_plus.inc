@@ -7,14 +7,14 @@
 /**
  * Schema meta tag controller.
  *
- * This extends DrupalTextMetaTag as we need to alter variables in
+ * This extends BackdropTextMetaTag as we need to alter variables in
  * template_preprocess_html() rather output a normal meta tag.
  *
- * This controller is little different from DrupalTitleMetaTag and same value in
+ * This controller is little different from BackdropTitleMetaTag and same value in
  * the itemtype instead of title. So in the MYTHEME_preprocess_html(),
  * $variable['itemtype'] will be provided.
  */
-class DrupalSchemaMetaTag extends DrupalTextMetaTag {
+class BackdropSchemaMetaTag extends BackdropTextMetaTag {
 
   public function getElement(array $options = array()) {
     $element = array();

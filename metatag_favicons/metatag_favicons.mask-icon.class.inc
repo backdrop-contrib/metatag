@@ -7,7 +7,7 @@
 /**
  * Mask icon meta tag controller.
  */
-class DrupalMaskIconMetaTag extends DrupalTextMetaTag {
+class BackdropMaskIconMetaTag extends BackdropTextMetaTag {
 
   /**
    * {@inheritdoc}

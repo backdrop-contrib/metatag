@@ -176,7 +176,7 @@ function hook_metatag_config_delete($config) {
  *       the default output of core image theming, i.e. the following string:
  *         src="[URL]" width=
  *     'url' - If set to TRUE, relative paths will be converted to absolute.
- *     'is_language' - If set to TRUE, will not allow the Drupal default
+ *     'is_language' - If set to TRUE, will not allow the Backdrop default
  *       language value "und" to be output.
  *     'select_or_other' - If set to TRUE, form[#type] is set to 'select' and
  *       the "select_or_other" module is available, that module will be used to
@@ -319,7 +319,7 @@ function hook_metatag_token_types_alter(&$options) {
  * @param string $tag_name
  *   The name of the meta tag being altered.
  *
- * @see DrupalTextMetaTag::getValue()
+ * @see BackdropTextMetaTag::getValue()
  */
 function hook_metatag_pattern_alter(&$pattern, &$types, $tag_name) {
   if (strpos($pattern, 'token_type1') !== FALSE) {

@@ -70,7 +70,7 @@ class MetatagCoreImageTest extends MetatagTestHelper {
    * Confirm that an image can be added to a global configuration using the
    * image's relative URL.
    */
-  function testConfigDrupalRelativeURL() {
+  function testConfigBackdropRelativeURL() {
     // Generate a test image.
     $image_uri = $this->generateImage();
     $this->verbose($image_uri);

@@ -54,7 +54,7 @@ function metatag_views_i18n_object_info() {
   foreach ($meta_tag_info['tags'] as $tag_info) {
     // Ignore certain field types that aren't translatable, mostly fields that
     // list predetermined options in various forms.
-    if (!empty($tag_info['class']) && $tag_info['class'] == 'DrupalListMetaTag') {
+    if (!empty($tag_info['class']) && $tag_info['class'] == 'BackdropListMetaTag') {
       continue;
     }
     elseif (!empty($tag_info['form']['#type']) && $tag_info['form']['#type'] == 'select') {

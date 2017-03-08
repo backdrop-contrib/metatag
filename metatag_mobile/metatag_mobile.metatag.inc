@@ -42,7 +42,7 @@ function metatag_mobile_metatag_info() {
   // Default values for each meta tag.
   $defaults = array(
     'description' => '',
-    'class' => 'DrupalTextMetaTag',
+    'class' => 'BackdropTextMetaTag',
     'group' => 'mobile',
   );
 
@@ -84,14 +84,14 @@ function metatag_mobile_metatag_info() {
   $info['tags']['amphtml'] = array(
     'label' => t('AMP URL'),
     'description' => t('Provides an absolute URL to an AMP-formatted version of the current page. See the <a href="@url">official AMP specifications</a> for details on how the page should be formatted.', array('@url' => 'https://www.ampproject.org/')),
-    'class' => 'DrupalLinkMetaTag',
+    'class' => 'BackdropLinkMetaTag',
     'weight' => ++$weight,
   ) + $defaults;
 
   $info['tags']['alternate_handheld'] = array(
     'label' => t('Handheld URL'),
     'description' => t('Provides an absolute URL to a specially formatted version of the current page designed for "feature phones", mobile phones that do not support modern browser standards. See the <a href="@url">official Google Mobile SEO Guide</a> for details on how the page should be formatted.', array('@url' => 'https://developers.google.com/webmasters/mobile-sites/mobile-seo/other-devices?hl=en#feature_phones')),
-    'class' => 'DrupalLinkMetaTag',
+    'class' => 'BackdropLinkMetaTag',
     'weight' => ++$weight,
     'element' => array(
       '#theme' => 'metatag_mobile_alt_handheld',
@@ -103,14 +103,14 @@ function metatag_mobile_metatag_info() {
   $info['tags']['amphtml'] = array(
     'label' => t('AMP URL'),
     'description' => t('Provides an absolute URL to an AMP-formatted version of the current page. See the <a href="@url">official AMP specifications</a> for details on how the page should be formatted.', array('@url' => 'https://www.ampproject.org/')),
-    'class' => 'DrupalLinkMetaTag',
+    'class' => 'BackdropLinkMetaTag',
     'weight' => ++$weight,
   ) + $tag_info_defaults;
 
   // Default values for each meta tag.
   $defaults = array(
     'description' => '',
-    'class' => 'DrupalTextMetaTag',
+    'class' => 'BackdropTextMetaTag',
     'group' => 'apple_mobile',
   );
 
@@ -147,7 +147,7 @@ function metatag_mobile_metatag_info() {
   $info['tags']['ios-app-link-alternative'] = array(
     'label' => t('iOS app link alternative'),
     'description' => t('A custom string for deeplinking to an iOS mobile app. Should be in the format "itunes_id/scheme/host_path", e.g. 123456/example/hello-screen". The "ios-app://" prefix will be included automatically.'),
-    'class' => 'DrupalLinkMetaTag',
+    'class' => 'BackdropLinkMetaTag',
     'weight' => ++$weight,
     'element' => array(
       '#theme' => 'metatag_mobile_ios_app',
@@ -158,14 +158,14 @@ function metatag_mobile_metatag_info() {
   // Default values for each meta tag.
   $defaults = array(
     'description' => '',
-    'class' => 'DrupalTextMetaTag',
+    'class' => 'BackdropTextMetaTag',
     'group' => 'android_mobile',
   );
 
   $info['tags']['android-app-link-alternative'] = array(
     'label' => t('Android app link alternative'),
     'description' => t('A custom string for deeplinking to an Android mobile app. Should be in the format "package_name/host_path", e.g. "com.example.android/example/hello-screen". The "android-app://" prefix will be included automatically.'),
-    'class' => 'DrupalLinkMetaTag',
+    'class' => 'BackdropLinkMetaTag',
     'weight' => ++$weight,
     'element' => array(
       '#theme' => 'metatag_mobile_android_app',
@@ -176,7 +176,7 @@ function metatag_mobile_metatag_info() {
   $info['tags']['android-manifest'] = array(
     'label' => t('Manifest'),
     'description' => t('A URL to a manifest.json file that describes the application. The <a href="https://developer.chrome.com/multidevice/android/installtohomescreen">JSON-based manifest</a> provides developers with a centralized place to put metadata associated with a web application.'),
-    'class' => 'DrupalLinkMetaTag',
+    'class' => 'BackdropLinkMetaTag',
     'weight' => ++$weight,
     'element' => array(
       '#name' => 'manifest',
@@ -186,7 +186,7 @@ function metatag_mobile_metatag_info() {
   // Default values for each meta tag.
   $defaults = array(
     'description' => '',
-    'class' => 'DrupalTextMetaTag',
+    'class' => 'BackdropTextMetaTag',
     'group' => 'windows_mobile',
   );
 

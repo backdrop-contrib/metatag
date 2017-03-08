@@ -22,7 +22,7 @@ function metatag_facebook_metatag_info() {
   // Default values for each meta tag.
   $tag_info_defaults = array(
     'description' => '',
-    'class' => 'DrupalTextMetaTag',
+    'class' => 'BackdropTextMetaTag',
     'group' => 'facebook',
     'element' => array(
       '#theme' => 'metatag_property',

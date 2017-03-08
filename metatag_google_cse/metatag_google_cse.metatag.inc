@@ -20,7 +20,7 @@ function metatag_google_cse_metatag_info() {
 
   // Default values for each meta tag.
   $tag_info_defaults = array(
-    'class' => 'DrupalTextMetaTag',
+    'class' => 'BackdropTextMetaTag',
     'group' => 'google_cse',
     'element' => array(
       '#theme' => 'metatag_google_cse',

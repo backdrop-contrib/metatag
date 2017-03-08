@@ -6,7 +6,7 @@ file = metatag_verification.test
 
 [MetatagVerificationTagsTest]
 name = Metatag tags: Verification
-description = Test the Verification meta tags.
+description = Test the Verification metatags.
 group = Metatag
 file = metatag_verification.tags.test
 

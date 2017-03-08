@@ -37,7 +37,7 @@ function metatag_dc_advanced_metatag_info() {
 
   // Additional tags.
   $defaults = array(
-    'class' => 'DrupalTextMetaTag',
+    'class' => 'BackdropTextMetaTag',
     'group' => 'dublin-core-additional',
     'element' => array(
       '#type' => 'term',

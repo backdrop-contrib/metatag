@@ -78,7 +78,7 @@ function metatag_google_plus_metatag_info() {
 
   // Defaults used for all cards.
   $defaults = array(
-    'class' => 'DrupalTextMetaTag',
+    'class' => 'BackdropTextMetaTag',
     'group' => 'google-plus',
     'element' => array(
       '#theme' => 'metatag_google_plus',
@@ -88,7 +88,7 @@ function metatag_google_plus_metatag_info() {
   $info['tags']['itemtype'] = array(
     'label' => t('Page type'),
     'description' => t('Schema type. <a href="!url">More schema info</a>. If your page type does not exist in options above, please install <a href="!url2">select_or_other</a> module to enter page type manually.', array('!url' => 'http://schema.org/docs/schemas.html', '!url2' => 'https://drupal.org/project/select_or_other')),
-    'class' => 'DrupalSchemaMetaTag',
+    'class' => 'BackdropSchemaMetaTag',
     'weight' => ++$weight,
     'select_or_other' => TRUE,
     'form' => array(
@@ -131,7 +131,7 @@ function metatag_google_plus_metatag_info() {
   $info['tags']['author'] = array(
     'label' => t('Author URL'),
     'description' => t("Used by some search engines to confirm authorship of the content on a page. Should be either the full URL for the author's Google+ profile page or a local page with information about the author."),
-    'class' => 'DrupalLinkMetaTag',
+    'class' => 'BackdropLinkMetaTag',
     'weight' => ++$weight,
     'devel_generate' => array(
       'type' => 'url',
@@ -140,7 +140,7 @@ function metatag_google_plus_metatag_info() {
   $info['tags']['publisher'] = array(
     'label' => t('Publisher URL'),
     'description' => t("Used by some search engines to confirm publication of the content on a page. Should be the full URL for the publication's Google+ profile page."),
-    'class' => 'DrupalLinkMetaTag',
+    'class' => 'BackdropLinkMetaTag',
     'weight' => ++$weight,
     'devel_generate' => array(
       'type' => 'url',

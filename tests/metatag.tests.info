@@ -4,11 +4,11 @@ description = Unit tests for meta tags (sort-of)
 group = Metatag
 file = metatag.unit.test
 
-[MetatagTagsTest]
+[MetatagTagsTestBase]
 name = Metatag base tag tests
 description = Tests that each of the Metatag base tags work correctly.
 group = Metatag
-file = metatag.tags.test
+file = metatag.tags_helper.test
 
 [MetatagCoreNodeTest]
 name = Metatag tests for nodes

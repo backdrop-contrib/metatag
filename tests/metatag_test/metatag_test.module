@@ -61,7 +61,7 @@ function metatag_test_metatag_info() {
   $info['test:foo'] = array(
     'label' => t('Foo meta tag'),
     'description' => t('Testing metatag.'),
-    'class' => 'DrupalTextMetaTag',
+    'class' => 'BackdropTextMetaTag',
     'group' => 'testing',
   );
 

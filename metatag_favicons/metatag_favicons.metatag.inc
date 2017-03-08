@@ -32,7 +32,7 @@ function metatag_favicons_metatag_info() {
   // Default values for each meta tag.
   $favicon_defaults = array(
     'description' => '',
-    'class' => 'DrupalLinkMetaTag',
+    'class' => 'BackdropLinkMetaTag',
     'group' => 'favicons',
     'url' => TRUE,
     'context' => array('global'),
@@ -55,7 +55,7 @@ function metatag_favicons_metatag_info() {
     'element' => array(
       '#theme' => 'metatag_mask_icon',
     ),
-    'class' => 'DrupalMaskIconMetaTag',
+    'class' => 'BackdropMaskIconMetaTag',
     'replaces' => array('icon_any'),
   ) + $favicon_defaults;
 

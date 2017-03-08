@@ -55,7 +55,7 @@ class MetatagFaviconsTest extends MetatagTestHelper {
     $relative_path = str_replace('?q=', '', $relative_path);
     $absolute_path = str_replace('?q=', '', $absolute_path);
 
-    // Try filling in a path relative to the Drupal installation.
+    // Try filling in a path relative to the document root.
     $config = metatag_config_load('global');
     $config->config['mask-icon']['value'] = $svg_path;
     metatag_config_save($config);

@@ -59,7 +59,7 @@ if (class_exists('SearchApiAbstractAlterCallback')) {
       $tags = metatag_get_info('tags');
       foreach ($tags as $id => $tag) {
         switch ($tag['class']) {
-          case 'DrupalLinkMetaTag':
+          case 'BackdropLinkMetaTag':
             $type = 'uri';
             break;
           default:

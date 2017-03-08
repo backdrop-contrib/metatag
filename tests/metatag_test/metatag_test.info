@@ -1,3 +1,4 @@
+type = module
 name = Meta Tag Test
 description = Helper module for testing metatag.module.
 backdrop = 1.x

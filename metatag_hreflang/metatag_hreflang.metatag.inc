@@ -55,7 +55,7 @@ function metatag_hreflang_metatag_info() {
   // Default values for each meta tag.
   $tag_info_defaults = array(
     'description' => '',
-    'class' => 'DrupalLinkMetaTag',
+    'class' => 'BackdropLinkMetaTag',
     'group' => 'hreflang',
   );
 

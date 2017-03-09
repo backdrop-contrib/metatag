@@ -386,7 +386,7 @@ function metatag_config_save($data) {
 /**
  * Delete a metatag configuration file.
  */
-function metatag_config_delete($data) {
+function metatag_delete_config($data) {
   // Replace colons with dots.
   $name = str_replace(':', '.', $data['instance']);
   $config = config('metatag.instance.' . $name);
@@ -1872,7 +1872,7 @@ function metatag_field_attach_rename_bundle($entity_type, $bundle_old, $bundle_n
     $config->instance = $instance_new;
     metatag_config_save($config);
     $config->instance = $instance_old;
-    metatag_config_delete($config);
+    metatag_delete_config($config);
   }
 }
 
@@ -1882,7 +1882,7 @@ function metatag_field_attach_rename_bundle($entity_type, $bundle_old, $bundle_n
 function metatag_field_attach_delete_bundle($entity_type, $bundle) {
   $instance = $entity_type . ':' . $bundle;
   if ($config = metatag_config_load($instance)) {
-    metatag_config_delete($config);
+    metatag_delete_config($config);
   }
 }
 

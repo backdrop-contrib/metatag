@@ -2,7 +2,9 @@
     "_config_name": "metatag.instance.global",
     "module": "metatag",
     "storage": "default",
+    "name": "global",
     "instance": "global",
+    "label": "Global",
     "disabled": false,
     "api_version": 1,
     "config": {

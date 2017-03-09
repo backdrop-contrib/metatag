@@ -21,7 +21,7 @@ function metatag_config_info() {
 
   // Metatag instances.
   $prefixes['metatag.instance'] = array(
-    'name_key' => 'instance',
+    'name_key' => 'name',
     'label_key' => 'label',
     'group' => t('Metatag'),
   );

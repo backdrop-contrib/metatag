@@ -501,3 +501,28 @@ function metatag_update_1001() {
 function metatag_update_1002() {
   cache_clear_all('output:', 'cache_metatag', TRUE);
 }
+
+/**
+ * Add a name and label attributes to all config instances.
+ */
+function metatag_update_1003() {
+  $labels = array(
+    'global' => 'Global',
+    'global.frontpage' => 'Global: Home page',
+    'global.403' => 'Global: 403 access denied',
+    'global.404' => 'Global: 404 page not found',
+    'node' => 'Content',
+    'user' => 'User account',
+    'taxonomy_term' => 'Taxonomy term',
+  );
+  $files = config_get_names_with_prefix('metatag.instance');
+  $configs = config_load_multiple($files);
+  foreach ($configs as $filename => $config) {
+    $instance = $config['instance'];
+    $name = str_replace(':', '.', $instance);
+    config_set($filename, 'name', $name);
+    if (isset($labels[$name])) {
+      config_set($filename, 'label', $labels[$name]);
+    }
+  }
+}

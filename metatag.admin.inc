@@ -39,8 +39,16 @@ function metatag_config_overview() {
       $row['class'][] = 'disabled';
     }
 
+    if (isset($config['label'])) {
+      $label = check_plain($config['label']);
+    }
+    else {
+      // @todo remove this? Replace with "Unknown?"
+      $label = check_plain(metatag_config_instance_label($config['instance']));
+    }
+
     $details  = '<div class="metatag-config-label collapsed">';
-    $details .= '  <a href="#" class="toggle-details">' . check_plain(metatag_config_instance_label($config['instance'])) . '</a>';
+    $details .= '  <a href="#" class="toggle-details">' . $label . '</a>';
     $details .= '</div>';
     $details .= '<div class="metatag-config-details js-hide">';
 

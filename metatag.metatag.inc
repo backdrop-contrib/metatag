@@ -7,6 +7,7 @@
  * Implements hook_metatag_config_instance_info().
  */
 function metatag_metatag_config_instance_info() {
+  // @todo remove these once metatag_config_instance_label() is gone.
   $info['global']           = array('label' => t('Global'));
   $info['global:frontpage'] = array('label' => t('Home page'));
   $info['global:403']       = array('label' => t('403 access denied'));

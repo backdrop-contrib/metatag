@@ -2,7 +2,9 @@
     "_config_name": "metatag.instance.global.frontpage",
     "module": "metatag",
     "storage": "default",
+    "name": "global.frontpage",
     "instance": "global:frontpage",
+    "label": "Global: Home page",
     "disabled": false,
     "api_version": 1,
     "config": {

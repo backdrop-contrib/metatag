@@ -978,9 +978,10 @@ function metatag_entity_view($entity, $entity_type, $view_mode, $langcode, $forc
   // Only run this function once per page load, for an entity which is allowed
   // metatags.
   static $i_will_say_this_only_once = FALSE;
-
+//  dpm('hi there: ' . $entity_type);
   // Only proceed if this entity object is the page being viewed.
   if (_metatag_entity_is_page($entity_type, $entity)) {
+
     // Get the entity's extra information.
     list($entity_id, $revision_id, $bundle) = entity_extract_ids($entity_type, $entity);
 
@@ -996,12 +997,6 @@ function metatag_entity_view($entity, $entity_type, $view_mode, $langcode, $forc
         return;
       }
       $i_will_say_this_only_once = TRUE;
-    }
-
-    // CTools uses 'page_manager' view mode to indicate the full entity display
-    // page rather than 'full', so streamline the internal processes.
-    if ($view_mode == 'page_manager') {
-      $view_mode = 'full';
     }
 
     // Generate metatags output.
@@ -1224,7 +1219,7 @@ function metatag_metatags_view($instance, array $metatags = array(), array $opti
       && $metatag_instance = metatag_get_instance($metatag, $data)) {
       $tag_output = $metatag_instance->getElement($options);
       // Don't output the pager if that's all there is.
-      if ($tag_output != $current_pager) {
+      if (!empty($tag_output) && $tag_output != $current_pager) {
         $output[$metatag] = $tag_output;
       }
     }
@@ -1319,9 +1314,10 @@ function metatag_metatags_form(array &$form, $instance, array $metatags = array(
   // Merge in the default options.
   $options += array(
     'token types' => array(),
-    'defaults' => metatag_config_load($instance),
+    'defaults' => metatag_config_load_with_defaults($instance),
     'instance' => $instance,
   );
+//dpm($options);
 
   // Allow the defined tokens to be modified.
   backdrop_alter('metatag_token_types', $options);
@@ -1795,6 +1791,7 @@ function metatag_prepare_tags() {
   // must include the necessary defaults.
   else {
     $tags += metatag_page_get_metatags();
+    //dpm($tags);
   }
 
   // If no meta tags were loaded at least load the global defaults. This may be
@@ -2071,6 +2068,7 @@ function metatag_get_value($metatag, array $data, array $options = array()) {
 function metatag_preprocess_page(&$variables) {
   // Prepare all the tags, including doing token replacements.
   $metatags = metatag_prepare_tags();
+  //dpm($metatags);
 
   // Add each metatag to page header.
   if (is_array($metatags) && !empty($metatags)) {

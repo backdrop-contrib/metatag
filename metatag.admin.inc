@@ -689,7 +689,7 @@ function metatag_admin_settings_form() {
     }
   }
 
-  if (module_exists(i18n)) {
+  if (module_exists('i18n')) {
     $form['i18n'] = array(
       '#type' => 'fieldset',
       '#title' => t('Internationalization options'),

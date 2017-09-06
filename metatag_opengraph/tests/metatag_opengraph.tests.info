@@ -1,0 +1,11 @@
+[MetatagOpenGraphTest]
+name = Metatag OpenGraph tests
+description = Test the Metatag:OpenGraph module
+group = Metatag
+file = metatag_opengraph.test
+
+[MetatagOpenGraphTagsTest]
+name = Metatag tags: OpenGraph
+description = Test the OpenGraph meta tags
+group = Metatag
+file = metatag_opengraph.tags.test

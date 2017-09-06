@@ -1,13 +1,7 @@
-;marking as hidden until ported.
-hidden = true
-
 type = module
 name = Metatag: OpenGraph
 description = Provides support for Open Graph Protocol meta tags.
 package = SEO
-core = 7.x
-dependencies[] = metatag
+backdrop = 1.x
 
-; Tests.
-files[] = tests/metatag_opengraph.test
-files[] = tests/metatag_opengraph.tags.test
+dependencies[] = metatag

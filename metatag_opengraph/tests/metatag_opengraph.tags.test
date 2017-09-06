@@ -3,19 +3,7 @@
  * @file
  * Tests that each of the Metatag OpenGraph tags work correctly.
  */
-
 class MetatagOpenGraphTagsTest extends MetatagTagsTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Metatag tags: OpenGraph',
-      'description' => 'Test the OpenGraph meta tags.',
-      'group' => 'Metatag',
-    );
-  }
 
   /**
    * {@inheritdoc}

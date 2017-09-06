@@ -3,19 +3,7 @@
  * @file
  * Tests for the Metatag OpenGraph module.
  */
-
 class MetatagOpenGraphTest extends MetatagTestHelper {
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Metatag OpenGraph tests',
-      'description' => 'Test the Metatag:OpenGraph module.',
-      'group' => 'Metatag',
-    );
-  }
 
   /**
    * {@inheritdoc}
@@ -27,18 +15,18 @@ class MetatagOpenGraphTest extends MetatagTestHelper {
 
     // Create an admin user and log them in.
     $this->adminUser = $this->createAdminUser();
-    $this->drupalLogin($this->adminUser);
+    $this->backdropLogin($this->adminUser);
   }
 
   /**
    * Confirm that it's possible to load the main admin page.
    */
   public function testAdminPage() {
-    $this->drupalGet('admin/config/metadata/metatags');
+    $this->backdropGet('admin/config/metadata/metatags');
     $this->assertResponse(200);
 
     // Confirm the page is correct.
-    $this->assertText(t('To view a summary of the default meta tags and the inheritance, click on a meta tag type.'));
+    $this->assertText('Add default meta tags');
   }
 
 }

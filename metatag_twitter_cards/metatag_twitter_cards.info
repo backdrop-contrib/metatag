@@ -1,13 +1,10 @@
-;marking as hidden until ported.
-hidden = true
-
 type = module
 name = Metatag: Twitter Cards
-description = "Provides support for Twitter's Card meta tags."
+description = Provides metatags for Twitter's Cards.
 package = SEO
-core = 7.x
+backdrop = 1.x
+
 dependencies[] = metatag
 
 ; Tests.
-files[] = tests/metatag_twitter_cards.test
 files[] = tests/metatag_twitter_cards.tags.test

@@ -1,0 +1,11 @@
+[MetatagTwitterCardsTest]
+name = Metatag Twitter Cards tests
+description = Test the Metatag:Twitter Cards module
+group = Metatag
+file = metatag_twitter_cards.test
+
+[MetatagTwitterCardsTagsTest]
+name = Metatag tags: Twitter Cards
+description = Test the Twitter Cards meta tags
+group = Metatag
+file = metatag_twitter_cards.tags.test

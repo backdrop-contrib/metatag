@@ -3,20 +3,7 @@
  * @file
  * Tests for the Metatag Twitter Cards module.
  */
-
 class MetatagTwitterCardsTest extends MetatagTestHelper {
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Metatag Twitter Cards tests',
-      'description' => 'Test the Metatag:Twitter Cards module.',
-      'group' => 'Metatag',
-    );
-  }
-
   /**
    * {@inheritdoc}
    */
@@ -27,14 +14,14 @@ class MetatagTwitterCardsTest extends MetatagTestHelper {
 
     // Create an admin user and log them in.
     $this->adminUser = $this->createAdminUser();
-    $this->drupalLogin($this->adminUser);
+    $this->backdropLogin($this->adminUser);
   }
 
   /**
    * Confirm that it's possible to load the main admin page.
    */
   public function testAdminPage() {
-    $this->drupalGet('admin/config/metadata/metatags');
+    $this->backdropGet('admin/config/metadata/metatags');
     $this->assertResponse(200);
 
     // Confirm the page is correct.

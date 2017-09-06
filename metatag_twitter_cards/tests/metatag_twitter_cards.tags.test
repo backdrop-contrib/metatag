@@ -3,19 +3,7 @@
  * @file
  * Tests that each of the Metatag Twitter Cards tags work correctly.
  */
-
 class MetatagTwitterCardsTagsTest extends MetatagTagsTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Metatag tags: Twitter Cards',
-      'description' => 'Test the Twitter Cards meta tags.',
-      'group' => 'Metatag',
-    );
-  }
 
   /**
    * {@inheritdoc}

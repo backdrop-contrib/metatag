@@ -6,5 +6,17 @@ backdrop = 1.x
 
 dependencies[] = metatag
 
-; Tests.
-files[] = tests/metatag_twitter_cards.tags.test
+* [ ] metatag_app_links
+* [ ] metatag_dc
+* [ ] metatag_dc_advanced
+* [ ] metatag_devel
+* [ ] metatag_facebook
+* [ ] metatag_favicons
+* [ ] metatag_google_cse
+* [ ] metatag_google_plus
+* [ ] metatag_hreflang
+* [ ] metatag_importer
+* [ ] metatag_mobile
+* [ ] metatag_opengraph
+* [ ] metatag_opengraph_products
+* [ ] metatag_twitter_cards

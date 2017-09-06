@@ -3,19 +3,7 @@
  * @file
  * Tests for the Metatag Facebook module.
  */
-
 class MetatagFacebookTest extends MetatagTestHelper {
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Metatag Facebook tests',
-      'description' => 'Test the Metatag:Facebook module.',
-      'group' => 'Metatag',
-    );
-  }
 
   /**
    * {@inheritdoc}
@@ -27,14 +15,14 @@ class MetatagFacebookTest extends MetatagTestHelper {
 
     // Create an admin user and log them in.
     $this->adminUser = $this->createAdminUser();
-    $this->drupalLogin($this->adminUser);
+    $this->backdropLogin($this->adminUser);
   }
 
   /**
    * Confirm that it's possible to load the main admin page.
    */
   public function testAdminPage() {
-    $this->drupalGet('admin/config/metadata/metatags');
+    $this->backdropGet('admin/config/metadata/metatags');
     $this->assertResponse(200);
 
     // Confirm the page is correct.

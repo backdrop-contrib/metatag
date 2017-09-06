@@ -1,13 +1,7 @@
-;marking as hidden until ported.
-hidden = true
-
 type = module
 name = Metatag: Facebook
-description = "Provides support for Facebook's custom meta tags."
+description = Provides Metatags for Facebook.
 package = SEO
-core = 7.x
-dependencies[] = metatag
+backdrop = 1.x
 
-; Tests.
-files[] = tests/metatag_facebook.test
-files[] = tests/metatag_facebook.tags.test
+dependencies[] = metatag

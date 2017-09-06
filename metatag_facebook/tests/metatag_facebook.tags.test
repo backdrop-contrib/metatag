@@ -3,19 +3,7 @@
  * @file
  * Tests that each of the Metatag Facebook tags work correctly.
  */
-
 class MetatagFacebookTagsTest extends MetatagTagsTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Metatag tags: Facebook',
-      'description' => 'Test the Facebook meta tags.',
-      'group' => 'Metatag',
-    );
-  }
 
   /**
    * {@inheritdoc}

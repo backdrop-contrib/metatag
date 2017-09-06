@@ -1,0 +1,11 @@
+[MetatagFacebookTest]
+name = Metatag Facebook tests
+description = Test the Metatag: Facebook module
+group = Metatag
+file = metatag_facebook.test
+
+[MetatagFacebookTagsTest]
+name = Metatag tags: Facebook
+description = Test the Facebook meta tags
+group = Metatag
+file = metatag_facebook.tags.test

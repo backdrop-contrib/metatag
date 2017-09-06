@@ -26,7 +26,7 @@ class MetatagFacebookTest extends MetatagTestHelper {
     $this->assertResponse(200);
 
     // Confirm the page is correct.
-    $this->assertText(t('To view a summary of the default meta tags and the inheritance, click on a meta tag type.'));
+    $this->assertText('Add default meta tags');
   }
 
 }

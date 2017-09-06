@@ -622,7 +622,7 @@ function metatag_bulk_revert_batch_finished($success, $results, $operations) {
 function metatag_admin_settings_form() {
   $settings = config('metatag.settings');
 
-  $form = array();
+  $form = array('#config' => 'metatag.settings');
 
   $form['#attached'] = array(
     'js' => array(
@@ -666,18 +666,11 @@ function metatag_admin_settings_form() {
             $form['entities']['metatag_enable_' . $entity_type . '__' . $bundle_name] = array(
               '#type' => 'checkbox',
               '#title' => t($bundle_info['label']),
-              '#default_value' => !$entity_enabled || metatag_entity_supports_metatags($entity_type, $bundle_name),
+              '#default_value' => metatag_entity_supports_metatags($entity_type, $bundle_name),
               '#attributes' => array(
-                // Add some theming that'll indent this bundle.
                 'class' => array('metatag-bundle-checkbox'),
               ),
               '#states' => array(
-                'unchecked' => array(
-                  ':input[name="metatag_enable_' . $entity_type . '"]' => array('checked' => FALSE),
-                ),
-                'checked' => array(
-                  ':input[name="metatag_enable_' . $entity_type . '"]' => array('checked' => TRUE),
-                ),
                 'visible' => array(
                   ':input[name="metatag_enable_' . $entity_type . '"]' => array('checked' => TRUE),
                 ),
@@ -782,26 +775,34 @@ function metatag_admin_settings_form() {
   // Submit handler.
   $form['#submit'][] = 'metatag_admin_settings_form_submit';
 
-  return $form;
+  return system_settings_form($form);
 }
 
 /**
- * Form API submission callback for metatag_admin_settings_form().
+ * Validate handler for metatag_admin_settings_form().
+ */
+function metatag_admin_settings_form_validate(&$form, &$form_state) {
+  foreach($form_state['values'] as $key => $value) {
+    // If the setting is disabled...
+    if (strstr($key, 'metatag_enable') && $value == 0) {
+      // If the setting is for an entity...
+      if (!strstr($key, '__')) {
+        // Disable all its bundles.
+        foreach ($form_state['values'] as $key2 => $value2) {
+          if (strstr($key2, $key)) {
+            $form_state['values'][$key2] = 0;
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Submit handler for metatag_admin_settings_form().
  */
 function metatag_admin_settings_form_submit(&$form, &$form_state) {
-  $settings = config('metatag.settings');
-  $values = $form_state['values']; // Make a copy.
-  unset($values['form_build_id']);
-  unset($values['form_token']);
-  unset($values['form_id']);
-  unset($values['op']);
-  unset($values['submit']);
-  foreach ($values as $key => $value) {
-    $settings->set($key, $value);
-  }
-  $settings->save();
-
   cache_clear_all('entity_info:', 'cache', TRUE);
   cache_clear_all('*', 'cache_metatag', TRUE);
-  backdrop_set_message(t('The configuration options have been saved and the Metatag cache cleared.'));
+  backdrop_set_message(t('The Metatag cache has been cleared.'));
 }

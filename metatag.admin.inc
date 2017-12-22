@@ -111,9 +111,9 @@ function metatag_config_overview() {
     $row['data']['details'] = $details;
 
     $operations = array();
-    if (metatag_config_access('edit', $config)) {
+    if (metatag_config_access('configure', $config)) {
       $operations['edit'] = array(
-        'title' => t('Edit'),
+        'title' => t('Configure'),
         'href' => 'admin/config/metadata/metatags/config/' . $config['instance'],
       );
       if ($config['storage'] == METATAG_STORAGE_DEFAULT) {

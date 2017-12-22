@@ -2326,7 +2326,7 @@ function metatag_config_access($op, $config = NULL) {
     $config['disabled'] = FALSE;
   }
 
-  if ($op == 'edit') {
+  if ($op == 'edit' || $op == 'configure') {
     return !$config['disabled'];
   }
   if ($op == 'enable') {

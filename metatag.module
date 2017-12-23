@@ -978,7 +978,6 @@ function metatag_entity_view($entity, $entity_type, $view_mode, $langcode, $forc
   // Only run this function once per page load, for an entity which is allowed
   // metatags.
   static $i_will_say_this_only_once = FALSE;
-//  dpm('hi there: ' . $entity_type);
   // Only proceed if this entity object is the page being viewed.
   if (_metatag_entity_is_page($entity_type, $entity)) {
 
@@ -1003,7 +1002,7 @@ function metatag_entity_view($entity, $entity_type, $view_mode, $langcode, $forc
     if ($output = metatag_generate_entity_metatags($entity, $entity_type, $langcode, $view_mode)) {
       $instance = metatag_get_entity_metatags_instance($entity, $entity_type, $bundle);
       // We need to register the term's metatags, so we can later fetch them.
-      // @see metatag_page_build().
+      // @see metatag_prepare_tags().
       metatag_page_set_metatags($instance, $output);
     }
   }
@@ -1317,7 +1316,6 @@ function metatag_metatags_form(array &$form, $instance, array $metatags = array(
     'defaults' => metatag_config_load_with_defaults($instance),
     'instance' => $instance,
   );
-//dpm($options);
 
   // Allow the defined tokens to be modified.
   backdrop_alter('metatag_token_types', $options);
@@ -1706,7 +1704,7 @@ function metatag_entity_type_disable($entity_type, $bundle = NULL) {
 }
 
 /**
- * Add meta tags to be added later with metatag_page_build().
+ * Add meta tags to be added later with metatag_prepare_tags().
  *
  * @param string $instance
  *   The configuration instance key of the meta tags, e.g. "node:article".
@@ -1719,7 +1717,7 @@ function metatag_page_set_metatags($instance, $metatags) {
 }
 
 /**
- * Retrieve the array of meta tags to be added with metatag_page_build().
+ * Retrieve the array of meta tags to be added with metatag_prepare_tags().
  */
 function metatag_page_get_metatags() {
   // @todo Add alter to this result?
@@ -1790,8 +1788,7 @@ function metatag_prepare_tags() {
   // Load any meta tags assigned via metatag_page_set_metatags(). Note: this
   // must include the necessary defaults.
   else {
-    $tags += metatag_page_get_metatags();
-    //dpm($tags);
+    $tags += metatag_page_get_metatags($instance);
   }
 
   // If no meta tags were loaded at least load the global defaults. This may be

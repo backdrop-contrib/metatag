@@ -5,26 +5,72 @@
  */
 
 /**
- * Implements hook_preprocess_page().
+ * Implements hook_metatag_bundled_config_alter().
  */
-function metatag_opengraph_preprocess_page(&$variables) {
-  // @TODO Would it be worth dynamically identifying whether these should be
-  // added, or just output them all?
+function metatag_opengraph_metatag_bundled_config_alter(array &$configs) {
+  foreach ($configs as &$config) {
+    switch ($config['instance']) {
+      case 'global':
+        $config['config'] += array(
+          'og:site_name' => array('value' => '[site:name]'),
+          'og:title' => array('value' => '[current-page:title]'),
+          'og:type' => array('value' => 'article'),
+          'og:url' => array('value' => '[current-page:url:absolute]'),
+        );
+        break;
 
-  if (!isset($variables['rdf_namespaces'])) {
-    $variables['rdf_namespaces'] = '';
+      case 'global:frontpage':
+        $config['config'] += array(
+          'og:description' => array('value' => '[site:slogan]'),
+          'og:title' => array('value' => '[site:name]'),
+          'og:type' => array('value' => 'website'),
+          'og:url' => array('value' => '[site:url]'),
+        );
+        break;
+
+      // On error pages point everything to the homepage.
+      case 'global:403':
+      case 'global:404':
+        $config['config'] += array(
+          'og:title' => array('value' => '[site:name]'),
+          'og:type' => array('value' => 'website'),
+          'og:url' => array('value' => '[site:url]'),
+        );
+        break;
+
+      case 'node':
+        $config['config'] += array(
+          'article:modified_time' => array('value' => '[node:changed:custom:c]'),
+          'article:published_time' => array('value' => '[node:created:custom:c]'),
+          'og:description' => array('value' => '[node:summary]'),
+          'og:title' => array('value' => '[node:title]'),
+          'og:updated_time' => array('value' => '[node:changed:custom:c]'),
+          'og:image' => array('value' => '[node:field_image]'),
+          'og:image:url' => array('value' => '[node:field_image:url]'),
+        );
+        break;
+
+      case 'taxonomy_term':
+        $config['config'] += array(
+          'og:description' => array('value' => '[term:description]'),
+          'og:title' => array('value' => '[term:name]'),
+        );
+        break;
+
+      case 'user':
+        $config['config'] += array(
+          'og:title' => array('value' => '[user:name]'),
+          'og:type' => array('value' => 'profile'),
+          'profile:username' => array('value' => '[user:name]'),
+        );
+        if (variable_get('user_pictures')) {
+          $config['config'] += array(
+            'og:image' => array('value' => '[user:picture:url]'),
+            // For now keep the old default.
+            // 'og:image:url' => array('value' => '[user:picture:url]'),
+          );
+        }
+        break;
+    }
   }
-
-  // Need an extra namespace for the 'og' tags.
-  $variables['rdf_namespaces'] .= "\n  xmlns:og=\"http://ogp.me/ns#\"";
-  // Need an extra namespace for the "article" tags.
-  $variables['rdf_namespaces'] .= "\n  xmlns:article=\"http://ogp.me/ns/article#\"";
-  // Need an extra namespace for the "book" tags.
-  $variables['rdf_namespaces'] .= "\n  xmlns:book=\"http://ogp.me/ns/book#\"";
-  // Need an extra namespace for the "profile" tags.
-  $variables['rdf_namespaces'] .= "\n  xmlns:profile=\"http://ogp.me/ns/profile#\"";
-  // Need an extra namespace for the "video" tags.
-  $variables['rdf_namespaces'] .= "\n  xmlns:video=\"http://ogp.me/ns/video#\"";
-  // And for product tags.
-  $variables['rdf_namespaces'] .= "\n  xmlns:product=\"http://ogp.me/ns/product#\"";
 }

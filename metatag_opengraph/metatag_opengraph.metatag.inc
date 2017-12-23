@@ -5,75 +5,6 @@
  */
 
 /**
- * Implements hook_metatag_bundled_config_alter().
- */
-function metatag_opengraph_metatag_bundled_config_alter(array &$configs) {
-  foreach ($configs as &$config) {
-    switch ($config->instance) {
-      case 'global':
-        $config->config += array(
-          'og:site_name' => array('value' => '[site:name]'),
-          'og:title' => array('value' => '[current-page:title]'),
-          'og:type' => array('value' => 'article'),
-          'og:url' => array('value' => '[current-page:url:absolute]'),
-        );
-        break;
-
-      case 'global:frontpage':
-        $config->config += array(
-          'og:description' => array('value' => '[site:slogan]'),
-          'og:title' => array('value' => '[site:name]'),
-          'og:type' => array('value' => 'website'),
-          'og:url' => array('value' => '[site:url]'),
-        );
-        break;
-
-      // On error pages point everything to the homepage.
-      case 'global:403':
-      case 'global:404':
-        $config->config += array(
-          'og:title' => array('value' => '[site:name]'),
-          'og:type' => array('value' => 'website'),
-          'og:url' => array('value' => '[site:url]'),
-        );
-        break;
-
-      case 'node':
-        $config->config += array(
-          'article:modified_time' => array('value' => '[node:changed:custom:c]'),
-          'article:published_time' => array('value' => '[node:created:custom:c]'),
-          'og:description' => array('value' => '[node:summary]'),
-          'og:title' => array('value' => '[node:title]'),
-          'og:updated_time' => array('value' => '[node:changed:custom:c]'),
-        );
-        break;
-
-      case 'taxonomy_term':
-        $config->config += array(
-          'og:description' => array('value' => '[term:description]'),
-          'og:title' => array('value' => '[term:name]'),
-        );
-        break;
-
-      case 'user':
-        $config->config += array(
-          'og:title' => array('value' => '[user:name]'),
-          'og:type' => array('value' => 'profile'),
-          'profile:username' => array('value' => '[user:name]'),
-        );
-        if (variable_get('user_pictures')) {
-          $config->config += array(
-            'og:image' => array('value' => '[user:picture:url]'),
-            // For now keep the old default.
-            // 'og:image:url' => array('value' => '[user:picture:url]'),
-          );
-        }
-        break;
-    }
-  }
-}
-
-/**
  * Implements hook_metatag_info().
  */
 function metatag_opengraph_metatag_info() {
@@ -90,9 +21,6 @@ function metatag_opengraph_metatag_info() {
     'description' => '',
     'class' => 'BackdropTextMetaTag',
     'group' => 'open-graph',
-    'element' => array(
-      '#theme' => 'metatag_property',
-    ),
   );
 
   // Open Graph meta tags stack after the Facebook tags.

@@ -63,7 +63,7 @@ function metatag_opengraph_metatag_bundled_config_alter(array &$configs) {
           'og:type' => array('value' => 'profile'),
           'profile:username' => array('value' => '[user:name]'),
         );
-        if (variable_get('user_pictures')) {
+        if (config_get('system.core', 'user_pictures')) {
           $config['config'] += array(
             'og:image' => array('value' => '[user:picture:url]'),
             // For now keep the old default.

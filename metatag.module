@@ -2068,7 +2068,6 @@ function metatag_get_value($metatag, array $data, array $options = array()) {
 function metatag_preprocess_page(&$variables) {
   // Prepare all the tags, including doing token replacements.
   $metatags = metatag_prepare_tags();
-  //dpm($metatags);
 
   // Add each metatag to page header.
   if (is_array($metatags) && !empty($metatags)) {

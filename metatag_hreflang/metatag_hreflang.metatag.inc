@@ -17,23 +17,25 @@ function metatag_hreflang_metatag_bundled_config_alter(array &$configs) {
   }
 
   foreach ($configs as &$config) {
-    switch ($config->instance) {
-      case 'node':
-        // The x-default should default to the source language.
-        $config->config += array(
-          'hreflang_xdefault' => array('value' => '[node:source:url]'),
-        );
+    if (isset($config['instance'])) {
+      switch ($config['instance']) {
+        case 'node':
+          // The x-default should default to the source language.
+          $config['config'] += array(
+            'hreflang_xdefault' => array('value' => '[node:source:url]'),
+          );
 
-        // Add all of the other hreflang values.
-        $languages = language_list('enabled');
-        if (!empty($languages[1])) {
-          foreach (array_keys($languages[1]) as $langcode) {
-            $config->config += array(
-              'hreflang_' . $langcode => array('value' => '[node:url-' . $langcode . ']'),
-            );
+          // Add all of the other hreflang values.
+          $languages = language_list('enabled');
+          if (!empty($languages[1])) {
+            foreach (array_keys($languages[1]) as $langcode) {
+              $config['config'] += array(
+                'hreflang_' . $langcode => array('value' => '[node:url-' . $langcode . ']'),
+              );
+            }
           }
-        }
-        break;
+          break;
+      }
     }
   }
 }

@@ -9,12 +9,14 @@
  */
 function metatag_dc_advanced_metatag_bundled_config_alter(array &$configs) {
   foreach ($configs as &$config) {
-    switch ($config->instance) {
-      case 'node':
-        $config->config += array(
-          'dcterms.modified' => array('value' => '[node:changed:custom:Y-m-d\TH:iP]'),
-        );
-        break;
+    if (isset($config['instance'])) {
+      switch ($config['instance']) {
+        case 'node':
+          $config['config'] += array(
+            'dcterms.modified' => array('value' => '[node:changed:custom:Y-m-d\TH:iP]'),
+          );
+          break;
+      }
     }
   }
 }

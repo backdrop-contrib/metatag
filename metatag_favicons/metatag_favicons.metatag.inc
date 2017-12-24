@@ -10,7 +10,7 @@
 function metatag_favicons_metatag_bundled_config_alter(&$config) {
   $favicon = metatag_favicons_get_theme_favicon();
   if (!empty($favicon)) {
-    $config['global']->config['shortcut icon'] = array('value' => $favicon);
+    $config['global']['config']['shortcut icon'] = array('value' => $favicon);
   }
 }
 

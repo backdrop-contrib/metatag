@@ -9,54 +9,56 @@
  */
 function metatag_google_plus_metatag_bundled_config_alter(array &$configs) {
   foreach ($configs as &$config) {
-    switch ($config->instance) {
-      case 'global':
-        $config->config += array(
-          'itemprop:name' => array('value' => '[current-page:title]'),
-        );
-        break;
-
-      case 'global:frontpage':
-        $config->config += array(
-          'itemprop:name' => array('value' => '[site:name]'),
-          'itemprop:description' => array('value' => '[site:slogan]'),
-        );
-        break;
-
-      // On error pages point everything to the homepage.
-      case 'global:403':
-      case 'global:404':
-        $config->config += array(
-          'itemprop:name' => array('value' => '[site:name]'),
-        );
-        break;
-
-      case 'node':
-        $config->config += array(
-          'itemprop:description' => array('value' => '[node:summary]'),
-          'itemprop:name' => array('value' => '[node:title]'),
-          'itemtype' => array('value' => 'Article'),
-        );
-        break;
-
-      case 'taxonomy_term':
-        $config->config += array(
-          'itemprop:description' => array('value' => '[term:description]'),
-          'itemprop:name' => array('value' => '[term:name]'),
-        );
-        break;
-
-      case 'user':
-        $config->config += array(
-          'itemprop:name' => array('value' => '[user:name]'),
-          'itemtype' => array('value' => 'Person'),
-        );
-        if (variable_get('user_pictures')) {
-          $config->config += array(
-            'itemprop:image' => array('value' => '[user:picture:url]'),
+    if (isset($config['instance'])) {
+      switch ($config['instance']) {
+        case 'global':
+          $config['config'] += array(
+            'itemprop:name' => array('value' => '[current-page:title]'),
           );
-        }
-        break;
+          break;
+
+        case 'global:frontpage':
+          $config['config'] += array(
+            'itemprop:name' => array('value' => '[site:name]'),
+            'itemprop:description' => array('value' => '[site:slogan]'),
+          );
+          break;
+
+        // On error pages point everything to the homepage.
+        case 'global:403':
+        case 'global:404':
+          $config['config'] += array(
+            'itemprop:name' => array('value' => '[site:name]'),
+          );
+          break;
+
+        case 'node':
+          $config['config'] += array(
+            'itemprop:description' => array('value' => '[node:summary]'),
+            'itemprop:name' => array('value' => '[node:title]'),
+            'itemtype' => array('value' => 'Article'),
+          );
+          break;
+
+        case 'taxonomy_term':
+          $config['config'] += array(
+            'itemprop:description' => array('value' => '[term:description]'),
+            'itemprop:name' => array('value' => '[term:name]'),
+          );
+          break;
+
+        case 'user':
+          $config['config'] += array(
+            'itemprop:name' => array('value' => '[user:name]'),
+            'itemtype' => array('value' => 'Person'),
+          );
+          if (variable_get('user_pictures')) {
+            $config['config'] += array(
+              'itemprop:image' => array('value' => '[user:picture:url]'),
+            );
+          }
+          break;
+      }
     }
   }
 }

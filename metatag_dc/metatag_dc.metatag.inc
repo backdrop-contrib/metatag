@@ -9,57 +9,59 @@
  */
 function metatag_dc_metatag_bundled_config_alter(array &$configs) {
   foreach ($configs as &$config) {
-    switch ($config->instance) {
-      case 'global':
-        $config->config += array(
-          'dcterms.format' => array('value' => 'text/html'),
-          'dcterms.identifier' => array('value' => '[current-page:url:absolute]'),
-          'dcterms.title' => array('value' => '[current-page:title]'),
-          'dcterms.type' => array('value' => 'Text'),
-        );
-        break;
+    if (isset($config['instance'])) {
+      switch ($config['instance']) {
+        case 'global':
+          $config['config'] += array(
+            'dcterms.format' => array('value' => 'text/html'),
+            'dcterms.identifier' => array('value' => '[current-page:url:absolute]'),
+            'dcterms.title' => array('value' => '[current-page:title]'),
+            'dcterms.type' => array('value' => 'Text'),
+          );
+          break;
 
-      case 'global:frontpage':
-        $config->config += array(
-          'dcterms.description' => array('value' => '[site:slogan]'),
-          'dcterms.identifier' => array('value' => '[site:url]'),
-          'dcterms.title' => array('value' => '[site:name]'),
-        );
-        break;
+        case 'global:frontpage':
+          $config['config'] += array(
+            'dcterms.description' => array('value' => '[site:slogan]'),
+            'dcterms.identifier' => array('value' => '[site:url]'),
+            'dcterms.title' => array('value' => '[site:name]'),
+          );
+          break;
 
-      // On error pages point everything to the homepage.
-      case 'global:403':
-      case 'global:404':
-        $config->config += array(
-          'dcterms.identifier' => array('value' => '[site:url]'),
-          'dcterms.title' => array('value' => '[site:name]'),
-        );
-        break;
+        // On error pages point everything to the homepage.
+        case 'global:403':
+        case 'global:404':
+          $config['config'] += array(
+            'dcterms.identifier' => array('value' => '[site:url]'),
+            'dcterms.title' => array('value' => '[site:name]'),
+          );
+          break;
 
-      case 'node':
-        $config->config += array(
-          'dcterms.creator' => array('value' => '[node:author]'),
-          'dcterms.date' => array('value' => '[node:created:custom:Y-m-d\TH:iP]'),
-          'dcterms.description' => array('value' => '[node:summary]'),
-          'dcterms.language' => array('value' => '[node:language]'),
-          'dcterms.title' => array('value' => '[node:title]'),
-        );
-        break;
+        case 'node':
+          $config['config'] += array(
+            'dcterms.creator' => array('value' => '[node:author]'),
+            'dcterms.date' => array('value' => '[node:created:custom:Y-m-d\TH:iP]'),
+            'dcterms.description' => array('value' => '[node:summary]'),
+            'dcterms.language' => array('value' => '[node:language]'),
+            'dcterms.title' => array('value' => '[node:title]'),
+          );
+          break;
 
-      case 'taxonomy_term':
-        $config->config += array(
-          'dcterms.description' => array('value' => '[term:description]'),
-          'dcterms.title' => array('value' => '[term:name]'),
-        );
-        break;
+        case 'taxonomy_term':
+          $config['config'] += array(
+            'dcterms.description' => array('value' => '[term:description]'),
+            'dcterms.title' => array('value' => '[term:name]'),
+          );
+          break;
 
-      case 'user':
-        $config->config += array(
-          'dcterms.creator' => array('value' => '[user:name]'),
-          'dcterms.date' => array('value' => '[user:created:custom:Y-m-d\TH:iP]'),
-          'dcterms.title' => array('value' => '[user:name]'),
-        );
-        break;
+        case 'user':
+          $config['config'] += array(
+            'dcterms.creator' => array('value' => '[user:name]'),
+            'dcterms.date' => array('value' => '[user:created:custom:Y-m-d\TH:iP]'),
+            'dcterms.title' => array('value' => '[user:name]'),
+          );
+          break;
+      }
     }
   }
 }

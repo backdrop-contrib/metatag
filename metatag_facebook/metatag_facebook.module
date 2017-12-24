@@ -2,15 +2,5 @@
 /**
  * @file
  * Provides Metatags for Facebook.
+ * @see  metatag_facebok.metatag.inc
  */
-
-/**
- * Implements hook_preprocess_page().
- */
-function metatag_facebook_preprocess_page(&$variables) {
-  if (!isset($variables['rdf_namespaces'])) {
-    $variables['rdf_namespaces'] = '';
-  }
-
-  $variables['rdf_namespaces'] .= "\n  xmlns:fb=\"http://ogp.me/ns/fb#\"";
-}

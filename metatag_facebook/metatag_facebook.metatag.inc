@@ -24,9 +24,6 @@ function metatag_facebook_metatag_info() {
     'description' => '',
     'class' => 'BackdropTextMetaTag',
     'group' => 'facebook',
-    'element' => array(
-      '#theme' => 'metatag_property',
-    ),
   );
 
   $info['tags']['fb:admins'] = array(

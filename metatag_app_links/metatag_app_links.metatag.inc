@@ -21,9 +21,6 @@ function metatag_app_links_metatag_info() {
     'description' => '',
     'class' => 'BackdropTextMetaTag',
     'group' => 'app_links',
-    'element' => array(
-      '#theme' => 'metatag_property',
-    ),
   );
   // Stack these codes after most others.
   $weight = 80;

@@ -22,9 +22,6 @@ function metatag_opengraph_products_metatag_info() {
     'description' => '',
     'class' => 'BackdropTextMetaTag',
     'group' => 'open-graph-products',
-    'element' => array(
-      '#theme' => 'metatag_property',
-    ),
   );
 
   $weight = 50;

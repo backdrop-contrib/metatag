@@ -5,16 +5,6 @@
  */
 
 /**
- * Implements hook_metatag_bundled_config_alter().
- */
-function metatag_favicons_metatag_bundled_config_alter(&$config) {
-  $favicon = metatag_favicons_get_theme_favicon();
-  if (!empty($favicon)) {
-    $config['global']['config']['shortcut icon'] = array('value' => $favicon);
-  }
-}
-
-/**
  * Implements hook_metatag_info().
  */
 function metatag_favicons_metatag_info() {
@@ -52,9 +42,6 @@ function metatag_favicons_metatag_info() {
     'label' => t('Icon: SVG'),
     'description' => t('A grayscale scalable vector graphic (SVG) file.'),
     'weight' => ++$weight,
-    'element' => array(
-      '#theme' => 'metatag_mask_icon',
-    ),
     'class' => 'BackdropMaskIconMetaTag',
     'replaces' => array('icon_any'),
   ) + $favicon_defaults;

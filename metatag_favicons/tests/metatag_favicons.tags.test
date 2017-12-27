@@ -9,17 +9,6 @@ class MetatagFaviconsTagsTest extends MetatagTagsTestBase {
   /**
    * {@inheritdoc}
    */
-  public static function getInfo() {
-    return array(
-      'name' => 'Metatag tags: Favicons',
-      'description' => 'Test the Favicons meta tags.',
-      'group' => 'Metatag',
-    );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public $tags = array(
     'apple-touch-icon',
     'apple-touch-icon-precomposed',

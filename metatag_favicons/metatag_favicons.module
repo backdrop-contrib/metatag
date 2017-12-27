@@ -5,21 +5,26 @@
  */
 
 /**
+ * Implements hook_autoload_info().
+ */
+function metatag_favicons_autoload_info() {
+  return array(
+    'BackdropMaskIconMetaTag' => 'metatag_favicons.mask-icon.class.inc',
+  );
+}
+
+/**
  * Implements hook_theme().
  */
 function metatag_favicons_theme() {
-  $info['metatag_favicon'] = array(
-    'render element' => 'element',
+  return array(
+    'metatag_favicon' => array(
+      'render element' => 'element',
+    ),
+    'metatag_shortcut_icon' => array(
+      'render element' => 'element',
+    ),
   );
-
-  $info['metatag_mask_icon'] = array(
-    'render element' => 'element',
-  );
-
-  $info['metatag_shortcut_icon'] = array(
-    'render element' => 'element',
-  );
-  return $info;
 }
 
 /**
@@ -29,35 +34,17 @@ function metatag_favicons_theme() {
  * <link rel="[rel]" href="[value]" sizes="[sizes]" />
  */
 function theme_metatag_favicon($variables) {
+  $variables['#tag'] = 'link';
   $element = &$variables['element'];
-  $args = array(
+  $attributes = array(
     '#rel' => 'rel',
     '#value' => 'href',
     '#sizes' => 'sizes',
     '#mask' => 'mask',
   );
-  element_set_attributes($element, $args);
+  element_set_attributes($element, $attributes);
   unset($element['#value']);
-  return theme('html_tag', $variables);
-}
-
-/**
- * Theme callback for the mask-icon meta tag.
- *
- * The format is:
- * <link rel="mask-icon" href="[value]" sizes="[sizes]" />
- */
-function theme_metatag_mask_icon($variables) {
-  $element = &$variables['element'];
-
-  $args = array(
-    '#rel' => 'rel',
-    '#value' => 'href',
-    '#color' => 'color',
-  );
-  element_set_attributes($element, $args);
-  unset($element['#value']);
-  return theme('html_tag', $variables);
+  return theme('head_tag', $variables);
 }
 
 /**
@@ -67,19 +54,19 @@ function theme_metatag_mask_icon($variables) {
  * <link rel="[rel]" href="[value]" type="[type]" />
  */
 function theme_metatag_shortcut_icon($variables) {
+  $variables['#tag'] = 'link';
   $element = &$variables['element'];
 
   // Extract the MIME type.
   $element['#type'] = metatag_favicons_get_mime_type($element['#value']);
-
-  $args = array(
+  $attributes = array(
     '#rel' => 'rel',
     '#value' => 'href',
     '#type' => 'type',
   );
-  element_set_attributes($element, $args);
+  element_set_attributes($element, $attributes);
   unset($element['#value']);
-  return theme('html_tag', $variables);
+  return theme('head_tag', $variables);
 }
 
 /**
@@ -146,4 +133,14 @@ function metatag_favicons_get_mime_type($uri) {
   }
 
   return $type;
+}
+
+/**
+ * Implements hook_metatag_bundled_config_alter().
+ */
+function metatag_favicons_metatag_bundled_config_alter(&$config) {
+  $favicon = metatag_favicons_get_theme_favicon();
+  if (!empty($favicon)) {
+    $config['global']['config']['shortcut icon'] = array('value' => $favicon);
+  }
 }

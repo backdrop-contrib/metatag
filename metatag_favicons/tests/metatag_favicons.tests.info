@@ -1,0 +1,11 @@
+[MetatagFaviconsTest]
+name = Metatag Favicons tests
+description = Test the Metatag:Favicons module.
+group = Metatag
+file = metatag_favicons.test
+
+[MetatagFaviconsTagsTest]
+name = Metatag tags: Favicons
+description = Test the Favicons meta tags.
+group = Metatag
+file = metatag_favicons.tags.test

@@ -9,17 +9,6 @@ class MetatagFaviconsTest extends MetatagTestHelper {
   /**
    * {@inheritdoc}
    */
-  public static function getInfo() {
-    return array(
-      'name' => 'Metatag Favicons tests',
-      'description' => 'Test the Metatag:Favicons module.',
-      'group' => 'Metatag',
-    );
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   function setUp(array $modules = array()) {
     $modules[] = 'metatag_favicons';
 
@@ -27,18 +16,18 @@ class MetatagFaviconsTest extends MetatagTestHelper {
 
     // Create an admin user and log them in.
     $this->adminUser = $this->createAdminUser();
-    $this->drupalLogin($this->adminUser);
+    $this->backdropLogin($this->adminUser);
   }
 
   /**
    * Confirm that it's possible to load the main admin page.
    */
   public function testAdminPage() {
-    $this->drupalGet('admin/config/metadata/metatags');
+    $this->backdropGet('admin/config/metadata/metatags');
     $this->assertResponse(200);
 
     // Confirm the page is correct.
-    $this->assertText(t('To view a summary of the default meta tags and the inheritance, click on a meta tag type.'));
+    $this->assertText(t('Items marked as "Unknown" will not be used.'));
   }
 
   /**
@@ -47,7 +36,7 @@ class MetatagFaviconsTest extends MetatagTestHelper {
   public function testMaskIconValue() {
     // The SVG image is copied from the archive obtained from
     // https://www.drupal.org/about/media-kit/logos on 6/20/2016.
-    $svg_path = drupal_get_path('module', 'metatag_favicons') . '/tests/druplicon-vector.svg';
+    $svg_path = backdrop_get_path('module', 'metatag_favicons') . '/tests/druplicon-vector.svg';
     $relative_path = url($svg_path, array('absolute' => FALSE));
     $absolute_path = url($svg_path, array('absolute' => TRUE));
 
@@ -57,11 +46,11 @@ class MetatagFaviconsTest extends MetatagTestHelper {
 
     // Try filling in a path relative to the document root.
     $config = metatag_config_load('global');
-    $config->config['mask-icon']['value'] = $svg_path;
+    $config['config']['mask-icon']['value'] = $svg_path;
     metatag_config_save($config);
 
     // Load the config page.
-    $this->drupalGet('admin/config/metadata/metatags');
+    $this->backdropGet('admin/config/metadata/metatags');
     $this->assertResponse(200);
 
     // Confirm the meta tag's value is on the page.
@@ -69,7 +58,7 @@ class MetatagFaviconsTest extends MetatagTestHelper {
     $this->assertText($absolute_path);
 
     // Load the front page.
-    $this->drupalGet('<front>');
+    $this->backdropGet('<front>');
     $this->assertResponse(200);
 
     // Confirm the meta tag is present.
@@ -79,15 +68,15 @@ class MetatagFaviconsTest extends MetatagTestHelper {
     $this->assertEqual((string)$xpath[0]['href'], $absolute_path);
 
     // Before proceeding, clear the site's caches.
-    drupal_flush_all_caches();
+    backdrop_flush_all_caches();
 
     // Try filling in a relative path.
     $config = metatag_config_load('global');
-    $config->config['mask-icon']['value'] = $relative_path;
+    $config['config']['mask-icon']['value'] = $relative_path;
     metatag_config_save($config);
 
     // Load the front page.
-    $this->drupalGet('<front>');
+    $this->backdropGet('<front>');
     $this->assertResponse(200);
 
     // Confirm the meta tag is present.
@@ -97,15 +86,15 @@ class MetatagFaviconsTest extends MetatagTestHelper {
     $this->assertNotEqual((string)$xpath[0]['href'], $relative_path);
 
     // Before proceeding, clear the site's caches.
-    drupal_flush_all_caches();
+    backdrop_flush_all_caches();
 
     // Test filling in an absolute path.
     $config = metatag_config_load('global');
-    $config->config['mask-icon']['value'] = $absolute_path;
+    $config['config']['mask-icon']['value'] = $absolute_path;
     metatag_config_save($config);
 
     // Load the front page.
-    $this->drupalGet('<front>');
+    $this->backdropGet('<front>');
     $this->assertResponse(200);
 
     // Confirm the meta tag is present.
@@ -115,16 +104,16 @@ class MetatagFaviconsTest extends MetatagTestHelper {
     $this->assertEqual((string)$xpath[0]['href'], $absolute_path);
 
     // Before proceeding, clear the site's caches.
-    drupal_flush_all_caches();
+    backdrop_flush_all_caches();
 
     // Test filling in an absolute path for an external file
     $path = 'https://www.example.com/example.svg';
     $config = metatag_config_load('global');
-    $config->config['mask-icon']['value'] = $path;
+    $config['config']['mask-icon']['value'] = $path;
     metatag_config_save($config);
 
     // Load the front page.
-    $this->drupalGet('<front>');
+    $this->backdropGet('<front>');
     $this->assertResponse(200);
 
     // Confirm the meta tag is present.
@@ -140,7 +129,7 @@ class MetatagFaviconsTest extends MetatagTestHelper {
   public function testMaskIconColor() {
     // The SVG image is copied from the archive obtained from
     // https://www.drupal.org/about/media-kit/logos on 6/20/2016.
-    $svg_path = drupal_get_path('module', 'metatag_favicons') . '/tests/druplicon-vector.svg';
+    $svg_path = backdrop_get_path('module', 'metatag_favicons') . '/tests/druplicon-vector.svg';
     $absolute_path = url($svg_path, array('absolute' => TRUE));
 
     // Testbot doesn't have "clean_url" enabled.
@@ -151,12 +140,12 @@ class MetatagFaviconsTest extends MetatagTestHelper {
 
     // Update the global config.
     $config = metatag_config_load('global');
-    $config->config['mask-icon']['value'] = $svg_path;
-    $config->config['mask-icon']['color'] = $color;
+    $config['config']['mask-icon']['value'] = $svg_path;
+    $config['config']['mask-icon']['color'] = $color;
     metatag_config_save($config);
 
     // Load the front page.
-    $this->drupalGet('<front>');
+    $this->backdropGet('<front>');
     $this->assertResponse(200);
 
     // Confirm the meta tag is present.
@@ -166,19 +155,19 @@ class MetatagFaviconsTest extends MetatagTestHelper {
     $this->assertEqual((string)$xpath[0]['color'], $color);
 
     // Before proceeding, clear the site's caches.
-    drupal_flush_all_caches();
+    backdrop_flush_all_caches();
 
     // Try a color hex code.
     $color = '#990000';
 
     // Update the global config.
     $config = metatag_config_load('global');
-    $config->config['mask-icon']['value'] = $svg_path;
-    $config->config['mask-icon']['color'] = $color;
+    $config['config']['mask-icon']['value'] = $svg_path;
+    $config['config']['mask-icon']['color'] = $color;
     metatag_config_save($config);
 
     // Load the front page.
-    $this->drupalGet('<front>');
+    $this->backdropGet('<front>');
     $this->assertResponse(200);
 
     // Confirm the meta tag is present.
@@ -188,23 +177,26 @@ class MetatagFaviconsTest extends MetatagTestHelper {
     $this->assertEqual((string)$xpath[0]['color'], $color);
 
     // Try a color RGB value.
-    $color = 'rgb(153, 0, 0)';
+    $color2 = 'rgb(153, 0, 0)';
+
+    // Before proceeding, clear the site's caches.
+    backdrop_flush_all_caches();
 
     // Update the global config.
     $config = metatag_config_load('global');
-    $config->config['mask-icon']['value'] = $svg_path;
-    $config->config['mask-icon']['color'] = $color;
+    $config['config']['mask-icon']['value'] = $svg_path;
+    $config['config']['mask-icon']['color'] = $color2;
     metatag_config_save($config);
 
     // Load the front page.
-    $this->drupalGet('<front>');
+    $this->backdropGet('<front>');
     $this->assertResponse(200);
 
     // Confirm the meta tag is present.
     $xpath = $this->xpath("//link[@rel='mask-icon']");
     $this->assertEqual(count($xpath), 1, 'One mask-icon meta tag found.');
     $this->assertEqual((string)$xpath[0]['href'], $absolute_path);
-    $this->assertEqual((string)$xpath[0]['color'], $color);
+    $this->assertEqual((string)$xpath[0]['color'], $color2);
   }
 
 }

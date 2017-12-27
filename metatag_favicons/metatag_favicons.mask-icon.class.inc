@@ -26,7 +26,7 @@ class BackdropMaskIconMetaTag extends BackdropTextMetaTag {
       '#title' => t('Icon: SVG color'),
       '#default_value' => isset($this->data['color']) ? $this->data['color'] : '',
       '#description' => t('Provides a color for the SVG icon. Per <a href="@specs_url">Apple\'s specifications</a>, it may be a hexadecimal value (e.g. "#990000"), an RGB value (e.g. "rgb(153, 0, 0)"), or a recognized color-keyword (e.g. "red", "lime", "navy", etc). Will only be output if the SVG icon meta tag has a value.', array('@specs_url' => 'https://developer.apple.com/library/mac/releasenotes/General/WhatsNewInSafari/Articles/Safari_9_0.html#//apple_ref/doc/uid/TP40014305-CH9-SW20')),
-      '#maxlength' => 10,
+      '#maxlength' => 20,
       '#weight' => $form['value']['#weight'] + 0.01,
     );
 
@@ -79,26 +79,18 @@ class BackdropMaskIconMetaTag extends BackdropTextMetaTag {
 
     // Combine the base configuration for this meta tag with the value.
     $element = $base_element + array(
-      '#theme' => 'metatag',
       '#tag' => 'link',
-      '#id' => 'metatag_' . $this->info['name'] . '_' . 1,
-      '#rel' => $this->info['name'],
-      '#name' => $this->info['name'],
-      '#value' => $value,
-      '#color' => $color,
+      '#attributes' => array(
+        'id' => 'metatag_' . $this->info['name'] . '_' . 1,
+        'name' => $this->info['name'],
+        'rel' => $this->info['name'],
+        'href' => $value,
+        'color' => $color,
+      ),
       '#weight' => $this->getWeight(),
     );
 
-    // Add header information if desired.
-    if (!empty($this->info['header'])) {
-      $element['#attached']['backdrop_add_http_header'][] = array($this->info['header'], $value);
-    }
-
-    $elements[] = array($element, $element['#id']);
-
-    return array(
-      '#attached' => array('backdrop_add_html_head' => $elements),
-    );
+    return $element;
   }
 
 }

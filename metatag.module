@@ -1313,9 +1313,11 @@ function metatag_metatags_form(array &$form, $instance, array $metatags = array(
   // Merge in the default options.
   $options += array(
     'token types' => array(),
-    'defaults' => metatag_config_load_with_defaults($instance),
+    'defaults' => array(),
     'instance' => $instance,
   );
+  $options['defaults'] += array('config' => array());
+  $options['defaults']['config'] += metatag_config_load_with_defaults($instance);
 
   // Allow the defined tokens to be modified.
   backdrop_alter('metatag_token_types', $options);
@@ -1392,6 +1394,11 @@ function metatag_metatags_form(array &$form, $instance, array $metatags = array(
     }
     else {
       $metatag_form['#access'] = $form['metatags']['#access'];
+    }
+
+    // Add placeholders for inherited default values.
+    if (!empty($options['defaults']['config'][$metatag])) {
+      $metatag_form['value']['#placeholder'] = $options['defaults']['config'][$metatag]['value'];
     }
 
     if (!empty($metatag_info['group'])) {

@@ -2746,9 +2746,7 @@ function metatag_entity_type_is_suitable($entity_type, $entity_info = array()) {
  */
 function metatag_node_type_insert($info) {
   if (metatag_entity_supports_metatags('node')) {
-    if (metatag_entity_type_enable('node', $info->type)) {
-      backdrop_set_message(t('Metatag support has been enabled for the @label content type.', array('@label' => $info->name)));
-    }
+    metatag_entity_type_enable('node', $info->type);
   }
 }
 

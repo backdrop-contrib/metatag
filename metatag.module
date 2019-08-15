@@ -2083,7 +2083,15 @@ function metatag_preprocess_page(&$variables) {
             $variables['head_title'] = check_plain($data['#value']);
           }
           else {
-            backdrop_add_html_head($data, 'metatag_preprocess_page-' . $tag);
+            // Account for multi-valued tags.
+            if (!isset($data['#tag']) && !empty($data[0])) {
+              foreach($data as $delta => $subdata) {
+                backdrop_add_html_head($subdata, 'metatag_preprocess_page-' . $tag . '-' . $delta);
+              }
+            }
+            else {
+              backdrop_add_html_head($data, 'metatag_preprocess_page-' . $tag);
+            }
           }
         }
       }

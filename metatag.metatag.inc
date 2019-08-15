@@ -301,7 +301,7 @@ function metatag_metatag_info() {
 
   $info['tags']['revisit-after'] = array(
     'label' => t('Revisit After'),
-    'description' => t('Tell search engines when to index the page again. Very few search engines support this tag, it is more useful to use an <a href="@xmlsitemap">XML Sitemap</a> file.', array('@xmlsitemap' => 'https://www.drupal.org/project/xmlsitemap')),
+    'description' => t('Tell search engines when to index the page again. Very few search engines support this tag, it is more useful to use an <a href="@xmlsitemap">XML Sitemap</a> file.', array('@xmlsitemap' => 'https://backdropcms.org/project/xmlsitemap')),
     'class' => 'BackdropDateIntervalMetaTag',
     'group' => 'advanced',
     'weight' => ++$weight,

@@ -202,7 +202,7 @@ function metatag_install() {
     }
   }
 
-  backdrop_set_message(t('Please visit the <a href="@url">Metatag settings page</a> to determine which types of content should allow meta tags.', array('@url' => url('admin/config/search/metatags/settings'))));
+  backdrop_set_message(t('Please visit the <a href="@url">Metatag settings page</a> to determine which types of content should allow meta tags.', array('@url' => url('admin/config/metadata/metatags/settings'))));
 }
 
 /**

@@ -1765,6 +1765,7 @@ function metatag_prepare_tags() {
       }
       else {
         $metatags = metatag_metatags_view($instance, array());
+        // If output caching is enabled, save this for later.
         if ($cache_output) {
           metatag_cache_set($cid, $metatags);
         }
@@ -1784,6 +1785,7 @@ function metatag_prepare_tags() {
     }
     else {
       $metatags = metatag_metatags_view($instance, array());
+      // If output caching is enabled, save this for later.
       if ($cache_output) {
         metatag_cache_set($cid, $metatags);
       }

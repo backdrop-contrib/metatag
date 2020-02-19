@@ -77,7 +77,7 @@ function metatag_metatag_info() {
 
   $info['tags']['abstract'] = array(
     'label' => t('Abstract'),
-    'description' => t("A oncise summary of the page's content, preferably 150 characters or less. May be used for archiving purposes."),
+    'description' => t("A concise summary of the page's content, preferably 150 characters or less. May be used to archive a summary about the page. This meta tag is <em>no longer</em> supported by major search engines."),
     'class' => 'BackdropTextMetaTag',
     'group' => 'basic',
     'weight' => ++$weight,

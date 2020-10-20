@@ -133,7 +133,7 @@ class BackdropDefaultMetaTag implements BackdropMetaTagInterface {
         $element = $base_element + array(
           '#tag' => 'meta',
           '#attributes' => array(
-            'property' => $this->info['name'],
+            'name' => $this->info['name'],
             'content' => $value,
           ),
           '#weight' => $this->getWeight(),

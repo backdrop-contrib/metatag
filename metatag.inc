@@ -130,10 +130,14 @@ class BackdropDefaultMetaTag implements BackdropMetaTagInterface {
         }
 
         // Combine the base configuration for this meta tag with the value.
+        $attribute = 'name';
+        if (in_array($this->info['group'], array('facebook', 'open-graph'))) {
+          $attribute = 'property';
+        }
         $element = $base_element + array(
           '#tag' => 'meta',
           '#attributes' => array(
-            'property' => $this->info['name'],
+            $attribute => $this->info['name'],
             'content' => $value,
           ),
           '#weight' => $this->getWeight(),

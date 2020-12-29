@@ -772,15 +772,16 @@ function metatag_admin_settings_form() {
     '#description' => t('When disabled, meta tags will only be output on public-facing pages.'),
     '#default_value' => $settings->get('tag_admin_pages'),
   );
+  $form['advanced']['token_sanitize'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Sanitize token data to ensure meta tag text is safe'),
+    '#description' => t('When disabled, token replacements may return raw, unfiltered values.'),
+    '#default_value' => $settings->get('token_sanitize'),
+  );
   $form['advanced']['extended_permissions'] = array(
     '#type' => 'checkbox',
     '#title' => t('Provide a permission for each individual meta tag'),
     '#default_value' => $settings->get('extended_permissions'),
-  );
-  $form['advanced']['token_sanitize'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Sanitize meta tag text during token replacement'),
-    '#default_value' => $settings->get('token_sanitize'),
   );
   $form['advanced']['pager_string'] = array(
     '#title' => t('Replace the token [current-page:pager] with the following custom pager string:'),

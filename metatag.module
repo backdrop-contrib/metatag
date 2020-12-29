@@ -1313,9 +1313,11 @@ function metatag_metatags_form(array &$form, $instance, array $metatags = array(
   // Merge in the default options.
   $options += array(
     'token types' => array(),
-    'defaults' => metatag_config_load_with_defaults($instance),
+    'defaults' => array(),
     'instance' => $instance,
   );
+  $options['defaults'] += array('config' => array());
+  $options['defaults']['config'] += metatag_config_load_with_defaults($instance);
 
   // Allow the defined tokens to be modified.
   backdrop_alter('metatag_token_types', $options);
@@ -1392,6 +1394,11 @@ function metatag_metatags_form(array &$form, $instance, array $metatags = array(
     }
     else {
       $metatag_form['#access'] = $form['metatags']['#access'];
+    }
+
+    // Add placeholders for inherited default values.
+    if (!empty($options['defaults']['config'][$metatag])) {
+      $metatag_form['value']['#placeholder'] = $options['defaults']['config'][$metatag]['value'];
     }
 
     if (!empty($metatag_info['group'])) {
@@ -2077,7 +2084,15 @@ function metatag_preprocess_page(&$variables) {
             $variables['head_title'] = check_plain($data['#value']);
           }
           else {
-            backdrop_add_html_head($data, 'metatag_preprocess_page-' . $tag);
+            // Account for multi-valued tags.
+            if (!isset($data['#tag']) && !empty($data[0])) {
+              foreach($data as $delta => $subdata) {
+                backdrop_add_html_head($subdata, 'metatag_preprocess_page-' . $tag . '-' . $delta);
+              }
+            }
+            else {
+              backdrop_add_html_head($data, 'metatag_preprocess_page-' . $tag);
+            }
           }
         }
       }
@@ -2732,9 +2747,7 @@ function metatag_entity_type_is_suitable($entity_type, $entity_info = array()) {
  */
 function metatag_node_type_insert($info) {
   if (metatag_entity_supports_metatags('node')) {
-    if (metatag_entity_type_enable('node', $info->type)) {
-      backdrop_set_message(t('Metatag support has been enabled for the @label content type.', array('@label' => $info->name)));
-    }
+    metatag_entity_type_enable('node', $info->type);
   }
 }
 

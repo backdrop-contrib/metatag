@@ -19,7 +19,7 @@ function metatag_metatag_config_instance_info() {
     if (metatag_entity_supports_metatags($entity_type)) {
       $info[$entity_type] = array('label' => $entity_info['label']);
       foreach ($entity_info['bundles'] as $bundle => $bundle_info) {
-        if (count($entity_info['bundles'] == 1) && $bundle == $entity_type) {
+        if (count($entity_info['bundles']) == 1 && $bundle == $entity_type) {
           // Skip default bundles (entities that do not really have bundles).
           continue;
         }
@@ -301,7 +301,7 @@ function metatag_metatag_info() {
 
   $info['tags']['revisit-after'] = array(
     'label' => t('Revisit After'),
-    'description' => t('Tell search engines when to index the page again. Very few search engines support this tag, it is more useful to use an <a href="@xmlsitemap">XML Sitemap</a> file.', array('@xmlsitemap' => 'https://www.drupal.org/project/xmlsitemap')),
+    'description' => t('Tell search engines when to index the page again. Very few search engines support this tag, it is more useful to use an <a href="@xmlsitemap">XML Sitemap</a> file.', array('@xmlsitemap' => 'https://backdropcms.org/project/xmlsitemap')),
     'class' => 'BackdropDateIntervalMetaTag',
     'group' => 'advanced',
     'weight' => ++$weight,

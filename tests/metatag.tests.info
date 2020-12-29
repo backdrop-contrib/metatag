@@ -8,7 +8,7 @@ file = metatag.unit.test
 name = Metatag base tag tests
 description = Tests that each of the Metatag base tags work correctly.
 group = Metatag
-file = metatag.tags_helper.test
+file = metatag.tags.test
 
 [MetatagCoreNodeTest]
 name = Metatag tests for nodes

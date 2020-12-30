@@ -423,7 +423,7 @@ function metatag_bulk_revert_form() {
     '#default_value' => array(),
   );
 
-  $metatags = metatag_get_info();
+  $metatags = metatag_get_info(NULL, NULL, TRUE);
   $options = array();
   foreach ($metatags['tags'] as $tag_name => $tag) {
     $options[$tag_name] = t('@group_label: @tag_label', array(
@@ -712,6 +712,29 @@ function metatag_admin_settings_form() {
       '#disabled' => !module_exists('i18n_string'),
     );
   }
+
+  $form['enable'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Enable Meta tags'),
+    '#description' => t("Enable the specific meta tags that will be used/relevant for this site."),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+  );
+  $metatags = metatag_get_info(NULL, NULL, TRUE);
+  $options = array();
+  foreach ($metatags['tags'] as $tag) {
+    $options[$tag['name']] = t('@group_label: @tag_label', array(
+      '@group_label' => $metatags['groups'][$tag['group']]['label'],
+      '@tag_label' => $tag['label'],
+    ));
+  }
+  $default = $settings->get('enabled_tags');
+  $form['enable']['enabled_tags'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Meta tags to enable'),
+    '#options' => $options,
+    '#default_value' => isset($default) ? $default : array(),
+  );
 
   $form['advanced'] = array(
     '#type' => 'fieldset',

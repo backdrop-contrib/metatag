@@ -532,3 +532,15 @@ function metatag_update_1003() {
     }
   }
 }
+
+/**
+ * Enable all metatags for existing sites.
+ */
+function metatag_update_1004() {
+  $enabled_tags = array();
+  $metatags = metatag_get_info(NULL, NULL, TRUE);
+  foreach ($metatags['tags'] as $tag_name => $tag) {
+    $enabled_tags[$tag_name] = $tag_name;
+  }
+  config_set('metatag.settings', 'enabled_tags', $enabled_tags);
+}

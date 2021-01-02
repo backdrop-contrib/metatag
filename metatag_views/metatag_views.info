@@ -1,11 +1,8 @@
-;marking as hidden until ported.
-hidden = true
-
 type = module
 name = Metatag: Views
 description = Provides Metatag integration within the Views interface.
 package = SEO
-core = 7.x
+backdrop = 1.x
 
 dependencies[] = metatag
 dependencies[] = views

@@ -130,10 +130,11 @@ class BackdropDefaultMetaTag implements BackdropMetaTagInterface {
         }
 
         // Combine the base configuration for this meta tag with the value.
+        $attribute = 'name';
         $element = $base_element + array(
           '#tag' => 'meta',
           '#attributes' => array(
-            'name' => $this->info['name'],
+            $attribute => $this->info['name'],
             'content' => $value,
           ),
           '#weight' => $this->getWeight(),

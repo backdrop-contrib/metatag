@@ -686,7 +686,7 @@ function metatag_admin_settings_form() {
     $form['i18n'] = array(
       '#type' => 'fieldset',
       '#title' => t('Internationalization options'),
-      '#description' => t('Additional options are available when using the <a href="@url">Internationalization module</a>.', array('@url' => 'https://www.drupal.org/project/i18n')),
+      '#description' => t('Additional options are available when using the <a href="@url">Internationalization module</a>.', array('@url' => 'https://backdropcms.org/project/i18n')),
       '#collapsible' => TRUE,
       '#collapsed' => TRUE,
     );

@@ -2998,7 +2998,7 @@ function metatag_translate_metatags(&$metatags, $context = NULL, $langcode = NUL
 function metatag_translations_update($metatags, $context) {
   // Store the context as it was originally provided.
   $original_context = $context;
-  $config = config('metatag.settings');
+  $settings = config('metatag.settings');
 
   // Update the i18n string.
   if (module_exists('i18n_string') && !$settings->get('i18n_disabled')) {
@@ -3040,7 +3040,7 @@ function metatag_translations_update($metatags, $context) {
 function metatag_translations_delete($metatags, $context) {
   // Store the context as it was originally provided.
   $original_context = $context;
-  $config = config('metatag.settings');
+  $settings = config('metatag.settings');
 
   // Update the i18n string.
   if (module_exists('i18n_string') && !$settings->get('i18n_disabled')) {

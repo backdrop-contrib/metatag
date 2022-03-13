@@ -55,9 +55,8 @@ function metatag_importer_nodewords_form($form, &$form_state) {
   }
   else {
     $form['ohbother'] = array(
+      '#type' => 'help',
       '#markup' => t('Nothing has been found that needs to be imported.'),
-      '#prefix' => '<p>',
-      '#suffix' => '</p>',
     );
   }
 

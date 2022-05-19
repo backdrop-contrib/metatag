@@ -2189,15 +2189,17 @@ function metatag_html_head_alter(&$elements) {
     // Examine the other meta tags to see if we have any duplicates.
     foreach ($closer_inspection as $key => $data) {
       // Check attributes.
-      foreach ($closer_inspection[$key]['#attributes'] as $attr_key => $attr_value) {
-        $attr_value = strtolower($attr_value); // Account for G in generator.
-        // Only hide the metatag if it's one we care about.
-        if (in_array($attr_key, $metatag_attrs) && in_array($attr_value, $core_tags)) {
-          // Only hide metatag if another is provided.
-          if (isset($overridden[$attr_key]) && $overridden[$attr_key] == $attr_value) {
-            // Setting the #access attribute to these will stop them from being output
-            // but still leave the tags present for other modules to interact with.
-            $elements[$key]['#access'] = FALSE;
+      if (isset($closer_inspection[$key]['#attributes'])) {
+        foreach ($closer_inspection[$key]['#attributes'] as $attr_key => $attr_value) {
+          $attr_value = strtolower($attr_value); // Account for G in generator.
+          // Only hide the metatag if it's one we care about.
+          if (in_array($attr_key, $metatag_attrs) && in_array($attr_value, $core_tags)) {
+            // Only hide metatag if another is provided.
+            if (isset($overridden[$attr_key]) && $overridden[$attr_key] == $attr_value) {
+              // Setting the #access attribute to these will stop them from being output
+              // but still leave the tags present for other modules to interact with.
+              $elements[$key]['#access'] = FALSE;
+            }
           }
         }
       }
@@ -2998,7 +3000,7 @@ function metatag_translate_metatags(&$metatags, $context = NULL, $langcode = NUL
 function metatag_translations_update($metatags, $context) {
   // Store the context as it was originally provided.
   $original_context = $context;
-  $config = config('metatag.settings');
+  $settings = config('metatag.settings');
 
   // Update the i18n string.
   if (module_exists('i18n_string') && !$settings->get('i18n_disabled')) {
@@ -3040,7 +3042,7 @@ function metatag_translations_update($metatags, $context) {
 function metatag_translations_delete($metatags, $context) {
   // Store the context as it was originally provided.
   $original_context = $context;
-  $config = config('metatag.settings');
+  $settings = config('metatag.settings');
 
   // Update the i18n string.
   if (module_exists('i18n_string') && !$settings->get('i18n_disabled')) {

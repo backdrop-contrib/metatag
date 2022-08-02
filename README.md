@@ -105,6 +105,7 @@ Current Maintainers
 -------------------
 
 - Jen Lampton (https://github.com/jenlampton).
+- Nate Lampton (https://github.com/quicksketch).
 - Seeking additional maintainers.
 
 

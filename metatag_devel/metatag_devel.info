@@ -2,5 +2,6 @@ name = Metatag: Devel
 description = Provides development / debugging functionality for the Metatag module. Integrates with Devel Generate.
 package = Development
 backdrop = 1.x
+type = module
 
 dependencies[] = metatag

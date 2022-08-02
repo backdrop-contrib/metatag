@@ -14,7 +14,10 @@ function metatag_views_autoload_info() {
  * Implements hook_views_api().
  */
 function metatag_views_views_api() {
-  return array('api' => 3.0);
+  return array(
+    'api' => 3,
+    'path' => backdrop_get_path('module', 'metatag'),
+  );
 }
 
 /**

@@ -365,6 +365,12 @@ function metatag_config_save($data) {
   if ($config->get('storage') == METATAG_STORAGE_DEFAULT) {
     $config->set('storage', METATAG_STORAGE_OVERRIDDEN);
   }
+  if ($config->get('name') == NULL) {
+    $config->set('name',$name);
+  }
+  if ($config->get('label') == NULL ) {
+    $config->set('label', metatag_config_instance_label($data['instance']));
+  }
 
   foreach ($data as $key => $value) {
     $config->set($key, $value);
@@ -2137,11 +2143,6 @@ function metatag_preprocess_page(&$variables) {
  * @see metatag_preprocess_page().
  */
 function metatag_preprocess_maintenance_page(&$variables) {
-  // Don't modify install or update pages.
-  if (defined('MAINTENANCE_MODE') && in_array(MAINTENANCE_MODE, array('install', 'update'))) {
-    return;
-  }
-
   // Prepare all the tags, including doing token replacements.
   $metatags = metatag_prepare_tags();
   // Add each metatag to page header.

@@ -548,7 +548,6 @@ function metatag_update_1004() {
 /**
  * Add name and label attributes to any config instances that don't have one
  */
-
 function metatag_update_1005() {
   $files = config_get_names_with_prefix('metatag.instance');
   $configs = config_load_multiple($files);

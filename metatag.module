@@ -2147,6 +2147,7 @@ function metatag_preprocess_maintenance_page(&$variables) {
   if (defined('MAINTENANCE_MODE') && in_array(MAINTENANCE_MODE, array('install', 'update'))) {
     return;
   }
+  
   // Prepare all the tags, including doing token replacements.
   $metatags = metatag_prepare_tags();
   // Add each metatag to page header.

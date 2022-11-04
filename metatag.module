@@ -365,6 +365,12 @@ function metatag_config_save($data) {
   if ($config->get('storage') == METATAG_STORAGE_DEFAULT) {
     $config->set('storage', METATAG_STORAGE_OVERRIDDEN);
   }
+  if ($config->get('name') == NULL) {
+    $config->set('name', $name);
+  }
+  if ($config->get('label') == NULL) {
+    $config->set('label', metatag_config_instance_label($data['instance']));
+  }
 
   foreach ($data as $key => $value) {
     $config->set($key, $value);

@@ -1,6 +1,6 @@
 name = Metatag:Views Tests
 description = Helper module for testing metatag_views.module.
-core = 7.x
+backdrop = 1.x
 
 ; Don't show this on the modules admin page.
 hidden = TRUE

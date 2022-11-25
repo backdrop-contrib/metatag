@@ -1,0 +1,12 @@
+[MetatagViewsTest]
+name = Metatag: Views tests
+description = Test Metatag integration via the Metatag: Views module
+group = Metatag
+file = metatag_views.test
+
+# @todo: Finish porting i18n tests to Backdrop.
+# [MetatagViewsI18nTest]
+# name = Metatag: Views i18n tests
+# description = Test Metatag i18n integration via the Metatag: Views module.
+# group = Metatag
+# file = metatag_views.i18n.test

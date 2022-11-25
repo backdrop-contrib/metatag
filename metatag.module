@@ -42,6 +42,10 @@ function metatag_autoload_info() {
     'BackdropTitleMetaTag' => 'metatag.inc',
     'BackdropListMetaTag' => 'metatag.inc',
     'BackdropDateIntervalMetaTag' => 'metatag.inc',
+
+    // Search API classes.
+    'MetatagSearchAlterCallback' => 'metatag.search_api.inc',
+
     // Tests.
     'MetatagTestHelper' => 'tests/metatag.helper.test',
     'MetatagCoreUnitTest' => 'tests/metatag.unit.test',

@@ -2037,7 +2037,8 @@ function metatag_get_info($type = NULL, $name = NULL, $include_disabled = FALSE)
     if (!isset($info_enabled)) {
       $info_enabled = $info;
 
-      $enabled_tags = array_filter(config_get('metatag.settings', 'enabled_tags'));
+      $enabled_tags_config = config_get('metatag.settings', 'enabled_tags');
+      $enabled_tags = is_array($enabled_tags_config) ? array_filter($enabled_tags_config) : [];
       $info_enabled['tags'] = array_intersect_key($info['tags'], $enabled_tags);
 
       // Filter down the list of groups to only those that have active tags.

@@ -2132,6 +2132,9 @@ function metatag_preprocess_page(&$variables) {
                 backdrop_add_html_head($subdata, $tag . '-' . $delta);
               }
             }
+            elseif (!empty($data['#attached'])) {
+              backdrop_render($data);
+            }
             else {
               backdrop_add_html_head($data, $tag);
             }

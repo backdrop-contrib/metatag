@@ -2129,11 +2129,11 @@ function metatag_preprocess_page(&$variables) {
             // Account for multi-valued tags.
             if (!isset($data['#tag']) && !empty($data[0])) {
               foreach($data as $delta => $subdata) {
-                backdrop_add_html_head($subdata, $tag . '-' . $delta);
+                backdrop_add_html_head($subdata, 'metatag_' . $tag . '-' . $delta);
               }
             }
             else {
-              backdrop_add_html_head($data, $tag);
+              backdrop_add_html_head($data, 'metatag_' . $tag);
             }
           }
         }

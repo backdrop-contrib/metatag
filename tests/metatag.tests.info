@@ -4,8 +4,8 @@ description = Unit tests for meta tags (sort-of)
 group = Metatag
 file = metatag.unit.test
 
-[MetatagTagsTestBase]
-name = Metatag base tag tests
+[MetatagBuiltInTagsTest]
+name = Metatag built-in tags tests
 description = Tests that each of the Metatag base tags work correctly.
 group = Metatag
 file = metatag.tags.test

@@ -4,6 +4,8 @@
  * Tests for the Metatag module and node entities.
  */
 
+include_once __DIR__ . '/metatag.helper.test';
+
 class MetatagCoreNodeTest extends MetatagTestHelper {
 
   /**

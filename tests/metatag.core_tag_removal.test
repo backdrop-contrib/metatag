@@ -4,6 +4,8 @@
  * Tests for the Metatag module to ensure removal of core tags works correctly.
  */
 
+include_once __DIR__ . '/metatag.helper.test';
+
 class MetatagCoreTagRemovalTest extends MetatagTestHelper {
 
   /**

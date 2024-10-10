@@ -538,6 +538,7 @@ function metatag_update_1003() {
  */
 function metatag_update_1004() {
   $enabled_tags = array();
+  module_load_include('module', 'metatag', 'metatag');
   $metatags = metatag_get_info(NULL, NULL, TRUE);
   foreach ($metatags['tags'] as $tag_name => $tag) {
     $enabled_tags[$tag_name] = $tag_name;

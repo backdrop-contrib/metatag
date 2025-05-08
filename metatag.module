@@ -45,19 +45,6 @@ function metatag_autoload_info() {
 
     // Search API classes.
     'MetatagSearchAlterCallback' => 'metatag.search_api.inc',
-
-    // Tests.
-    'MetatagTestHelper' => 'tests/metatag.helper.test',
-    'MetatagCoreUnitTest' => 'tests/metatag.unit.test',
-    // Basic tag testing.
-    'MetatagTagsTestBase' => 'tests/metatag.tags.test',
-    'MetatagTagsTest' => 'tests/metatag.tags.test',
-    // Core entities.
-    'MetatagCoreNodeTest' => 'tests/metatag.node.test',
-    'MetatagCoreTermTest' => 'tests/metatag.term.test',
-    'MetatagCoreUserTest' => 'tests/metatag.user.test',
-    // Handling of core's default meta tags.
-    'MetatagCoreTagRemovalTest' => 'tests/metatag.core_tag_removal.test',
   );
 }
 

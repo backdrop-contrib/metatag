@@ -313,9 +313,11 @@ function metatag_config_load_multiple(array $instances) {
     $options['watchdog'] = $settings->get('i18n_enable_watchdog');
 
     foreach ($configs as $instance => &$config) {
-      foreach ($config['config'] as $tag => &$value) {
-        if (isset($value['value']) && is_string($value['value'])) {
-          $value['value'] = i18n_string_translate(array('metatag', 'metatag_config', $instance, $tag), $value['value'], $options);
+      if (isset($config['config']) && is_array($config['config'])) {
+        foreach ($config['config'] as $tag => &$value) {
+          if (isset($value['value']) && is_string($value['value'])) {
+            $value['value'] = i18n_string_translate(array('metatag', 'metatag_config', $instance, $tag), $value['value'], $options);
+          }
         }
       }
     }

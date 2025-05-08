@@ -520,7 +520,18 @@ function metatag_metatags_load_multiple($entity_type, array $entity_ids, array $
   // translations keyed by language code.
   $metatags = array();
   while ($record = $result->fetchObject()) {
-    $data = unserialize($record->data);
+
+    $data = @unserialize($record->data);
+    if ($data === FALSE || !is_array($data)) {
+      // Try json deode
+      $data = (array) json_decode($record->data, TRUE);
+      if ($data === FALSE || !is_array($data)) {
+        $message = "This was expected to be an array but it is not: \n%value";
+        $replacments = array('%value' => print_r($record->data, TRUE));
+        watchdog('metatag', $message, $replacments, WATCHDOG_WARNING);
+        $data = array();
+      }
+    }
 
     // "Fix" any records that might be using old values. Ideally these will be
     // permanently fixed by being re-saved.

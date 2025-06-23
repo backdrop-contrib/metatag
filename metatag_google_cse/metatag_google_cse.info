@@ -1,13 +1,7 @@
-;marking as hidden until ported.
-hidden = true
-
 type = module
 name = "Metatag: Google Custom Search Engine (CSE)"
 description = "Provides support for meta tags used for Google Custom Search Engine."
 package = SEO
-core = 7.x
-dependencies[] = metatag
+backdrop = 1.x
 
-; Tests.
-files[] = tests/metatag_google_cse.test
-files[] = tests/metatag_google_cse.tags.test
+dependencies[] = metatag

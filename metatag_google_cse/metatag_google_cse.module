@@ -5,18 +5,9 @@
  */
 
 /**
- * Implements hook_ctools_plugin_api().
- */
-function metatag_google_cse_ctools_plugin_api($owner, $api) {
-  if ($owner == 'metatag' && $api == 'metatag') {
-    return array('version' => 1);
-  }
-}
-
-/**
  * Implements hook_theme().
  */
-function metatag_google_cse_theme() {
+function metatag_google_cse_theme($existing, $type, $theme, $path) {
   $info['metatag_google_cse'] = array(
     'render element' => 'element',
   );
@@ -31,6 +22,7 @@ function metatag_google_cse_theme() {
  * <meta name="[name]" content="[value]" />
  */
 function theme_metatag_google_cse($variables) {
+  $variables['#tag'] = 'meta';
   $element = &$variables['element'];
 
   if ($element['#name'] === 'google_rating') {
@@ -43,5 +35,5 @@ function theme_metatag_google_cse($variables) {
   );
   element_set_attributes($element, $args);
   unset($element['#value']);
-  return theme('html_tag', $variables);
+  return theme('head_tag', $variables);
 }

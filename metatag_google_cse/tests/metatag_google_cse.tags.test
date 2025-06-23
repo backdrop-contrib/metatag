@@ -8,18 +8,6 @@
  * MetatagMobileTagsTest for Google CSE.
  */
 class MetatagMobileTagsTest extends MetatagTagsTestBase {
-
-  /**
-   * {@inheritdoc}
-   */
-  public static function getInfo() {
-    return array(
-      'name' => 'Metatag Google CSE tests',
-      'description' => 'Test the Metatag:Google CSE module.',
-      'group' => 'Metatag',
-    );
-  }
-
   /**
    * {@inheritdoc}
    */

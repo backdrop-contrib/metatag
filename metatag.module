@@ -2196,9 +2196,9 @@ function metatag_html_head_alter(&$elements) {
       if (!empty($element['#attributes'])) {
         foreach ($element['#attributes'] as $attr_key => $attr_value) {
           if (!is_scalar($attr_value)) {
-  continue;
-} 
-$attr_value = strtolower($attr_value);  // Account for G in generator.
+            continue;
+          } 
+          $attr_value = strtolower($attr_value);  // Account for G in generator.
           // Only hide the metatag if it's one we care about.
           if (in_array($attr_key, $metatag_attrs) && in_array($attr_value, $core_tags)) {
             // Setting the #access attribute to these will stop them from being output

@@ -58,7 +58,7 @@ function theme_metatag_shortcut_icon($variables) {
   $element = &$variables['element'];
 
   // Extract the MIME type.
-  $element['#type'] = metatag_favicons_get_mime_type($element['#value']);
+  $element['#type'] = metatag_favicons_get_mime_type($element['#attributes']['href']);
   $attributes = array(
     '#rel' => 'rel',
     '#value' => 'href',

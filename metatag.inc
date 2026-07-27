@@ -38,7 +38,7 @@ class BackdropDefaultMetaTag implements BackdropMetaTagInterface {
   protected $data = array('value' => '');
   protected $weight = 0;
 
-  function __construct(array $info, array $data = NULL) {
+  function __construct(array $info, ?array $data = NULL) {
     $this->info = $info;
     if (isset($data)) {
       $this->data = $data;
@@ -447,7 +447,7 @@ class BackdropListMetaTag extends BackdropDefaultMetaTag {
   /**
    * {@inheritdoc}
    */
-  function __construct(array $info, array $data = NULL) {
+  function __construct(array $info, ?array $data = NULL) {
     // Ensure that the $data['value] argument is an array.
     if (empty($data['value'])) {
       $data['value'] = array();

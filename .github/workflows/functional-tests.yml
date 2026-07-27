@@ -3,7 +3,7 @@ on: [pull_request]
 jobs:
   simpletest:
     name: Run Simpletest
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Setup env
         run: |

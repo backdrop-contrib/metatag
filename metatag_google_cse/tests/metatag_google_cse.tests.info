@@ -1,0 +1,11 @@
+[MetatagMobileTest]
+name = Metatag Google CSE tests
+description = Test the Metatag:Google CSE module.
+group = Metatag
+file = metatag_google_cse.test
+
+[MetatagMobileTagsTest]
+name = Metatag Google CSE tags tests
+description = Test the Metatag:Google CSE tags.
+group = Metatag
+file = metatag_google_cse.tags.test
